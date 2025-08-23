@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Figtree } from 'next/font/google';
+import { ClerkProvider } from '@clerk/nextjs';
 import './globals.css';
 
 // const inter = Inter({
@@ -130,7 +131,9 @@ export default function RootLayout({
       <body
         className={`${figtree.variable} font-sans antialiased`}
         suppressHydrationWarning>
-        {children}
+        <ClerkProvider>
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );

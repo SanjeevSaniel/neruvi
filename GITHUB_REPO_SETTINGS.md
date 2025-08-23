@@ -4,7 +4,7 @@
 
 ### Description
 
-```
+```Plaintext
 🧠 Advanced AI-powered learning assistant with RAG capabilities for Node.js and Python courses. Features real-time streaming, semantic search, HyDE query enhancement, and Claude-style expandable UI with two-column layout.
 ```
 
@@ -20,7 +20,7 @@ https://flowmind-chat.vercel.app
 
 #### Core Technologies
 
-```
+```Plaintext
 nextjs
 typescript
 react

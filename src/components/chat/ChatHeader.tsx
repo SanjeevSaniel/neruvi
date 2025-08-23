@@ -1,6 +1,7 @@
 // components/chat/ChatHeader.tsx
 import { motion } from 'framer-motion';
 import { Brain, Menu } from 'lucide-react';
+import { UserButton } from '@clerk/nextjs';
 import FlowMindLogo from '../FlowMindLogo';
 
 const AIStatusIndicator = () => {
@@ -104,19 +105,33 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
           </button>
         </div>
 
-        {/* Single AI Status Indicator */}
-        <div className='hidden md:block'>
-          <AIStatusIndicator />
-        </div>
+        <div className="flex items-center space-x-4">
+          {/* Single AI Status Indicator */}
+          <div className='hidden md:block'>
+            <AIStatusIndicator />
+          </div>
 
-        {/* Mobile compact version */}
-        <div className='md:hidden'>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
-            <div className='w-2 h-2 rounded-full bg-emerald-400 animate-pulse' />
-            <span className='text-white text-xs font-semibold'>AI Ready</span>
-          </motion.div>
+          {/* Mobile compact version */}
+          <div className='md:hidden'>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
+              <div className='w-2 h-2 rounded-full bg-emerald-400 animate-pulse' />
+              <span className='text-white text-xs font-semibold'>AI Ready</span>
+            </motion.div>
+          </div>
+
+          {/* User Profile */}
+          <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "w-9 h-9 border-2 border-white/30 shadow-lg",
+                userButtonPopoverCard: "bg-white/95 backdrop-blur-sm border border-white/20 shadow-2xl",
+                userButtonPopoverActionButton: "hover:bg-purple-50",
+              },
+            }}
+            afterSignOutUrl="/"
+          />
         </div>
       </div>
     </motion.div>
