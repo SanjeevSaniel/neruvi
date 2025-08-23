@@ -8,6 +8,22 @@ interface SourcePanelProps {
 }
 
 export default function SourcePanel({ sources }: SourcePanelProps) {
+  // Sort sources by timestamp chronologically
+  const sortedSources = [...sources].sort((a, b) => {
+    // Convert timestamp (MM:SS) to seconds for comparison
+    const timeToSeconds = (timestamp: string) => {
+      const parts = timestamp.split(':');
+      if (parts.length === 2) {
+        const minutes = parseInt(parts[0]) || 0;
+        const seconds = parseInt(parts[1]) || 0;
+        return minutes * 60 + seconds;
+      }
+      return 0;
+    };
+    
+    return timeToSeconds(a.timestamp) - timeToSeconds(b.timestamp);
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -17,14 +33,14 @@ export default function SourcePanel({ sources }: SourcePanelProps) {
       <div className='flex items-center space-x-2 mb-2'>
         <Clock className='w-4 h-4 text-slate-600' />
         <span className='text-sm font-medium text-slate-800'>
-          Course material references:
+          Exact reference:
         </span>
       </div>
 
       <div className='space-y-2'>
-        {sources.map((source, idx) => (
+        {sortedSources.map((source, idx) => (
           <SourceItem
-            key={idx}
+            key={`${source.course}-${source.timestamp}-${idx}`}
             source={source}
           />
         ))}
@@ -36,6 +52,15 @@ export default function SourcePanel({ sources }: SourcePanelProps) {
 const SourceItem = ({ source }: { source: SourceTimestamp }) => {
   // Check if relevance is a reason text or percentage
   const isPercentage = /^\d+\.?\d*$/.test(source.relevance);
+
+  const getDynamicRelevanceMessage = (score: number): string => {
+    if (score >= 85) return 'Exact match';
+    if (score >= 75) return 'Highly relevant';
+    if (score >= 60) return 'Good match';
+    if (score >= 45) return 'Related content';
+    if (score >= 30) return 'Supplementary';
+    return 'Background info';
+  };
   
   const getRelevanceColor = (relevance: string): string => {
     if (!isPercentage) return 'text-blue-600'; // Default color for text reasons
@@ -65,21 +90,17 @@ const SourceItem = ({ source }: { source: SourceTimestamp }) => {
 
   return (
     <motion.div 
-      className='flex items-center justify-between text-xs bg-white rounded-md px-2 py-1 hover:bg-slate-50 transition-colors'
+      className="flex items-center justify-between text-xs bg-white rounded-md px-2 py-1 hover:bg-slate-50 transition-colors border border-slate-200"
       whileHover={{ scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <div className='flex items-center space-x-2'>
-        <span className='font-medium text-purple-700'>
-          {source.course.toUpperCase()}
-        </span>
-        <span className='text-slate-400'>•</span>
-        <span className='text-slate-700'>{source.section}</span>
+        <span className='text-slate-700 font-medium'>{source.section}</span>
         <span className='text-slate-400'>•</span>
         <button
           onClick={handleTimestampClick}
           className='font-mono text-blue-600 bg-blue-100 px-2 py-1 rounded hover:bg-blue-200 hover:text-blue-700 transition-colors cursor-pointer'
-          title={`Jump to ${source.timestamp} in ${source.course}`}
+          title={`Jump to ${source.timestamp}`}
         >
           <Clock className='w-3 h-3 inline mr-1' />
           {source.timestamp}
@@ -87,11 +108,10 @@ const SourceItem = ({ source }: { source: SourceTimestamp }) => {
       </div>
       <div className='flex items-center space-x-2'>
         <span className={`font-medium text-xs ${getRelevanceColor(source.relevance)}`}>
-          {isPercentage ? `${source.relevance}% match` : source.relevance}
+          {isPercentage ? getDynamicRelevanceMessage(parseFloat(source.relevance)) : source.relevance}
         </span>
         <div className='flex items-center space-x-1'>
           <div className={`w-2 h-2 rounded-full ${getRelevanceDot(source.relevance)}`} />
-          <ExternalLink className='w-3 h-3 text-slate-500 hover:text-slate-700 cursor-pointer' />
         </div>
       </div>
     </motion.div>
