@@ -5,26 +5,55 @@ import { Code2, FileText, Sparkles, Zap, Send } from 'lucide-react';
 import { Suggestion } from './types';
 import Image from 'next/image';
 
+type CourseType = 'nodejs' | 'python' | 'both';
+
 interface WelcomeScreenProps {
   onSubmit: (text: string) => Promise<void>;
+  selectedCourse?: CourseType | null;
 }
 
-export default function WelcomeScreen({ onSubmit }: WelcomeScreenProps) {
+export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScreenProps) {
   const [input, setInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const suggestions: Suggestion[] = [
-    { icon: Code2, text: 'Explain async/await in Node.js' },
-    { icon: FileText, text: 'Python list comprehensions tutorial' },
-    { icon: Zap, text: 'Express.js middleware concepts' },
-    { icon: Sparkles, text: 'Best practices for error handling' },
-  ];
+  // Course-specific suggestions
+  const getSuggestions = (course: CourseType | null): Suggestion[] => {
+    const suggestionsByCourse = {
+      nodejs: [
+        { icon: Code2, text: 'How to create an Express.js server?' },
+        { icon: Zap, text: 'Explain async/await in Node.js' },
+        { icon: FileText, text: 'What is middleware in Express?' },
+        { icon: Sparkles, text: 'JWT authentication setup guide' },
+      ],
+      python: [
+        { icon: Code2, text: 'Python list comprehensions tutorial' },
+        { icon: Zap, text: 'Object-oriented programming in Python' },
+        { icon: FileText, text: 'How do Python decorators work?' },
+        { icon: Sparkles, text: 'Working with pandas for data analysis' },
+      ],
+      both: [
+        { icon: Code2, text: 'Best practices for error handling' },
+        { icon: Zap, text: 'Debugging techniques for developers' },
+        { icon: FileText, text: 'Performance optimization strategies' },
+        { icon: Sparkles, text: 'Code review best practices' },
+      ],
+    };
+
+    return suggestionsByCourse[course || 'both'] || suggestionsByCourse.both;
+  };
+
+  const suggestions = getSuggestions(selectedCourse);
 
   const handleSuggestionClick = async (text: string) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    await onSubmit(text);
-    setIsSubmitting(false);
+    try {
+      await onSubmit(text);
+    } catch (error) {
+      console.error('Error submitting suggestion:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,10 +85,13 @@ export default function WelcomeScreen({ onSubmit }: WelcomeScreenProps) {
         </div>
 
         <h2 className='text-2xl font-bold text-purple-900 mb-3'>
-          Welcome to FlowMind
+          {selectedCourse ? `Ready to learn ${selectedCourse === 'nodejs' ? 'Node.js' : selectedCourse === 'python' ? 'Python' : 'Programming'}?` : 'Welcome to FlowMind'}
         </h2>
         <p className='text-base text-purple-800 mb-6 leading-relaxed'>
-          Your intelligent programming assistant for Node.js and Python
+          {selectedCourse 
+            ? `Let's explore ${selectedCourse === 'nodejs' ? 'Node.js development' : selectedCourse === 'python' ? 'Python programming' : 'programming concepts'} together. Ask me anything!`
+            : 'Your intelligent programming assistant for Node.js and Python'
+          }
         </p>
 
         <div className='grid grid-cols-1 md:grid-cols-2 gap-3 mb-8'>
@@ -111,7 +143,11 @@ export default function WelcomeScreen({ onSubmit }: WelcomeScreenProps) {
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder='Ask me about Node.js or Python programming...'
+                placeholder={
+                  selectedCourse 
+                    ? `Ask me anything about ${selectedCourse === 'nodejs' ? 'Node.js development' : selectedCourse === 'python' ? 'Python programming' : 'programming'}...`
+                    : 'Ask me about Node.js or Python programming...'
+                }
                 rows={1}
                 className='flex-1 bg-transparent text-purple-900 placeholder-purple-500/70 resize-none focus:outline-none text-base leading-relaxed transition-all duration-300 focus:placeholder-purple-600/80'
                 style={{ minHeight: '24px', maxHeight: '120px' }}

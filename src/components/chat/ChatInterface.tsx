@@ -4,27 +4,64 @@
 import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { useEffect, useRef, useState } from 'react';
+import { useConversationStore } from '@/store/conversationStore';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
+import ConversationSidebar from './ConversationSidebar';
+import CourseSelector, { CourseType } from './CourseSelector';
 import MessagesContainer from './MessagesContainer';
 import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content:
-        "👋 Welcome to FlowMind! I'm your AI learning companion for Node.js and Python programming.",
-      timestamp: new Date(),
-      sources: [],
-    },
-  ]);
+  const {
+    getCurrentConversation,
+    createConversation,
+    addMessage,
+    updateMessage,
+    setCourseForConversation,
+    currentConversationId,
+    getOrCreateConversationForCourse
+  } = useConversationStore();
+  
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasStartedChat, setHasStartedChat] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showCourseSelector, setShowCourseSelector] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Get current conversation or create one if none exists
+  const conversation = getCurrentConversation();
+  const messages = conversation?.messages || [];
+  const selectedCourse = conversation?.selectedCourse || null;
+  
+  // Check if we need course selection (no current conversation or no course selected)
+  const needsCourseSelection = (!currentConversationId || !selectedCourse) && !showCourseSelector;
+  
+  // Check if we should show welcome screen (course selected but no messages yet)
+  const shouldShowWelcome = currentConversationId && selectedCourse && messages.length === 0 && !showCourseSelector;
+  
+  // Handle header click to show course selector
+  const handleHeaderClick = () => {
+    setShowCourseSelector(!showCourseSelector);
+  };
+  
+  // Don't auto-create conversations - wait for course selection
+  // useEffect(() => {
+  //   if (!currentConversationId) {
+  //     createConversation();
+  //   }
+  // }, [currentConversationId, createConversation]);
+
+  // Reset chat state when conversation changes
+  useEffect(() => {
+    const conversation = getCurrentConversation();
+    if (conversation) {
+      setHasStartedChat(conversation.messages.length > 0);
+      setShowCourseSelector(false); // Hide course selector when switching conversations
+    }
+  }, [currentConversationId, getCurrentConversation]);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -49,7 +86,7 @@ export default function ChatInterface() {
     const parts = timestamp.split(':');
     if (parts.length === 2 && !parts.some((part) => isNaN(Number(part)))) {
       const minutes = parseInt(parts[0]);
-      const seconds = parseInt(parts[14]); // Fixed: was parts
+      const seconds = parseInt(parts[1]);
       if (minutes >= 0 && seconds >= 0) {
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
       }
@@ -57,9 +94,27 @@ export default function ChatInterface() {
     return '0:00';
   };
 
+  const handleCourseSelect = (course: CourseType) => {
+    // Get or create a conversation specific to this course
+    getOrCreateConversationForCourse(course);
+    setShowCourseSelector(false); // Hide selector after selection
+  };
+
+  const handleSuggestionClick = async (suggestion: string, course: CourseType) => {
+    // Ensure we have the right conversation for this course
+    getOrCreateConversationForCourse(course);
+    setShowCourseSelector(false); // Hide selector after selection
+    setHasStartedChat(true); // Mark chat as started immediately
+    
+    // Start the chat with the suggestion
+    await handleSubmit(suggestion);
+  };
+
   const handleSubmit = async (inputText: string) => {
     if (!inputText.trim() || isLoading) return;
     if (!hasStartedChat) setHasStartedChat(true);
+    
+    const conversationId = currentConversationId || createConversation();
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -69,7 +124,8 @@ export default function ChatInterface() {
       sources: [],
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    addMessage(conversationId, userMessage);
+    setInput(''); // Clear input box immediately after sending
     setIsLoading(true);
 
     try {
@@ -81,6 +137,7 @@ export default function ChatInterface() {
             role: m.role,
             content: m.content,
           })),
+          course: selectedCourse || 'both',
         }),
       });
 
@@ -114,7 +171,7 @@ export default function ChatInterface() {
         sources,
       };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+      addMessage(conversationId, assistantMessage);
 
       let done = false;
       let accumulatedContent = '';
@@ -127,28 +184,20 @@ export default function ChatInterface() {
           const chunk = decoder.decode(value, { stream: true });
           accumulatedContent += chunk;
 
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantMessage.id
-                ? { ...m, content: accumulatedContent }
-                : m,
-            ),
-          );
+          updateMessage(conversationId, assistantMessage.id, accumulatedContent);
         }
       }
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 2).toString(),
-          role: 'assistant',
-          content: `Error: ${errorMessage}`,
-          timestamp: new Date(),
-          sources: [],
-        },
-      ]);
+      const errorMsg: Message = {
+        id: (Date.now() + 2).toString(),
+        role: 'assistant',
+        content: `Error: ${errorMessage}`,
+        timestamp: new Date(),
+        sources: [],
+      };
+      addMessage(conversationId, errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -159,16 +208,39 @@ export default function ChatInterface() {
       {/* Subtle animated overlay for extra depth */}
       <div className='absolute inset-0 bg-gradient-to-tr from-purple-100/50 via-transparent to-purple-200/30 animate-pulse'></div>
 
+      {/* Conversation Sidebar */}
+      <ConversationSidebar 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+      />
+
       {/* Updated ChatHeader with complementary colors */}
       <div className='relative z-10'>
-        <ChatHeader />
+        <ChatHeader 
+          onOpenSidebar={() => setSidebarOpen(true)}
+          onHeaderClick={handleHeaderClick}
+        />
       </div>
 
       <div className='flex-1 flex justify-center min-h-0 relative z-10'>
-        <div className='w-full max-w-4xl flex flex-col min-h-0'>
-          {!hasStartedChat ? (
-            <WelcomeScreen onSubmit={handleSubmit} />
-          ) : (
+        {(needsCourseSelection || showCourseSelector) ? (
+          // Full screen course selection
+          <div className='w-full h-full flex flex-col'>
+            <CourseSelector
+              selectedCourse={selectedCourse}
+              onCourseSelect={handleCourseSelect}
+              onSuggestionClick={handleSuggestionClick}
+              isVisible={needsCourseSelection || showCourseSelector}
+            />
+          </div>
+        ) : shouldShowWelcome ? (
+          // Welcome screen after course selection
+          <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
+            <WelcomeScreen onSubmit={handleSubmit} selectedCourse={selectedCourse} />
+          </div>
+        ) : (
+          // Chat interface
+          <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -184,10 +256,16 @@ export default function ChatInterface() {
                 onChange={setInput}
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
+                disabled={!selectedCourse}
+                placeholder={
+                  selectedCourse 
+                    ? `Ask me anything about ${selectedCourse === 'both' ? 'programming' : selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}...`
+                    : 'Please select a course first...'
+                }
               />
             </motion.div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
