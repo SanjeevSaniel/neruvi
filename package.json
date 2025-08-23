@@ -10,12 +10,14 @@
     "test-qdrant": "tsx src/scripts/test-qdrant.ts",
     "init-collections": "tsx src/scripts/init-collections.ts",
     "setup-qdrant": "tsx src/scripts/setup-qdrant.ts",
-    "process-vtt": "tsx src/scripts/setup-qdrant.ts process-vtt"
+    "process-vtt": "tsx src/scripts/setup-qdrant.ts process-vtt",
+    "populate-qdrant": "tsx src/scripts/populate-qdrant.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.19",
     "@ai-sdk/react": "^2.0.22",
     "@qdrant/js-client-rest": "^1.15.1",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "ai": "^5.0.22",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -29,9 +31,12 @@
     "openai": "^5.15.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-icons": "^5.5.0",
+    "react-syntax-highlighter": "^15.6.3",
     "tailwind-merge": "^3.3.1",
     "tsx": "^4.20.4",
-    "zod": "^4.1.0"
+    "zod": "^4.1.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -53,9 +53,9 @@ export const metadata: Metadata = {
     siteName: 'FlowMind',
     images: [
       {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
+        url: '/favicon.svg',
+        width: 512,
+        height: 512,
         alt: 'FlowMind - AI-Powered Learning Assistant',
       },
     ],
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     title: 'FlowMind - AI-Powered Learning Assistant',
     description:
       'Master Node.js and Python with FlowMind, your intelligent learning companion.',
-    images: ['/og-image.png'],
+    images: ['/favicon.svg'],
     creator: '@flowmind',
   },
   robots: {
@@ -84,17 +84,18 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   icons: {
     icon: [
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-16x16.svg', sizes: '16x16', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.svg', sizes: '32x32', type: 'image/svg+xml' },
     ],
     apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/apple-touch-icon.svg', sizes: '180x180', type: 'image/svg+xml' },
     ],
     other: [
       {
         rel: 'mask-icon',
-        url: '/safari-pinned-tab.svg',
-        color: '#3b82f6',
+        url: '/favicon.svg',
+        color: '#8B5CF6',
       },
     ],
   },
@@ -122,8 +123,8 @@ export default function RootLayout({
       <head>
         <link
           rel='icon'
-          href='/favicon.ico'
-          sizes='any'
+          href='/favicon.svg'
+          type='image/svg+xml'
         />
       </head>
       <body
