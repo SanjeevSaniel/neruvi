@@ -94,7 +94,10 @@ export class QdrantRAGSystem {
       this.isInitialized = true;
       
       console.log(`✅ Qdrant RAG initialized in ${endTime - startTime}ms`);
-      await this.qdrantSetup.getCollectionInfo();
+      // Only show collection info in development mode
+      if (process.env.NODE_ENV === 'development') {
+        await this.qdrantSetup.getCollectionInfo();
+      }
       
     } catch (error) {
       console.error('❌ Failed to initialize Qdrant RAG:', error);
@@ -393,7 +396,7 @@ export class QdrantRAGSystem {
     }
 
     try {
-      console.log(`🔍 Optimized Qdrant search for: "${query}" (course: ${course})`);
+      // console.log(`🔍 Optimized Qdrant search for: "${query}" (course: ${course})`);
       const startTime = Date.now();
       
       // Only create embeddings for user query - VTT files already indexed
@@ -459,7 +462,7 @@ export class QdrantRAGSystem {
         }));
       
       const endTime = Date.now();
-      console.log(`⚡ Optimized search completed in ${endTime - startTime}ms, found ${results.length} unique results`);
+      // console.log(`⚡ Optimized search completed in ${endTime - startTime}ms, found ${results.length} unique results`);
       
       return results;
     } catch (error) {
@@ -601,7 +604,7 @@ export class QdrantRAGSystem {
     limit: number, 
     course: 'nodejs' | 'python' | 'both'
   ): Promise<QdrantSearchResult[]> {
-    console.log('⚡ Falling back to basic search');
+    // console.log('⚡ Falling back to basic search');
     
     const { queryOptimizer } = await import('./query-optimizer');
     const queryEmbedding = await queryOptimizer.getOptimizedEmbedding(query);

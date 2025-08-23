@@ -17,7 +17,7 @@ export default function TypingIndicator() {
   useEffect(() => {
     const interval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 2000);
+    }, 4000); // Increased from 2000ms to 4000ms (4 seconds)
     
     return () => clearInterval(interval);
   }, [messages.length]);

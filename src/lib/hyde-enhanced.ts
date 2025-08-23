@@ -45,7 +45,7 @@ class HydeEnhancedSystem {
     }
 
     try {
-      console.log(`🧠 Generating enhanced HYDE for: "${query}" (${course})`);
+      // console.log(`🧠 Generating enhanced HYDE for: "${query}" (${course})`);
       
       // Generate comprehensive HYDE query
       const hydeQuery = await this.generateHydeQuery(query, course);
@@ -84,14 +84,14 @@ Course Context: ${courseContext}
 
 Generate a comprehensive analysis for semantic search optimization. Provide a JSON response with:
 
-1. hypotheticalAnswers: Array of 3-4 detailed hypothetical answers that would perfectly match this query
-   - Include code examples, explanations, and practical insights
+1. hypotheticalAnswers: Array of 2-3 concise hypothetical answers that would match this query
+   - Include brief code examples and key explanations
    - Write as if from course transcripts/documentation
-   - Make each answer 200-400 words with different focuses
+   - Keep each answer 100-200 words focused and clear
 
-2. technicalContext: Comprehensive technical background and related concepts (150-300 words)
+2. technicalContext: Brief technical background and related concepts (100-150 words)
 
-3. relatedQuestions: Array of 5-6 related questions a student might ask
+3. relatedQuestions: Array of 3-4 related questions a student might ask
 
 4. expectedTopics: Array of key technical topics and keywords
 
@@ -99,20 +99,37 @@ Generate a comprehensive analysis for semantic search optimization. Provide a JS
 
 6. queryType: One of "concept", "implementation", "debugging", "comparison", "example"
 
-Focus on creating content that would realistically appear in ${courseContext} course materials.
-Write in an educational, detailed style with practical examples.
+Focus on creating concise, relevant content for ${courseContext} course materials.
+Keep responses brief but informative.
 
-Return only valid JSON.`;
+Return only valid JSON with no additional text or markdown formatting.`;
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
-      max_tokens: 1500,
+      max_tokens: 1000,
       response_format: { type: 'json_object' },
     });
 
-    const result = JSON.parse(response.choices[0].message.content || '{}');
+    let result;
+    try {
+      const content = response.choices[0].message.content || '{}';
+      // Clean the content to ensure valid JSON
+      const cleanedContent = content.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
+      result = JSON.parse(cleanedContent);
+    } catch (error) {
+      console.warn('⚠️ HYDE JSON parsing failed, using fallback');
+      // Fallback to basic structure
+      result = {
+        hypothetical_answers: [query],
+        technical_context: `Technical context for: ${query}`,
+        related_questions: [`How to implement ${query}?`],
+        expected_topics: ['programming', 'development'],
+        difficulty: 'intermediate',
+        query_type: 'concept'
+      };
+    }
     
     return {
       original: query,

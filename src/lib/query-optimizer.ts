@@ -48,7 +48,7 @@ export class QueryOptimizer {
     }
 
     try {
-      console.log(`🔧 Optimizing query: "${query}"`);
+      // console.log(`🔧 Optimizing query: "${query}"`);
       
       // Generate optimized query using AI
       const optimized = await this.generateOptimizedQuery(query);
@@ -114,7 +114,7 @@ Return only valid JSON.`;
     // Check embedding cache
     const cached = this.cache.embeddings.get(cacheKey);
     if (cached) {
-      console.log('⚡ Using cached query embedding');
+      // console.log('⚡ Using cached query embedding');
       return cached;
     }
 
@@ -136,7 +136,7 @@ Return only valid JSON.`;
       // Cache the embedding
       this.cache.embeddings.set(cacheKey, embedding);
       
-      console.log(`🔧 Created optimized embedding for: "${query}"`);
+      // console.log(`🔧 Created optimized embedding for: "${query}"`);
       return embedding;
     } catch (error) {
       console.error('❌ Optimized embedding creation failed:', error);
