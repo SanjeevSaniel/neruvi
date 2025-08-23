@@ -5,18 +5,20 @@
 ### 🔍 **Original Issues Identified**
 
 **Node.js Course:**
+
 - ❌ `01-Subtitles(01-26)` - Inconsistent parentheses
 - ❌ `02-Subtitles - Auth&Sec` - Spaces and ampersand  
 - ❌ `03-Subtitles BoSysDes` - Unclear abbreviation
 
 **Python Course:**
+
 - ❌ `01 Chapter Subtitles` - Generic naming
 - ❌ All folders named "Chapter Subtitles" - No topic clarity
 - ❌ Inconsistent spacing and numbering
 
 ### 🎯 **Optimized Structure Applied**
 
-```
+```Plaintext
 flowmind/src/data/transcripts/
 ├── nodejs/
 │   ├── 01-fundamentals/          ✅ Node.js core concepts (26 files)
@@ -38,16 +40,19 @@ flowmind/src/data/transcripts/
 ## 🚀 **Benefits Achieved**
 
 ### **Consistency**
+
 - ✅ Uniform kebab-case naming convention
 - ✅ Predictable numbering format (01-, 02-, etc.)
 - ✅ No spaces or special characters in folder names
 
-### **Clarity** 
+### **Clarity**
+
 - ✅ Descriptive topic-based folder names
 - ✅ Clear content scope for each section
 - ✅ Better learning path organization
 
 ### **Technical Benefits**
+
 - ✅ URL-friendly folder names
 - ✅ Improved search indexing potential
 - ✅ Better programmatic access
@@ -56,17 +61,20 @@ flowmind/src/data/transcripts/
 ## 🔧 **Code Enhancements**
 
 ### **Content Mapping System**
+
 - Added `content-mapping.ts` with structured section definitions
 - Each section now has: ID, name, topics, and description
 - Enhanced topic extraction using section context
 
 ### **VTT Processor Updates**
+
 - Updated to use new folder structure paths
 - Enhanced segment processing with section metadata
 - Improved topic extraction with section-specific keywords
 - Better embedding generation with contextual information
 
 ### **Search Enhancement**
+
 - Updated search results to include section information
 - Enhanced metadata for better relevance scoring
 - Improved query understanding with section context
@@ -74,11 +82,13 @@ flowmind/src/data/transcripts/
 ## 📊 **Content Overview**
 
 ### **Node.js Course (46 files)**
+
 1. **Fundamentals** (26 files): Core concepts, modules, HTTP, Express
 2. **Authentication** (8 files): Security, sessions, JWT, authorization  
 3. **System Design** (12 files): Scaling, microservices, architecture
 
 ### **Python Course (75 files)**
+
 1. **Introduction** (10 files): Basics, setup, PEP8
 2. **Data Types** (9 files): Strings, lists, dicts, sets
 3. **Control Flow** (6 files): Conditionals, projects
@@ -93,6 +103,7 @@ flowmind/src/data/transcripts/
 ## ✨ **Ready for Processing**
 
 The structured VTT files are now optimized for:
+
 - 🧠 AI-powered semantic search
 - 🔍 Enhanced topic extraction  
 - 📊 Better content organization
