@@ -1,7 +1,8 @@
 // components/chat/MessageBubble.tsx
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
-import MessageRenderer from './MessageRenderer';
+import { Sparkles, Copy, Download, Check, User, Bot } from 'lucide-react';
+import { useState } from 'react';
+import EnhancedMessageRenderer from './EnhancedMessageRenderer';
 import SourcePanel from './SourcePanel';
 import { Message } from './types';
 
@@ -11,6 +12,8 @@ interface MessageBubbleProps {
 }
 
 export default function MessageBubble({ message, index }: MessageBubbleProps) {
+  const [copied, setCopied] = useState(false);
+  
   const formatTimestamp = (timestamp: Date) => {
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
@@ -23,6 +26,26 @@ export default function MessageBubble({ message, index }: MessageBubbleProps) {
       minute: '2-digit',
       hour12: true
     });
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy message:', error);
+    }
+  };
+
+  const handleDownload = () => {
+    const element = document.createElement('a');
+    const file = new Blob([message.content], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `message-${Date.now()}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   return (
@@ -41,24 +64,32 @@ export default function MessageBubble({ message, index }: MessageBubbleProps) {
             message.role === 'user' ? 'justify-end space-x-2' : 'justify-start space-x-2'
           }`}>
             {message.role === 'assistant' && (
-              <div className='w-7 h-7 bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg'>
-                <Sparkles className='w-3.5 h-3.5 text-white' />
-              </div>
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className='w-8 h-8 bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg'
+              >
+                <Sparkles className='w-4 h-4 text-white' />
+              </motion.div>
             )}
-            <span className={`text-xs font-medium ${
-              message.role === 'user' ? 'order-1 text-purple-600' : 'text-purple-600'
+            <span className={`text-sm font-semibold ${
+              message.role === 'user' ? 'order-1 text-purple-700' : 'text-purple-700'
             }`}>
               {message.role === 'assistant' ? 'FlowMind' : 'You'}
             </span>
-            <span className='text-xs text-purple-500'>
+            <span className={`text-sm font-medium ${
+              message.role === 'user' ? 'text-purple-500' : 'text-slate-500'
+            }`}>
               {message.timestamp ? formatTimestamp(message.timestamp) : 'Just now'}
             </span>
             {message.role === 'user' && (
-              <div className='w-7 h-7 bg-gradient-to-br from-pink-500 via-purple-500 to-violet-500 rounded-xl flex items-center justify-center shadow-lg order-2'>
-                <div className='w-4 h-4 bg-white rounded-full flex items-center justify-center'>
-                  <div className='w-2 h-2 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full'></div>
-                </div>
-              </div>
+              <motion.div 
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className='w-8 h-8 bg-gradient-to-br from-pink-500 via-purple-500 to-violet-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white order-2'
+              >
+                <User className='w-4 h-4 text-white' />
+              </motion.div>
             )}
           </div>
 
@@ -67,12 +98,40 @@ export default function MessageBubble({ message, index }: MessageBubbleProps) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className={`px-5 py-4 rounded-2xl shadow-md ${
+            className={`relative group px-5 py-4 rounded-2xl shadow-md ${
               message.role === 'user'
                 ? 'bg-gradient-to-br from-purple-500/90 via-violet-500/90 to-indigo-500/90 text-white shadow-purple-500/20 ml-6'
                 : 'bg-white text-slate-900 border border-slate-200 shadow-lg'
             }`}>
-            <MessageRenderer content={message.content} role={message.role} />
+            <EnhancedMessageRenderer content={message.content} role={message.role} />
+            
+            {/* Copy and Download Actions - Only for assistant messages */}
+            {message.role === 'assistant' && (
+              <div className='absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 flex space-x-2'>
+                <motion.button
+                  whileHover={{ scale: 1.15, y: -1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleCopy}
+                  className={`p-2 rounded-full transition-all duration-200 shadow-lg ${
+                    copied
+                      ? 'bg-green-500 hover:bg-green-600 text-white'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white hover:shadow-xl'
+                  }`}
+                  title={copied ? 'Copied!' : 'Copy message'}
+                >
+                  {copied ? <Check className='w-4 h-4' /> : <Copy className='w-4 h-4' />}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.15, y: -1 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleDownload}
+                  className='p-2 rounded-full transition-all duration-200 shadow-lg bg-purple-500 hover:bg-purple-600 text-white hover:shadow-xl'
+                  title='Download as text file'
+                >
+                  <Download className='w-4 h-4' />
+                </motion.button>
+              </div>
+            )}
           </motion.div>
 
           {/* Source Panel for Assistant Messages */}

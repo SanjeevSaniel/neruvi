@@ -8,6 +8,8 @@ interface ChatInputProps {
   onChange: (value: string) => void;
   onSubmit: (value: string) => Promise<void>;
   isLoading: boolean;
+  disabled?: boolean;
+  placeholder?: string;
 }
 
 export default function ChatInput({
@@ -15,6 +17,8 @@ export default function ChatInput({
   onChange,
   onSubmit,
   isLoading,
+  disabled = false,
+  placeholder = 'Type your message...',
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -28,7 +32,7 @@ export default function ChatInput({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!value.trim() || isLoading) return;
+    if (!value.trim() || isLoading || disabled) return;
 
     await onSubmit(value);
     onChange('');
@@ -61,12 +65,21 @@ export default function ChatInput({
               ref={textareaRef}
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder='Type your message...'
+              placeholder={placeholder}
               rows={1}
-              className='flex-1 bg-transparent text-purple-900 placeholder-purple-500 resize-none focus:outline-none text-sm transition-all duration-300 hover:placeholder-purple-600'
-              style={{ minHeight: '20px', maxHeight: '100px' }}
+              disabled={disabled}
+              className={`flex-1 bg-transparent resize-none focus:outline-none text-base transition-all duration-300 ${
+                disabled 
+                  ? 'text-gray-400 placeholder-gray-400 cursor-not-allowed' 
+                  : 'text-purple-900 placeholder-purple-500 hover:placeholder-purple-600'
+              }`}
+              style={{ 
+                minHeight: '20px', 
+                maxHeight: '100px',
+                overflow: value.split('\n').length > 3 ? 'auto' : 'hidden'
+              }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                if (e.key === 'Enter' && !e.shiftKey && !disabled) {
                   e.preventDefault();
                   handleSubmit(e as unknown as React.FormEvent);
                 }
@@ -74,17 +87,17 @@ export default function ChatInput({
             />
             <motion.button
               type='submit'
-              disabled={isLoading || !value.trim()}
+              disabled={isLoading || !value.trim() || disabled}
               whileHover={{
-                scale: isLoading || !value.trim() ? 1 : 1.1,
+                scale: isLoading || !value.trim() || disabled ? 1 : 1.1,
                 boxShadow:
-                  isLoading || !value.trim()
+                  isLoading || !value.trim() || disabled
                     ? 'none'
                     : '0 10px 20px rgba(139, 92, 246, 0.4)',
               }}
-              whileTap={{ scale: isLoading || !value.trim() ? 1 : 0.9 }}
+              whileTap={{ scale: isLoading || !value.trim() || disabled ? 1 : 0.9 }}
               className={`ml-2 p-2 rounded-lg transition-all duration-300 ${
-                !isLoading && value.trim()
+                !isLoading && value.trim() && !disabled
                   ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/50 cursor-pointer'
                   : 'bg-purple-200 text-purple-400 cursor-not-allowed opacity-50'
               }`}>
