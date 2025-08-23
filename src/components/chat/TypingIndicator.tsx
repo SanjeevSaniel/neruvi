@@ -48,21 +48,48 @@ export default function TypingIndicator() {
         </div>
         <div className='px-4 py-2 rounded-2xl bg-white/50 backdrop-blur-sm'>
           <div className='flex items-center space-x-3'>
-            <div className='flex space-x-1'>
+            <div className='flex space-x-1 items-center'>
               <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity, delay: 0 }}
-                className='w-2 h-2 bg-blue-500 rounded-full'
+                animate={{ 
+                  scale: [1, 1.3, 1], 
+                  opacity: [0.5, 1, 0.5],
+                  y: [0, -2, 0]
+                }}
+                transition={{ 
+                  duration: 0.8, 
+                  repeat: Infinity, 
+                  delay: 0,
+                  ease: "easeInOut"
+                }}
+                className='w-2 h-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full'
               />
               <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
-                className='w-2 h-2 bg-purple-500 rounded-full'
+                animate={{ 
+                  scale: [1, 1.3, 1], 
+                  opacity: [0.5, 1, 0.5],
+                  y: [0, -2, 0]
+                }}
+                transition={{ 
+                  duration: 0.8, 
+                  repeat: Infinity, 
+                  delay: 0.2,
+                  ease: "easeInOut"
+                }}
+                className='w-2 h-2 bg-gradient-to-r from-blue-500 to-violet-500 rounded-full'
               />
               <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
-                className='w-2 h-2 bg-blue-500 rounded-full'
+                animate={{ 
+                  scale: [1, 1.3, 1], 
+                  opacity: [0.5, 1, 0.5],
+                  y: [0, -2, 0]
+                }}
+                transition={{ 
+                  duration: 0.8, 
+                  repeat: Infinity, 
+                  delay: 0.4,
+                  ease: "easeInOut"
+                }}
+                className='w-2 h-2 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full'
               />
             </div>
             <motion.span
