@@ -1,5 +1,18 @@
 # FlowMind 🧠✨
 
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-BB4B96?style=for-the-badge&logo=framer&logoColor=white)
+![GSAP](https://img.shields.io/badge/GSAP-3-88CE02?style=for-the-badge&logo=greensock&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI-5-74AA9C?style=for-the-badge&logo=openai&logoColor=white)
+![Vercel AI SDK](https://img.shields.io/badge/Vercel_AI_SDK-5-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Qdrant](https://img.shields.io/badge/Qdrant-1-FF6154?style=for-the-badge&logo=qdrant&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-5-FF9800?style=for-the-badge&logo=zustand&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22-5FA04E?style=for-the-badge&logo=node.js&logoColor=white)
+![Lucide React](https://img.shields.io/badge/Lucide_React-0.5-2563EB?style=for-the-badge&logo=lucide&logoColor=white)
+
 **Advanced AI-powered learning assistant** for Node.js and Python courses with **RAG (Retrieval-Augmented Generation)** capabilities and Microsoft Copilot/Claude-style interface.
 
 ## 🚀 **Production-Ready Features**
@@ -17,18 +30,21 @@
 ## 🏗️ **Technical Architecture**
 
 ### **RAG System Core**
+
 - **Vector Database**: Local fallback system with OpenAI embeddings (1536 dimensions)
 - **Chunking Strategy**: Intelligent VTT transcript processing with temporal awareness
 - **Search Methods**: Semantic search + HyDE + Context rewriting
 - **Content Sources**: 61 chunks from Node.js & Python course transcripts
 
 ### **AI Integration**
+
 - **OpenAI GPT-4o-mini**: Chat completions with streaming
 - **OpenAI text-embedding-3-small**: Vector embeddings generation
 - **Vercel AI SDK**: Streaming interface and response handling
 - **Custom System Prompts**: Course-aligned educational responses
 
 ### **Frontend Stack**
+
 - **Next.js 15**: App Router with TypeScript
 - **Tailwind CSS**: Custom Figtree font integration + Lavender theme
 - **Framer Motion**: Smooth animations and transitions
@@ -39,6 +55,7 @@
 ## 📊 **RAG Implementation Details**
 
 ### **1. Document Processing Pipeline**
+
 ```typescript
 // VTT Transcript → Chunks → Embeddings → Vector Store
 const processVTTFile = async (filePath: string) => {
@@ -57,6 +74,7 @@ const processVTTFile = async (filePath: string) => {
 ```
 
 ### **2. Semantic Search Engine**
+
 ```typescript
 // Cosine similarity search with relevance scoring
 const semanticSearch = async (query: string, limit = 5) => {
@@ -74,6 +92,7 @@ const semanticSearch = async (query: string, limit = 5) => {
 ```
 
 ### **3. HyDE (Hypothetical Document Embeddings)**
+
 ```typescript
 // Generate hypothetical document → Search → Combine results
 const hydeSearch = async (query: string) => {
@@ -86,6 +105,7 @@ const hydeSearch = async (query: string) => {
 ```
 
 ### **4. Context Rewriting System**
+
 ```typescript
 // Multi-perspective query enhancement
 const rewriteQuery = async (query: string) => {
@@ -120,11 +140,13 @@ const rewriteQuery = async (query: string) => {
 ## 🚀 **Quick Start**
 
 ### **Prerequisites**
+
 ```bash
 Node.js 18+ • OpenAI API Key • Modern Browser
 ```
 
 ### **Installation**
+
 ```bash
 # Clone and install
 git clone <repository>
@@ -141,6 +163,7 @@ npm run dev
 ```
 
 ### **Test RAG System**
+
 ```bash
 # Test complete pipeline
 npm run test-rag
@@ -176,7 +199,7 @@ npm run init-collections # Initialize Qdrant collections
 
 ## 📁 **Project Structure**
 
-```
+```Plaintext
 flowmind/
 ├── src/
 │   ├── app/
@@ -209,12 +232,14 @@ flowmind/
 ## 🎨 **Design System**
 
 ### **Color Palette**
+
 - **Primary**: Lavender (#FAD4FF) with complementary purples
 - **Backgrounds**: Subtle gradients from primary color
 - **Typography**: Figtree font family for modern readability
 - **Interactive**: Solid/faded button states for clear UX
 
 ### **Component Architecture**
+
 - **Message Cards**: Enhanced with user avatars and intelligent timestamps
 - **Input System**: Elevated design with gradients and glows
 - **Status Indicators**: Real-time RAG system status display
@@ -245,18 +270,21 @@ NEXTAUTH_URL=http://localhost:3000
 ## 🧠 **RAG System Capabilities**
 
 ### **Intelligent Search**
+
 - **Semantic Understanding**: Vector similarity with 0.4+ accuracy
 - **Multi-perspective Queries**: 3-4 query variations per request
 - **Hypothetical Document Generation**: AI-enhanced search relevance
 - **Course-specific Context**: Tailored responses for Node.js/Python
 
 ### **Content Processing**
+
 - **VTT Transcript Parsing**: Temporal-aware chunking with timestamps
 - **Section Mapping**: Organized by course structure and topics
 - **Topic Extraction**: Keyword-based topic identification
 - **Metadata Enhancement**: Rich context with video IDs and time references
 
 ### **Response Generation**
+
 ```typescript
 // Enhanced system prompt with RAG context
 const systemPrompt = `You are FlowMind, an advanced AI learning assistant.
@@ -276,12 +304,14 @@ ${ragContext}
 ## 📊 **Usage Analytics**
 
 ### **Processed Content**
+
 - **Node.js Fundamentals**: 21 chunks covering V8 engine, runtime concepts
 - **Node.js Installation**: 10 chunks with setup procedures
 - **Python Introduction**: 12 chunks with instructor content
 - **Python Programming Basics**: 18 chunks with core concepts
 
 ### **Search Performance**
+
 - **Node.js Query**: "What is async await?" → 0.613 similarity score
 - **Python Query**: "How do functions work?" → 0.417 similarity score
 - **Context Rewriting**: 3-4 variations per query for comprehensive coverage
@@ -302,7 +332,8 @@ ${ragContext}
 ## 📝 **Usage Examples**
 
 ### **Course Content Queries**
-```
+
+```Plaintext
 User: "What is Node.js and how does it work?"
 FlowMind: Based on course materials, Node.js is a JavaScript runtime 
 environment that embeds the V8 engine into a C program, allowing you 
@@ -311,7 +342,8 @@ to execute JavaScript outside the browser...
 ```
 
 ### **Programming Concepts**
-```
+
+```Plaintext
 User: "Explain Python functions"
 FlowMind: From the course content, Python functions are reusable blocks 
 of code that encapsulate specific functionality. They help reduce 
@@ -340,6 +372,7 @@ duplication and split complex tasks...
 ## 🚀 **Deployment**
 
 ### **Vercel (Recommended)**
+
 ```bash
 # Deploy to Vercel
 vercel --prod
@@ -349,6 +382,7 @@ vercel --prod
 ```
 
 ### **Docker**
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
