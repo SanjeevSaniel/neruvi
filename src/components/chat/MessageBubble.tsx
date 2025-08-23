@@ -9,9 +9,10 @@ import { Message } from './types';
 interface MessageBubbleProps {
   message: Message;
   index: number;
+  onClick?: (message: Message) => void;
 }
 
-export default function MessageBubble({ message, index }: MessageBubbleProps) {
+export default function MessageBubble({ message, index, onClick }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   
   const formatTimestamp = (timestamp: Date) => {
@@ -93,15 +94,17 @@ export default function MessageBubble({ message, index }: MessageBubbleProps) {
             )}
           </div>
 
-          {/* Message Bubble */}
+          {/* Message Bubble - Clickable Card */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className={`relative group px-5 py-4 rounded-2xl shadow-md ${
+            whileHover={{ scale: 1.01, boxShadow: '0 8px 25px rgba(139, 92, 246, 0.15)' }}
+            onClick={() => onClick?.(message)}
+            className={`relative group px-5 py-4 rounded-2xl shadow-md cursor-pointer transition-all duration-200 ${
               message.role === 'user'
-                ? 'bg-gradient-to-br from-purple-500/90 via-violet-500/90 to-indigo-500/90 text-white shadow-purple-500/20 ml-6'
-                : 'bg-white text-slate-900 border border-slate-200 shadow-lg'
+                ? 'bg-gradient-to-br from-purple-500/90 via-violet-500/90 to-indigo-500/90 text-white shadow-purple-500/20 ml-6 hover:shadow-purple-500/30'
+                : 'bg-white text-slate-900 border border-slate-200 shadow-lg hover:border-purple-200 hover:shadow-xl'
             }`}>
             <EnhancedMessageRenderer content={message.content} role={message.role} />
             

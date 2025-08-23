@@ -10,6 +10,7 @@ import ChatInput from './ChatInput';
 import ConversationSidebar from './ConversationSidebar';
 import CourseSelector, { CourseType } from './CourseSelector';
 import MessagesContainer from './MessagesContainer';
+import MessageDetailPanel from './MessageDetailPanel';
 import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
 
@@ -29,6 +30,8 @@ export default function ChatInterface() {
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showCourseSelector, setShowCourseSelector] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [messageDetailOpen, setMessageDetailOpen] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   
   // Get current conversation or create one if none exists
@@ -45,6 +48,16 @@ export default function ChatInterface() {
   // Handle header click to show course selector
   const handleHeaderClick = () => {
     setShowCourseSelector(!showCourseSelector);
+  };
+
+  const handleMessageClick = (message: Message) => {
+    setSelectedMessage(message);
+    setMessageDetailOpen(true);
+  };
+
+  const handleCloseMessageDetail = () => {
+    setMessageDetailOpen(false);
+    setSelectedMessage(null);
   };
   
   // Don't auto-create conversations - wait for course selection
@@ -222,50 +235,61 @@ export default function ChatInterface() {
         />
       </div>
 
-      <div className='flex-1 flex justify-center min-h-0 relative z-10'>
-        {(needsCourseSelection || showCourseSelector) ? (
-          // Full screen course selection
-          <div className='w-full h-full flex flex-col'>
-            <CourseSelector
-              selectedCourse={selectedCourse}
-              onCourseSelect={handleCourseSelect}
-              onSuggestionClick={handleSuggestionClick}
-              isVisible={needsCourseSelection || showCourseSelector}
-            />
-          </div>
-        ) : shouldShowWelcome ? (
-          // Welcome screen after course selection
-          <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
-            <WelcomeScreen onSubmit={handleSubmit} selectedCourse={selectedCourse} />
-          </div>
-        ) : (
-          // Chat interface
-          <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className='flex-1 flex flex-col min-h-0'>
-              <MessagesContainer
-                ref={messagesContainerRef}
-                messages={messages}
-                isLoading={isLoading}
+      <div className='flex-1 flex min-h-0 relative z-10'>
+        {/* Main Content Area */}
+        <div className={`flex-1 flex justify-center transition-all duration-300 ${messageDetailOpen ? 'mr-96 xl:mr-[28rem]' : ''}`}>
+          {(needsCourseSelection || showCourseSelector) ? (
+            // Full screen course selection
+            <div className='w-full h-full flex flex-col'>
+              <CourseSelector
+                selectedCourse={selectedCourse}
+                onCourseSelect={handleCourseSelect}
+                onSuggestionClick={handleSuggestionClick}
+                isVisible={needsCourseSelection || showCourseSelector}
               />
+            </div>
+          ) : shouldShowWelcome ? (
+            // Welcome screen after course selection
+            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
+              <WelcomeScreen onSubmit={handleSubmit} selectedCourse={selectedCourse} />
+            </div>
+          ) : (
+            // Chat interface
+            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className='flex-1 flex flex-col min-h-0'>
+                <MessagesContainer
+                  ref={messagesContainerRef}
+                  messages={messages}
+                  isLoading={isLoading}
+                  onMessageClick={handleMessageClick}
+                />
 
-              <ChatInput
-                value={input}
-                onChange={setInput}
-                onSubmit={handleSubmit}
-                isLoading={isLoading}
-                disabled={!selectedCourse}
-                placeholder={
-                  selectedCourse 
-                    ? `Ask me anything about ${selectedCourse === 'both' ? 'programming' : selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}...`
-                    : 'Please select a course first...'
-                }
-              />
-            </motion.div>
-          </div>
-        )}
+                <ChatInput
+                  value={input}
+                  onChange={setInput}
+                  onSubmit={handleSubmit}
+                  isLoading={isLoading}
+                  disabled={!selectedCourse}
+                  placeholder={
+                    selectedCourse 
+                      ? `Ask me anything about ${selectedCourse === 'both' ? 'programming' : selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}...`
+                      : 'Please select a course first...'
+                  }
+                />
+              </motion.div>
+            </div>
+          )}
+        </div>
+
+        {/* Message Detail Panel - Side by side */}
+        <MessageDetailPanel
+          message={selectedMessage}
+          isOpen={messageDetailOpen}
+          onClose={handleCloseMessageDetail}
+        />
       </div>
     </div>
   );

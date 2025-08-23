@@ -8,10 +8,11 @@ import MessageBubble from './MessageBubble';
 interface MessagesContainerProps {
   messages: Message[];
   isLoading: boolean;
+  onMessageClick?: (message: Message) => void;
 }
 
 const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
-  ({ messages, isLoading }, ref) => {
+  ({ messages, isLoading, onMessageClick }, ref) => {
     return (
       <div
         ref={ref}
@@ -23,6 +24,7 @@ const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
                 key={message.id}
                 message={message}
                 index={index}
+                onClick={onMessageClick}
               />
             ))}
           </AnimatePresence>
