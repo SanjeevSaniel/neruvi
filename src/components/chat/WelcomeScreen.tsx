@@ -17,7 +17,7 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Course-specific suggestions
-  const getSuggestions = (course: CourseType | null): Suggestion[] => {
+  const getSuggestions = (course: CourseType | null | undefined): Suggestion[] => {
     const suggestionsByCourse = {
       nodejs: [
         { icon: Code2, text: 'How to create an Express.js server?' },
