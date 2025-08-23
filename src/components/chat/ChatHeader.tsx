@@ -1,21 +1,21 @@
 // components/chat/ChatHeader.tsx
 import { motion } from 'framer-motion';
-import { Brain } from 'lucide-react';
+import { Brain, Menu } from 'lucide-react';
 import FlowMindLogo from '../FlowMindLogo';
 
 const AIStatusIndicator = () => {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className='flex items-center space-x-3 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg'>
+      className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg'>
       {/* AI Brain Icon with Animation */}
       <div className='relative'>
-        <Brain className='w-5 h-5 text-white drop-shadow-sm' />
+        <Brain className='w-4 h-4 text-white drop-shadow-sm' />
 
         {/* Status dot */}
-        <div className='absolute -top-1 -right-1'>
+        <div className='absolute -top-0.5 -right-0.5'>
           <motion.div
-            className='w-3 h-3 rounded-full bg-emerald-400 shadow-sm'
+            className='w-2 h-2 rounded-full bg-emerald-400 shadow-sm'
             animate={{
               scale: [1, 1.2, 1],
               opacity: [1, 0.7, 1],
@@ -28,22 +28,27 @@ const AIStatusIndicator = () => {
           />
 
           {/* Ping effect */}
-          <motion.div className='absolute inset-0 w-3 h-3 rounded-full bg-emerald-400 animate-ping opacity-30' />
+          <motion.div className='absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-30' />
         </div>
       </div>
 
       {/* Status Text */}
       <div className='flex flex-col'>
-        <span className='text-white text-sm font-bold tracking-wide'>
+        <span className='text-white text-xs font-semibold tracking-wide'>
           AI ACTIVE
         </span>
-        <span className='text-purple-100 text-xs opacity-90'>GPT-4o Ready</span>
+        <span className='text-purple-100 text-[10px] opacity-90'>GPT-4o-Mini</span>
       </div>
     </motion.div>
   );
 };
 
-export default function ChatHeader() {
+interface ChatHeaderProps {
+  onOpenSidebar?: () => void;
+  onHeaderClick?: () => void;
+}
+
+export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderProps) {
   return (
     <motion.div
       initial={{ y: -20, opacity: 0 }}
@@ -64,25 +69,40 @@ export default function ChatHeader() {
       <div className='absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent' />
 
       <div className='relative w-full max-w-6xl mx-auto px-6 flex items-center justify-between'>
-        {/* Logo Section */}
-        <motion.div
-          className='flex justify-center items-center gap-2'
-          // whileHover={{ scale: 1.02 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
-          <div className='mt-4'>
-            <FlowMindLogo />
-          </div>
+        {/* Left Side - Menu and Logo */}
+        <div className='flex items-center space-x-4'>
+          {/* Menu Button */}
+          {onOpenSidebar && (
+            <button
+              onClick={onOpenSidebar}
+              className='p-2 text-white hover:text-purple-200 hover:bg-white/10 rounded-lg transition-colors'
+              title='Open conversations'
+            >
+              <Menu className='w-5 h-5' />
+            </button>
+          )}
+          
+          {/* Logo Section - Clickable */}
+          <button
+            onClick={onHeaderClick}
+            className='flex justify-center items-center gap-2 p-2 rounded-lg cursor-pointer'
+            title='Show course selection'
+          >
+            <div>
+              <FlowMindLogo animated={true} />
+            </div>
 
-          {/* Brand Text */}
-          <div>
-            <h1 className='text-xl font-bold text-white drop-shadow-lg tracking-tight'>
-              FlowMind
-            </h1>
-            <p className='text-xs text-purple-100/90 font-semibold -mt-0.5 drop-shadow-sm'>
-              AI Programming Assistant
-            </p>
-          </div>
-        </motion.div>
+            {/* Brand Text */}
+            <div className='text-left'>
+              <h1 className='text-xl font-semibold text-white drop-shadow-lg tracking-tight'>
+                FlowMind
+              </h1>
+              <p className='text-xs text-purple-100/90 font-semibold -mt-0.5 drop-shadow-sm'>
+                AI Programming Assistant
+              </p>
+            </div>
+          </button>
+        </div>
 
         {/* Single AI Status Indicator */}
         <div className='hidden md:block'>
