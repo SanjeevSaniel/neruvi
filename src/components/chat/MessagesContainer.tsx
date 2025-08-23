@@ -9,10 +9,12 @@ interface MessagesContainerProps {
   messages: Message[];
   isLoading: boolean;
   onMessageClick?: (message: Message) => void;
+  isDetailPanelOpen?: boolean;
+  selectedMessageId?: string | null;
 }
 
 const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
-  ({ messages, isLoading, onMessageClick }, ref) => {
+  ({ messages, isLoading, onMessageClick, isDetailPanelOpen, selectedMessageId }, ref) => {
     return (
       <div
         ref={ref}
@@ -25,6 +27,8 @@ const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
                 message={message}
                 index={index}
                 onClick={onMessageClick}
+                isCompactMode={true}
+                isSelected={selectedMessageId === message.id}
               />
             ))}
           </AnimatePresence>
