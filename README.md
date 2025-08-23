@@ -31,6 +31,8 @@
 
 > 📊 **[View Complete Architecture Flow Diagram →](./ARCHITECTURE.md)**
 
+![FlowMind Architecture](./public/architecture-diagram.svg)
+
 ### **RAG System Core**
 
 - **Vector Database**: Local fallback system with OpenAI embeddings (1536 dimensions)
