@@ -14,7 +14,12 @@
       "Bash(npx tsx:*)",
       "Bash(timeout 60 npx tsx src/scripts/debug-rag.ts)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(winget install:*)",
+      "Bash(refreshenv)",
+      "Bash(\"%USERPROFILE%\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" --version)"
     ],
     "deny": [],
     "ask": []
