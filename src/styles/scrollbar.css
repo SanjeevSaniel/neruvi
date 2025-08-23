@@ -1,0 +1,51 @@
+/* Custom scrollbar styles for course selector */
+.course-scroll-container {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+.course-scroll-container:hover {
+  scrollbar-color: rgb(147 51 234) transparent;
+}
+
+/* WebKit browsers (Chrome, Safari, Edge) */
+.course-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.course-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.course-scroll-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.course-scroll-container:hover::-webkit-scrollbar-thumb {
+  background: rgb(147 51 234);
+}
+
+.course-scroll-container:hover::-webkit-scrollbar-thumb:hover {
+  background: rgb(126 34 206);
+}
+
+/* Smooth scrolling */
+.course-scroll-container {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar on mobile devices */
+@media (max-width: 768px) {
+  .course-scroll-container {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .course-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
+}
