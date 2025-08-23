@@ -12,7 +12,9 @@
       "Bash(npm run:*)",
       "Bash(tsx:*)",
       "Bash(npx tsx:*)",
-      "Bash(timeout 60 npx tsx src/scripts/debug-rag.ts)"
+      "Bash(timeout 60 npx tsx src/scripts/debug-rag.ts)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

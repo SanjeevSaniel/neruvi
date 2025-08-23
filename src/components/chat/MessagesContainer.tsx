@@ -15,8 +15,8 @@ const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
     return (
       <div
         ref={ref}
-        className='flex-1 overflow-y-auto px-6 py-4'>
-        <div className='max-w-2xl mx-auto space-y-4'>
+        className='flex-1 overflow-y-auto pr-0 pl-6 py-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-purple-300 hover:scrollbar-thumb-purple-400'>
+        <div className='max-w-2xl mx-auto space-y-4 pr-6'>
           <AnimatePresence>
             {messages.map((message, index) => (
               <MessageBubble
