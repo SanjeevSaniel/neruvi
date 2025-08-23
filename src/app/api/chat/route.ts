@@ -67,7 +67,7 @@ export const POST = async (req: Request) => {
         // Enhanced search with course filtering and HYDE
         const searchResults = await qdrantRAG.search(
           userQuery, 
-          5, // Get more results for better context
+          8, // Get more results to find the most relevant ones
           selectedCourse as 'nodejs' | 'python' | 'both'
         );
 
@@ -82,18 +82,49 @@ export const POST = async (req: Request) => {
             }
           });
           
-          const finalResults = Array.from(uniqueResults.values())
-            .sort((a, b) => b.score - a.score)
-            .slice(0, 3); // Limit to 3 unique references
+          const sortedResults = Array.from(uniqueResults.values())
+            .sort((a, b) => b.score - a.score);
+          
+          // Natural filtering based on course content structure
+          console.log('📊 Relevance scores:', sortedResults.map((r, i) => `${i}: ${r.score.toFixed(3)}`));
+          
+          const finalResults = [];
+          
+          // Return only the single best reference - the exact match
+          if (sortedResults.length > 0) {
+            finalResults.push(sortedResults[0]);
+          }
+          
+          console.log(`📋 Found ${finalResults.length} relevant references from ${sortedResults.length} candidates`);
           
           sourceTimestamps = finalResults.map(
-            (result): SourceTimestamp => ({
-              course: result.metadata.course || 'Unknown',
-              section: result.metadata.section || 'General',
-              videoId: result.metadata.videoId || 'unknown',
-              timestamp: formatTimestamp(result.metadata.startTime),
-              relevance: result.metadata.relevance_reason || 'Relevant content',
-            }),
+            (result, index): SourceTimestamp => {
+              const score = result.score;
+              let relevanceMessage = result.metadata.relevance_reason;
+              
+              // Generate better relevance messages if not provided
+              if (!relevanceMessage || relevanceMessage === 'Relevant content') {
+                if (index === 0 && score > 0.7) {
+                  relevanceMessage = 'Primary explanation';
+                } else if (score > 0.8) {
+                  relevanceMessage = 'Direct answer';
+                } else if (score > 0.65) {
+                  relevanceMessage = 'Main reference';
+                } else if (score > 0.5) {
+                  relevanceMessage = 'Related topic';
+                } else {
+                  relevanceMessage = 'Additional context';
+                }
+              }
+              
+              return {
+                course: result.metadata.course || 'Unknown',
+                section: result.metadata.section || 'General',
+                videoId: result.metadata.videoId || 'unknown',
+                timestamp: formatTimestamp(result.metadata.startTime),
+                relevance: `${(score * 100).toFixed(0)}`, // Store as percentage for dynamic display
+              };
+            }
           );
 
           // Create rich context from unique results with better formatting
