@@ -1,4 +1,9 @@
-# 🧠 FlowMind ✨
+<div align="center">
+  <img src="./public/flowmind-logo-2.png" alt="FlowMind Logo" width="80" height="80" />
+  <h1>FlowMind ✨</h1>
+</div>
+
+<div align="center">
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
@@ -12,6 +17,8 @@
 ![Zustand](https://img.shields.io/badge/Zustand-5-FF9800?style=for-the-badge&logo=zustand&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-22-5FA04E?style=for-the-badge&logo=node.js&logoColor=white)
 ![Lucide React](https://img.shields.io/badge/Lucide_React-0.5-2563EB?style=for-the-badge&logo=lucide&logoColor=white)
+
+</div>
 
 **Advanced AI-powered learning assistant** for Node.js and Python courses with **RAG (Retrieval-Augmented Generation)** capabilities and Microsoft Copilot/Claude-style interface.
 
