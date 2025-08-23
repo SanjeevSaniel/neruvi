@@ -1,7 +1,7 @@
 // components/chat/ChatInterface.tsx
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import { useEffect, useRef, useState } from 'react';
 import { useConversationStore } from '@/store/conversationStore';
@@ -73,8 +73,19 @@ export default function ChatInterface() {
     if (conversation) {
       setHasStartedChat(conversation.messages.length > 0);
       setShowCourseSelector(false); // Hide course selector when switching conversations
+      // Close message detail panel when switching conversations
+      setMessageDetailOpen(false);
+      setSelectedMessage(null);
     }
   }, [currentConversationId, getCurrentConversation]);
+
+  // Close panel when navigating away from chat (when course selector is shown)
+  useEffect(() => {
+    if (needsCourseSelection || showCourseSelector) {
+      setMessageDetailOpen(false);
+      setSelectedMessage(null);
+    }
+  }, [needsCourseSelection, showCourseSelector]);
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -237,7 +248,7 @@ export default function ChatInterface() {
 
       <div className='flex-1 flex min-h-0 relative z-10'>
         {/* Main Content Area */}
-        <div className={`flex-1 flex justify-center transition-all duration-300 ${messageDetailOpen ? 'mr-96 xl:mr-[28rem]' : ''}`}>
+        <div className={`${messageDetailOpen ? 'w-1/2' : 'flex-1'} flex justify-center transition-all duration-300`}>
           {(needsCourseSelection || showCourseSelector) ? (
             // Full screen course selection
             <div className='w-full h-full flex flex-col'>
@@ -265,6 +276,8 @@ export default function ChatInterface() {
                   messages={messages}
                   isLoading={isLoading}
                   onMessageClick={handleMessageClick}
+                  isDetailPanelOpen={messageDetailOpen}
+                  selectedMessageId={selectedMessage?.id || null}
                 />
 
                 <ChatInput
@@ -284,12 +297,18 @@ export default function ChatInterface() {
           )}
         </div>
 
-        {/* Message Detail Panel - Side by side */}
-        <MessageDetailPanel
-          message={selectedMessage}
-          isOpen={messageDetailOpen}
-          onClose={handleCloseMessageDetail}
-        />
+        {/* Message Detail Panel - Side by side - Only show in chat interface */}
+        {messageDetailOpen && !needsCourseSelection && !showCourseSelector && !shouldShowWelcome && (
+          <div className="w-1/2">
+            <AnimatePresence>
+              <MessageDetailPanel
+                message={selectedMessage}
+                isOpen={messageDetailOpen}
+                onClose={handleCloseMessageDetail}
+              />
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </div>
   );
