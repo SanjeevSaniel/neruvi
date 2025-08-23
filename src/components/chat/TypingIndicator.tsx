@@ -1,9 +1,27 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Bot, Sparkles, Brain } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function TypingIndicator() {
+  const [messageIndex, setMessageIndex] = useState(0);
+  
+  const messages = [
+    'Analyzing your question...',
+    'Searching course materials...',
+    'Crafting a helpful response...',
+    'Almost ready...'
+  ];
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % messages.length);
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [messages.length]);
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -13,12 +31,18 @@ export default function TypingIndicator() {
       <div className='max-w-[85%]'>
         <div className='flex items-center space-x-2 mb-2'>
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            className='w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center'>
-            <Sparkles className='w-3 h-3 text-white' />
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className='w-8 h-8 bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white'
+          >
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Bot className='w-4 h-4 text-white' />
+            </motion.div>
           </motion.div>
-          <span className='text-sm font-medium text-slate-700 dark:text-slate-300'>
+          <span className='text-sm font-semibold text-purple-700'>
             FlowMind
           </span>
         </div>
@@ -42,10 +66,13 @@ export default function TypingIndicator() {
               />
             </div>
             <motion.span
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className='text-sm text-gray-800 dark:text-slate-400'>
-              Thinking...
+              key={messageIndex}
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.3 }}
+              className='text-sm text-slate-600 font-medium'>
+              {messages[messageIndex]}
             </motion.span>
           </div>
         </div>
