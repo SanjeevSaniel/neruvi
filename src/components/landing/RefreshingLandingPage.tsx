@@ -11,6 +11,8 @@ import {
   MessageSquare,
   Code2,
   Brain,
+  Linkedin,
+  Twitter,
 } from 'lucide-react';
 import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -219,27 +221,66 @@ export default function RefreshingLandingPage() {
         </div>
       </section>
 
-      {/* Footer - Minimal */}
-      <footer className="relative z-10 border-t border-purple-100 px-6 lg:px-8 py-6 mt-8">
+      {/* Footer - Enhanced */}
+      <footer className="relative z-10 border-t border-purple-100 px-6 lg:px-8 py-8 mt-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <FlowMindLogo size={16} animated={false} className="w-5 h-5" />
-              <span className="text-purple-600">© 2025 FlowMind. Made with ❤️</span>
+          <div className="flex flex-col items-center space-y-6">
+            {/* Main branding */}
+            <div className="flex items-center space-x-3">
+              <FlowMindLogo size={20} animated={false} className="w-6 h-6" />
+              <span className="text-purple-600 font-medium">© 2025 FlowMind</span>
             </div>
 
-            <div className="flex items-center space-x-6">
+            {/* Creator info */}
+            <div className="text-center">
+              <p className="text-purple-700 font-medium mb-2">Crafted with ❤️ by Sanjeev Saniel</p>
+              <div className="flex items-center justify-center space-x-1 text-purple-500">
+                <Sparkles className="w-3 h-3 text-purple-400" />
+                <span className="text-xs">Open Source AI Learning Platform</span>
+              </div>
+            </div>
+
+            {/* Social links */}
+            <div className="flex items-center space-x-4">
+              <Link
+                href="https://github.com/SanjeevSaniel"
+                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Github className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                <span className="text-sm hidden sm:inline">GitHub</span>
+              </Link>
+              
+              <Link
+                href="https://www.linkedin.com/in/sanjeevsaniel/"
+                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                <span className="text-sm hidden sm:inline">LinkedIn</span>
+              </Link>
+              
+              <Link
+                href="https://x.com/SanjeevSaniel"
+                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Twitter className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                <span className="text-sm hidden sm:inline">Twitter</span>
+              </Link>
+
               <Link
                 href="https://github.com/SanjeevSaniel/flowmind-ai-chat"
-                className="group flex items-center space-x-1 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-2 py-1 rounded-lg transform hover:scale-105"
+                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                <Github className="w-3 h-3 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="text-xs">Star on GitHub</span>
+                <Github className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                <span className="text-sm">Repository</span>
               </Link>
-              <div className="flex items-center space-x-1 text-purple-500">
-                <Sparkles className="w-3 h-3 text-purple-400" />
-                <span className="text-xs">Open Source</span>
-              </div>
             </div>
           </div>
         </div>
