@@ -251,7 +251,7 @@ export class QdrantRAGSystem {
       let currentSize = 0;
       let end = start;
       let chunkContent = '';
-      let chunkStartTime = segments[start].startTime;
+      const chunkStartTime = segments[start].startTime;
       let chunkEndTime = segments[start].endTime;
       
       // Build chunk up to target size

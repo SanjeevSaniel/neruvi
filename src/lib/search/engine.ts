@@ -129,7 +129,7 @@ export class EnhancedSearchEngine {
     const course = translationResult.filters.course || 'both'
     const courses = course === 'both' ? ['nodejs', 'python'] as const : [course]
     
-    let allResults: VTTSearchResult[] = []
+    const allResults: VTTSearchResult[] = []
 
     for (const courseType of courses) {
       for (const query of rewriteResult.rewrittenQueries) {

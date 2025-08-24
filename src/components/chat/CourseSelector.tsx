@@ -237,7 +237,7 @@ export default function CourseSelector({ selectedCourse, onCourseSelect, onSugge
               Choose Your Learning Path
             </h2>
             <p className="text-slate-600 max-w-md mx-auto">
-              Select which course content you'd like me to help you with today
+              Select which course content you&apos;d like me to help you with today
             </p>
           </motion.div>
 

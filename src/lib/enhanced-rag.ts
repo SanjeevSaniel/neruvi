@@ -237,8 +237,8 @@ export class EnhancedRAGSystem {
     const OVERLAP_SIZE = 200; // 25% overlap
     const MIN_CHUNK_SIZE = 300;
     
-    let currentChunk = { content: '', startTime: 0, endTime: 0 };
-    let chunkBuffer: { content: string; startTime: number; endTime: number }[] = [];
+    const currentChunk = { content: '', startTime: 0, endTime: 0 };
+    const chunkBuffer: { content: string; startTime: number; endTime: number }[] = [];
     
     // Parse VTT content into timestamped segments
     for (let i = 0; i < lines.length; i++) {
@@ -274,7 +274,7 @@ export class EnhancedRAGSystem {
       let currentSize = 0;
       let end = start;
       let chunkContent = '';
-      let chunkStartTime = chunkBuffer[start].startTime;
+      const chunkStartTime = chunkBuffer[start].startTime;
       let chunkEndTime = chunkBuffer[start].endTime;
       
       // Build chunk up to target size
