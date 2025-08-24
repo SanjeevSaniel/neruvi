@@ -1,21 +1,31 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 import {
   ArrowRight,
-  Github,
-  Sparkles,
-  Zap,
-  MessageSquare,
-  Code2,
   Brain,
+  CheckCircle2,
+  ChevronRight,
+  Clock,
+  Code2,
+  Database,
+  FileText,
+  Github,
   Linkedin,
+  MessageCircle,
+  PlayCircle,
+  Search,
+  Sparkles,
+  Terminal,
   Twitter,
+  X,
+  Zap,
 } from 'lucide-react';
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
 
 // Register GSAP plugins
@@ -23,264 +33,699 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function RefreshingLandingPage() {
+export default function TranscriptLearningLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const heroRef = useRef<HTMLDivElement>(null);
+  const howItWorksRef = useRef<HTMLDivElement>(null);
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const demoRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
+  const [currentStep, setCurrentStep] = useState(0);
 
-  const features = [
+  const workflowSteps = [
     {
-      icon: Brain,
-      title: 'AI-Powered Learning',
-      description: 'Advanced RAG system with semantic search',
+      step: '01',
+      title: 'Ask Your Question',
+      description: 'Type any programming question in natural language',
+      icon: MessageCircle,
+      color: 'from-blue-500 to-blue-600',
+      demo: 'How do I implement authentication in Node.js?',
     },
     {
-      icon: MessageSquare,
-      title: 'Real-time Chat',
-      description: 'Streaming responses with instant feedback',
+      step: '02',
+      title: 'AI Searches Transcripts',
+      description:
+        'QdrantDB finds relevant moments across all indexed transcript content',
+      icon: Search,
+      color: 'from-purple-500 to-purple-600',
+      demo: 'Searching 10,000+ transcript segments...',
     },
     {
-      icon: Code2,
-      title: 'Course Navigation',
-      description: 'Node.js & Python with timestamps',
+      step: '03',
+      title: 'Get Timestamped Content',
+      description:
+        'Receive precise answers with exact transcript timestamps and context',
+      icon: Clock,
+      color: 'from-emerald-500 to-emerald-600',
+      demo: 'Found in "Node.js Auth Tutorial" at 12:34',
+    },
+    {
+      step: '04',
+      title: 'Read Full Context',
+      description:
+        'Access the complete transcript section for comprehensive understanding',
+      icon: FileText,
+      color: 'from-orange-500 to-orange-600',
+      demo: 'Reading transcript from 12:34...',
     },
   ];
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+  const keyFeatures = [
+    {
+      icon: FileText,
+      title: 'Transcript-First Learning',
+      description:
+        'Learn from detailed video transcripts with precise timing information',
+      highlight: 'Smart Transcript Indexing',
+    },
+    {
+      icon: Brain,
+      title: 'Context-Aware AI',
+      description:
+        'AI understands transcript context and provides accurate, detailed answers',
+      highlight: 'Advanced AI Understanding',
+    },
+    {
+      icon: Clock,
+      title: 'Precise Timestamps',
+      description:
+        'Jump directly to the transcript moment that answers your question',
+      highlight: 'Exact Moment Navigation',
+    },
+    {
+      icon: Database,
+      title: 'QdrantDB Powered',
+      description:
+        'Lightning-fast vector search across massive transcript libraries',
+      highlight: 'High-Performance Search',
+    },
+  ];
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+  const testimonialQuestions = [
+    'How do I deploy a React app to Vercel?',
+    "What's the difference between useEffect and useLayoutEffect?",
+    'How to implement JWT authentication?',
+    'What are the best practices for API design?',
+    'How to optimize database queries?',
+    "What's the difference between SQL and NoSQL?",
+  ];
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      lerp: 0.1,
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      touchMultiplier: 2,
+    });
+
+    lenisRef.current = lenis;
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
   }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
-      // Hero entrance animation
-      const tl = gsap.timeline({ delay: 0.3 });
+      // Sync GSAP with Lenis
+      if (lenisRef.current) {
+        lenisRef.current.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => {
+          lenisRef.current?.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+      }
 
-      tl.fromTo(
-        '.hero-content',
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' }
-      ).fromTo(
-        '.feature-card',
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', stagger: 0.1 },
-        '-=0.4'
+      // Hero animations
+      const heroTl = gsap.timeline({ delay: 0.3 });
+      heroTl
+        .fromTo(
+          '.hero-badge',
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
+        )
+        .fromTo(
+          '.hero-title',
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
+          '-=0.3',
+        )
+        .fromTo(
+          '.hero-subtitle',
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
+          '-=0.4',
+        )
+        .fromTo(
+          '.hero-buttons',
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' },
+          '-=0.2',
+        )
+        .fromTo(
+          '.hero-demo',
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power2.out' },
+          '-=0.3',
+        );
+
+      // Workflow steps animation
+      gsap.fromTo(
+        '.workflow-step',
+        { x: -50, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out',
+          stagger: 0.2,
+          scrollTrigger: {
+            trigger: howItWorksRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        },
       );
 
-      // Floating animations
-      gsap.to('.floating', {
-        y: -8,
-        duration: 3,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-        stagger: 0.5,
-      });
+      // Features animation
+      gsap.fromTo(
+        '.feature-card',
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power2.out',
+          stagger: 0.15,
+          scrollTrigger: {
+            trigger: featuresRef.current,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+          },
+        },
+      );
 
-      // Sparkle animation
-      gsap.to('.sparkle', {
-        rotation: 360,
-        duration: 8,
-        repeat: -1,
-        ease: 'none',
-        stagger: 2,
-      });
+      // Demo animation
+      gsap.fromTo(
+        '.demo-element',
+        { y: 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6,
+          ease: 'power2.out',
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: demoRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none reverse',
+          },
+        },
+      );
     }, containerRef);
 
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentStep((prev) => (prev + 1) % workflowSteps.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [workflowSteps.length]);
+
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-gradient-to-br from-lavender-50 via-white to-purple-50 overflow-hidden relative"
-      style={{
-        background: 'linear-gradient(135deg, #faf7ff 0%, #ffffff 20%, #f3f0ff 100%)'
-      }}
-    >
-      {/* Floating orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-purple-200/20 to-lavender-200/20 rounded-full blur-2xl floating" />
-        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-lavender-300/25 to-purple-300/25 rounded-full blur-xl floating" />
-        <div className="absolute bottom-32 left-1/3 w-20 h-20 bg-gradient-to-r from-purple-300/20 to-lavender-400/20 rounded-full blur-lg floating" />
-      </div>
-
-      {/* Cursor glow effect */}
-      <div
-        className="fixed w-4 h-4 pointer-events-none z-50 mix-blend-multiply opacity-30"
-        style={{
-          transform: `translate(${mousePosition.x - 8}px, ${mousePosition.y - 8}px)`,
-          transition: 'transform 0.1s ease-out',
-        }}
-      >
-        <div className="w-full h-full bg-gradient-to-r from-purple-400 to-lavender-400 rounded-full" />
-      </div>
-
+      className='min-h-screen bg-white'>
       {/* Navigation */}
-      <nav className="relative z-20 flex items-center justify-between px-6 lg:px-8 py-4">
-        <div className="flex items-center space-x-3">
-          <FlowMindLogo size={24} animated={false} className="w-8 h-8" />
-          <span className="text-lg font-bold bg-gradient-to-r from-purple-700 to-lavender-600 bg-clip-text text-transparent">
-            FlowMind
-          </span>
-        </div>
+      <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='flex items-center justify-between h-16'>
+            <div className='flex items-center space-x-3'>
+              <FlowMindLogo
+                size={28}
+                animated={true}
+                className='w-8 h-8'
+              />
+              <div>
+                <span className='text-xl font-bold text-gray-900'>
+                  FlowMind
+                </span>
+                <div className='text-xs text-gray-500 font-medium'>
+                  AI Powered Learning
+                </div>
+              </div>
+            </div>
 
-        <div className="flex items-center space-x-4">
-          <Link
-            href="https://github.com/SanjeevSaniel/flowmind-ai-chat"
-            className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 transition-all duration-300 text-sm hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
-          >
-            <Github className="w-4 h-4 transition-transform duration-300 group-hover:rotate-12" />
-            <span className="hidden sm:inline">GitHub</span>
-          </Link>
-          <SignInButton mode="modal">
-            <button className="text-sm text-purple-600 hover:text-purple-800 transition-all duration-300 px-3 py-1.5 rounded-lg hover:bg-purple-50 transform hover:scale-105 hover:shadow-md">
-              Sign In
-            </button>
-          </SignInButton>
+            <div className='flex items-center space-x-6'>
+              <Link
+                href='https://github.com/SanjeevSaniel/flowmind-ai-chat'
+                className='flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50'>
+                <Github className='w-4 h-4' />
+                <span className='hidden sm:inline font-medium'>GitHub</span>
+              </Link>
+
+              <SignInButton mode='modal'>
+                <button className='text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 font-medium'>
+                  Sign In
+                </button>
+              </SignInButton>
+            </div>
+          </div>
         </div>
       </nav>
 
-      {/* Hero Section - Compact */}
-      <section className="relative z-10 px-6 lg:px-8 py-12">
-        <div className="max-w-4xl mx-auto text-center hero-content">
-          {/* Logo with sparkles */}
-          <div className="relative mb-6 flex justify-center">
-            <div className="relative">
-              <FlowMindLogo size={48} animated={true} className="w-16 h-16 floating" />
-              <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-purple-400 sparkle" />
-              <Sparkles className="absolute -bottom-1 -left-1 w-3 h-3 text-lavender-400 sparkle" />
+      {/* Hero Section */}
+      <section
+        ref={heroRef}
+        className='relative bg-gradient-to-b from-blue-50 to-white pt-20 pb-32'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            {/* Badge */}
+            <div className='hero-badge inline-flex items-center space-x-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-8'>
+              <Sparkles className='w-4 h-4' />
+              <span>AI-Powered Transcript Learning Platform</span>
             </div>
-          </div>
 
-          {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-            <span className="bg-gradient-to-r from-purple-800 via-purple-600 to-lavender-600 bg-clip-text text-transparent">
-              Learn Programming
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-lavender-600 via-purple-500 to-purple-700 bg-clip-text text-transparent">
-              with AI Precision
-            </span>
-          </h1>
+            {/* Main Title */}
+            <h1 className='hero-title text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-8'>
+              Ask Questions,
+              <br />
+              <span className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
+                Get Transcript Answers
+              </span>
+            </h1>
 
-          {/* Subtitle */}
-          <p className="text-lg text-purple-700 max-w-2xl mx-auto leading-relaxed mb-8">
-            Experience intelligent learning with{' '}
-            <span className="font-semibold text-purple-800">advanced RAG</span>,{' '}
-            <span className="font-semibold text-lavender-700">real-time streaming</span>, and{' '}
-            <span className="font-semibold text-purple-600">smart navigation</span>
-          </p>
+            {/* Subtitle */}
+            <p className='hero-subtitle text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12'>
+              Chat with AI to get precise answers from programming tutorial
+              transcripts with exact timestamps. Skip the searching, jump
+              straight to learning from detailed content.
+            </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-12">
-            <SignUpButton mode="modal">
-              <button className="group relative px-6 py-3 bg-gradient-to-r from-purple-600 to-lavender-600 text-white rounded-xl font-semibold text-base shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-110 hover:-translate-y-1 hover:brightness-110">
-                <span className="flex items-center space-x-2">
-                  <span>Start Learning</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-                </span>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-400 to-lavender-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            {/* CTA Buttons */}
+            <div className='hero-buttons flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
+              <SignUpButton mode='modal'>
+                <button className='group bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 flex items-center space-x-3'>
+                  <span>Start Learning Now</span>
+                  <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
+                </button>
+              </SignUpButton>
+
+              <button className='group flex items-center space-x-3 px-8 py-4 border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-xl font-semibold text-lg transition-all duration-300'>
+                <PlayCircle className='w-5 h-5' />
+                <span>See Demo</span>
               </button>
-            </SignUpButton>
+            </div>
 
-            <SignInButton mode="modal">
-              <button className="group flex items-center space-x-2 px-6 py-3 border border-purple-200 text-purple-700 rounded-xl font-semibold text-base hover:bg-gradient-to-r hover:from-purple-50 hover:to-lavender-50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:border-purple-300">
-                <Zap className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                <span>Quick Access</span>
-              </button>
-            </SignInButton>
-          </div>
-
-          {/* Quick Features */}
-          <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="feature-card group p-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-purple-100 shadow-md hover:shadow-xl hover:bg-white/80 transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 cursor-pointer"
-              >
-                <div className="flex items-center justify-center mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-purple-500 to-lavender-500 flex items-center justify-center group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-                    <feature.icon className="w-4 h-4 text-white group-hover:scale-110 transition-transform duration-300" />
+            {/* Demo Preview */}
+            <div className='hero-demo max-w-4xl mx-auto'>
+              <div className='bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden'>
+                {/* Chat Interface Header */}
+                <div className='bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center space-x-3'>
+                  <div className='flex space-x-2'>
+                    <div className='w-3 h-3 bg-red-400 rounded-full'></div>
+                    <div className='w-3 h-3 bg-yellow-400 rounded-full'></div>
+                    <div className='w-3 h-3 bg-green-400 rounded-full'></div>
+                  </div>
+                  <div className='text-sm font-medium text-gray-600'>
+                    FlowMind AI Chat
                   </div>
                 </div>
-                <h3 className="text-sm font-bold text-purple-800 mb-1 group-hover:text-purple-900 transition-colors duration-300">
+
+                {/* Chat Demo */}
+                <div className='p-6 space-y-4 bg-gradient-to-br from-gray-50 to-white min-h-[300px]'>
+                  {/* User Question */}
+                  <div className='flex justify-end mb-4'>
+                    <div className='bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-br-md max-w-xs'>
+                      <p className='text-sm'>
+                        How do I implement JWT authentication in Express.js?
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* AI Response */}
+                  <div className='flex justify-start space-x-3'>
+                    <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0'>
+                      <Brain className='w-4 h-4 text-white' />
+                    </div>
+                    <div className='bg-white border border-gray-200 px-4 py-3 rounded-2xl rounded-bl-md max-w-md shadow-sm'>
+                      <p className='text-sm text-gray-800 mb-3'>
+                        I found the perfect explanation for JWT authentication
+                        in Express.js! Here&apos;s what the tutorial covers:
+                      </p>
+
+                      {/* Transcript Reference */}
+                      <div className='bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2'>
+                        <div className='flex items-center space-x-2 mb-2'>
+                          <FileText className='w-4 h-4 text-blue-600' />
+                          <span className='text-xs font-semibold text-blue-800'>
+                            Express.js Authentication Tutorial
+                          </span>
+                        </div>
+                        <div className='flex items-center space-x-2'>
+                          <Clock className='w-3 h-3 text-blue-600' />
+                          <span className='text-xs text-blue-700'>
+                            Transcript at 15:32 - JWT Implementation
+                          </span>
+                          <button className='ml-auto'>
+                            <FileText className='w-4 h-4 text-blue-600 hover:text-blue-800 transition-colors' />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Transcript Preview */}
+                      <div className='bg-gray-50 border border-gray-200 rounded-lg p-3 mb-2'>
+                        <p className='text-xs text-gray-700 font-mono leading-relaxed'>
+                          &quot;Now let&apos;s implement JWT authentication.
+                          First, we&apos;ll create middleware to verify tokens.
+                          Install jsonwebtoken package, then create a function
+                          that checks the Authorization header...&quot;
+                        </p>
+                      </div>
+
+                      <p className='text-xs text-gray-600'>
+                        The transcript covers middleware setup, token
+                        generation, and route protection with practical
+                        examples.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Typing Indicator */}
+                  <div className='flex justify-start space-x-3'>
+                    <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center'>
+                      <div className='flex space-x-1'>
+                        <div className='w-1 h-1 bg-white rounded-full animate-pulse'></div>
+                        <div
+                          className='w-1 h-1 bg-white rounded-full animate-pulse'
+                          style={{ animationDelay: '0.2s' }}></div>
+                        <div
+                          className='w-1 h-1 bg-white rounded-full animate-pulse'
+                          style={{ animationDelay: '0.4s' }}></div>
+                      </div>
+                    </div>
+                    <div className='bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-md'>
+                      <p className='text-sm text-gray-500'>
+                        AI is analyzing transcripts...
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section
+        ref={howItWorksRef}
+        className='py-24 bg-gray-50'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+              How FlowMind Works
+            </h2>
+            <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+              Our AI-powered system transforms how you learn from transcript
+              content
+            </p>
+          </div>
+
+          <div className='grid lg:grid-cols-2 gap-16 items-center'>
+            {/* Steps */}
+            <div className='space-y-8'>
+              {workflowSteps.map((step, index) => (
+                <div
+                  key={index}
+                  className={`workflow-step flex items-start space-x-4 p-6 rounded-2xl transition-all duration-500 ${
+                    currentStep === index
+                      ? 'bg-white shadow-lg border-2 border-blue-200'
+                      : 'bg-white/50 hover:bg-white/80'
+                  }`}>
+                  <div
+                    className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                    <step.icon className='w-6 h-6 text-white' />
+                  </div>
+                  <div className='flex-1'>
+                    <div className='flex items-center space-x-3 mb-2'>
+                      <span className='text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded'>
+                        {step.step}
+                      </span>
+                      <h3 className='text-lg font-bold text-gray-900'>
+                        {step.title}
+                      </h3>
+                    </div>
+                    <p className='text-gray-600 mb-3'>{step.description}</p>
+                    <div className='bg-gray-100 text-gray-700 text-sm px-3 py-2 rounded-lg font-mono'>
+                      {step.demo}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Visual Demo */}
+            <div className='relative'>
+              <div className='bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden'>
+                <div className='bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white'>
+                  <div className='flex items-center space-x-3 mb-4'>
+                    <Search className='w-6 h-6' />
+                    <h3 className='text-lg font-semibold'>
+                      Transcript Search Demo
+                    </h3>
+                  </div>
+                  <div className='bg-white/20 rounded-lg p-3'>
+                    <p className='text-sm opacity-90'>
+                      Searching through 50,000+ hours of programming tutorial
+                      transcripts...
+                    </p>
+                  </div>
+                </div>
+
+                <div className='p-6 space-y-4'>
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className='flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer'>
+                      <FileText className='w-5 h-5 text-blue-600' />
+                      <div className='flex-1'>
+                        <div className='text-sm font-medium text-gray-900'>
+                          React Hooks Tutorial
+                        </div>
+                        <div className='text-xs text-gray-500'>
+                          Timestamp: {(i + 1) * 12}:34
+                        </div>
+                      </div>
+                      <Zap className='w-4 h-4 text-gray-400' />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Key Features */}
+      <section
+        ref={featuresRef}
+        className='py-24 bg-white'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+              Why Choose FlowMind?
+            </h2>
+            <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+              Revolutionary features that make learning from transcripts
+              effortless and efficient
+            </p>
+          </div>
+
+          <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-8'>
+            {keyFeatures.map((feature, index) => (
+              <div
+                key={index}
+                className='feature-card group relative bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300'>
+                <div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300'>
+                  <feature.icon className='w-6 h-6 text-white' />
+                </div>
+
+                <h3 className='text-lg font-bold text-gray-900 mb-3'>
                   {feature.title}
                 </h3>
-                <p className="text-xs text-purple-600 leading-relaxed group-hover:text-purple-700 transition-colors duration-300">
+                <p className='text-gray-600 text-sm mb-4'>
                   {feature.description}
                 </p>
+
+                <div className='inline-flex items-center text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full'>
+                  <CheckCircle2 className='w-3 h-3 mr-1' />
+                  {feature.highlight}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer - Enhanced */}
-      <footer className="relative z-10 border-t border-purple-100 px-6 lg:px-8 py-8 mt-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col items-center space-y-6">
-            {/* Main branding */}
-            <div className="flex items-center space-x-3">
-              <FlowMindLogo size={20} animated={false} className="w-6 h-6" />
-              <span className="text-purple-600 font-medium">© 2025 FlowMind</span>
-            </div>
+      {/* Interactive Demo */}
+      <section
+        ref={demoRef}
+        className='py-24 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+              Try It Yourself
+            </h2>
+            <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+              See how FlowMind answers common programming questions with
+              transcript timestamps
+            </p>
+          </div>
 
-            {/* Creator info */}
-            <div className="text-center">
-              <p className="text-purple-700 font-medium mb-2">Crafted with ❤️ by Sanjeev Saniel</p>
-              <div className="flex items-center justify-center space-x-1 text-purple-500">
-                <Sparkles className="w-3 h-3 text-purple-400" />
-                <span className="text-xs">Open Source AI Learning Platform</span>
+          <div className='max-w-4xl mx-auto'>
+            <div className='bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden'>
+              <div className='bg-gray-900 text-white p-4 flex items-center space-x-3'>
+                <Terminal className='w-5 h-5' />
+                <span className='font-mono text-sm'>
+                  FlowMind Interactive Demo
+                </span>
+              </div>
+
+              <div className='p-8'>
+                <h3 className='text-lg font-semibold text-gray-900 mb-6'>
+                  Popular Questions
+                </h3>
+                <div className='grid md:grid-cols-2 gap-4'>
+                  {testimonialQuestions.map((question, index) => (
+                    <div
+                      key={index}
+                      className='demo-element group p-4 bg-gray-50 hover:bg-blue-50 rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer transition-all duration-300'>
+                      <div className='flex items-center space-x-3'>
+                        <MessageCircle className='w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors' />
+                        <p className='text-sm text-gray-700 group-hover:text-gray-900'>
+                          {question}
+                        </p>
+                        <ChevronRight className='w-4 h-4 text-gray-300 group-hover:text-blue-500 ml-auto transition-colors' />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className='mt-8 text-center'>
+                  <SignUpButton mode='modal'>
+                    <button className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg'>
+                      Try These Questions Free
+                    </button>
+                  </SignUpButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section
+        ref={ctaRef}
+        className='py-24 bg-gradient-to-r from-blue-600 to-purple-600'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8 text-center'>
+          <h2 className='text-4xl md:text-5xl font-bold text-white mb-6'>
+            Ready to Transform Your Learning?
+          </h2>
+          <p className='text-xl text-blue-100 max-w-3xl mx-auto mb-12'>
+            Stop wasting time searching through hours of content. Get instant,
+            precise answers from detailed transcripts with exact timestamps.
+          </p>
+
+          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
+            <SignUpButton mode='modal'>
+              <button className='bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-3'>
+                <span>Start Learning Free</span>
+                <ArrowRight className='w-5 h-5' />
+              </button>
+            </SignUpButton>
+
+            <button className='border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center space-x-3'>
+              <FileText className='w-5 h-5' />
+              <span>View Sample Transcripts</span>
+            </button>
+          </div>
+
+          <p className='text-blue-200 text-sm'>
+            No credit card required • Free forever plan available
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className='bg-gray-900 text-white py-16'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='grid lg:grid-cols-2 gap-12 items-center'>
+            <div className='space-y-6'>
+              <div className='flex items-center space-x-3'>
+                <FlowMindLogo
+                  size={28}
+                  animated={false}
+                  className='w-8 h-8'
+                />
+                <div>
+                  <span className='text-2xl font-bold'>FlowMind</span>
+                  <div className='text-gray-400 text-sm'>
+                    © 2025 Transcript Learning AI
+                  </div>
+                </div>
+              </div>
+
+              <div className='space-y-2'>
+                <p className='text-gray-300 font-semibold'>
+                  Crafted with ❤️ by Sanjeev Saniel
+                </p>
+                <p className='text-gray-400 flex items-center space-x-2'>
+                  <FileText className='w-4 h-4' />
+                  <span>
+                    Revolutionizing transcript-based learning through AI
+                  </span>
+                </p>
               </div>
             </div>
 
-            {/* Social links */}
-            <div className="flex items-center space-x-4">
-              <Link
-                href="https://github.com/SanjeevSaniel"
-                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="text-sm hidden sm:inline">GitHub</span>
-              </Link>
-              
-              <Link
-                href="https://www.linkedin.com/in/sanjeevsaniel/"
-                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Linkedin className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
-                <span className="text-sm hidden sm:inline">LinkedIn</span>
-              </Link>
-              
-              <Link
-                href="https://x.com/SanjeevSaniel"
-                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Twitter className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="text-sm hidden sm:inline">Twitter</span>
-              </Link>
-
-              <Link
-                href="https://github.com/SanjeevSaniel/flowmind-ai-chat"
-                className="group flex items-center space-x-2 text-purple-500 hover:text-purple-700 transition-all duration-300 hover:bg-purple-50 px-3 py-2 rounded-lg transform hover:scale-105"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="text-sm">Repository</span>
-              </Link>
+            <div className='flex flex-wrap gap-4 justify-start lg:justify-end'>
+              {[
+                {
+                  href: 'https://github.com/SanjeevSaniel',
+                  icon: Github,
+                  label: 'GitHub',
+                },
+                {
+                  href: 'https://www.linkedin.com/in/sanjeevsaniel/',
+                  icon: Linkedin,
+                  label: 'LinkedIn',
+                },
+                {
+                  href: 'https://x.com/SanjeevSaniel',
+                  icon: X,
+                  label: 'X.com',
+                },
+                {
+                  href: 'https://github.com/SanjeevSaniel/flowmind-ai-chat',
+                  icon: Code2,
+                  label: 'Repository',
+                },
+              ].map((link, index) => (
+                <Link
+                  key={index}
+                  href={link.href}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='flex items-center space-x-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg text-gray-300 hover:text-white transition-all duration-300'>
+                  <link.icon className='w-4 h-4' />
+                  <span className='text-sm font-medium'>{link.label}</span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
