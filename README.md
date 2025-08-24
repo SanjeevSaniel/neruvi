@@ -22,6 +22,8 @@
 
 **Advanced AI-powered learning assistant** for Node.js and Python courses with **RAG (Retrieval-Augmented Generation)** capabilities and Microsoft Copilot/Claude-style interface.
 
+> **🎯 Important**: FlowMind's AI assistant responds **only from curated course transcript data**, not web searches, ensuring focused and reliable educational content.
+
 ## 🚀 **Production-Ready Features**
 
 ✅ **Advanced RAG System Implementation**  
@@ -31,6 +33,44 @@
 ✅ **Intelligent Context Rewriting**  
 ✅ **Lavender Theme with Figtree Typography**  
 ✅ **61+ Course Content Chunks Processed**  
+
+---
+
+## 🧠 **AI Response System**
+
+### **📚 Data-Only Approach (No Web Search)**
+
+FlowMind's AI assistant is designed as a **focused learning companion** that exclusively uses pre-processed course materials:
+
+#### **✅ What FlowMind Uses:**
+- **Course Transcripts**: Pre-processed VTT files from Node.js & Python courses
+- **Local Vector Database**: 61+ chunks of educational content with embeddings
+- **Curated Knowledge**: Only verified, course-aligned educational material
+- **Timestamp References**: Precise video timestamps for source verification
+
+#### **❌ What FlowMind Does NOT Use:**
+- **No Web Search**: No external internet searches or real-time data
+- **No External APIs**: No Wikipedia, Stack Overflow, or documentation fetching
+- **No General Knowledge**: Responses are limited to course content only
+- **No Real-time Info**: No current events, latest updates, or trending topics
+
+#### **🎯 Benefits of This Approach:**
+- **Accuracy**: Responses are verified against actual course content
+- **Relevance**: All answers align with your specific learning curriculum
+- **Consistency**: Same teaching style and terminology throughout
+- **Trust**: Sources are always traceable to specific course timestamps
+- **Focus**: No distractions from unrelated or conflicting information
+
+#### **📊 Response Flow:**
+```mermaid
+graph TD
+    A[User Question] --> B[RAG System Search]
+    B --> C[Local Course Database]
+    C --> D[Find Relevant Chunks]
+    D --> E[AI Synthesis]
+    E --> F[Response with Sources]
+    F --> G[Display Timestamps]
+```
 
 ---
 
@@ -342,24 +382,35 @@ ${ragContext}
 
 ## 📝 **Usage Examples**
 
-### **Course Content Queries**
+#### **✅ Course Content Queries (Supported)**
 
 ```Plaintext
 User: "What is Node.js and how does it work?"
 FlowMind: Based on course materials, Node.js is a JavaScript runtime 
 environment that embeds the V8 engine into a C program, allowing you 
 to execute JavaScript outside the browser...
-[Timestamp: 7:09 - Node.js Fundamentals]
+[Source: 7:09 - Node.js Fundamentals]
 ```
-
-### **Programming Concepts**
 
 ```Plaintext
 User: "Explain Python functions"
 FlowMind: From the course content, Python functions are reusable blocks 
 of code that encapsulate specific functionality. They help reduce 
 duplication and split complex tasks...
-[Course Section: Functions & Scope]
+[Source: Python Programming Basics - Functions & Scope]
+```
+
+#### **❌ External Queries (Not Supported)**
+
+```Plaintext
+User: "What's the latest Node.js version?"
+FlowMind: I can only help with content from our Node.js and Python 
+courses. I don't have access to current version information or 
+external web data.
+
+User: "How do I deploy to AWS?"
+FlowMind: This topic isn't covered in our course materials. I can 
+help with Node.js and Python concepts from the available transcripts.
 ```
 
 ---
