@@ -1,7 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { 
   Brain, 
   Sparkles, 
@@ -15,11 +16,19 @@ import {
   Play,
   Github,
   Star,
-  Download
+  Layers,
+  Shield,
+  Cpu,
+  Workflow
 } from 'lucide-react';
 import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
+
+// Register GSAP plugins
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function LandingPage() {
   const [currentFeature, setCurrentFeature] = useState(0);
