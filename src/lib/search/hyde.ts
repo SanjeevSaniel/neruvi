@@ -116,7 +116,7 @@ Generate a comprehensive response (200-400 words) that would typically appear in
 
   async hydeSearch(
     query: string, 
-    course: 'nodejs' | 'python' = 'both' as any,
+    course: 'nodejs' | 'python' | 'both' = 'both',
     additionalContext: string = ''
   ): Promise<{
     direct: VTTSearchResult[],
