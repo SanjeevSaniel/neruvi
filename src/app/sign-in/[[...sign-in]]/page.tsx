@@ -2,6 +2,7 @@
 
 import { SignIn } from '@clerk/nextjs';
 import Image from 'next/image';
+import FlowMindLogo from '@/components/FlowMindLogo';
 
 export default function SignInPage() {
   return (
@@ -15,15 +16,7 @@ export default function SignInPage() {
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-2xl">
-              <Image
-                src="/flowmind-logo-2.png"
-                alt="FlowMind Logo"
-                width={32}
-                height={32}
-                className="drop-shadow-sm"
-              />
-            </div>
+            <FlowMindLogo size={32} animated={true} className="w-16 h-16" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome Back</h1>
           <p className="text-slate-600">Continue your AI-powered learning journey</p>

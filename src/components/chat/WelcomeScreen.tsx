@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Code2, FileText, Sparkles, Zap, Send } from 'lucide-react';
 import { Suggestion } from './types';
 import Image from 'next/image';
+import FlowMindLogo from '../FlowMindLogo';
 
 type CourseType = 'nodejs' | 'python' | 'both';
 
@@ -75,13 +76,8 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className='text-center mb-8 max-w-2xl'>
-        <div className='w-12 h-12 bg-gradient-to-br from-white via-violet-100 to-indigo-100 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg'>
-          <Image
-            src='/flowmind-logo-2.png'
-            alt='FlowMind Logo'
-            width={50}
-            height={50}
-          />
+        <div className='mx-auto mb-4 flex justify-center'>
+          <FlowMindLogo size={32} animated={true} className='w-12 h-12' />
         </div>
 
         <h2 className='text-2xl font-bold text-purple-900 mb-3'>

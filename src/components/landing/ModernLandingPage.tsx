@@ -22,6 +22,7 @@ import {
 import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
+import FlowMindLogo from '../FlowMindLogo';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -237,15 +238,7 @@ export default function ModernLandingPage() {
       {/* Navigation */}
       <nav className='relative z-20 flex items-center justify-between p-6 lg:px-12'>
         <div className='flex items-center space-x-3'>
-          <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center shadow-lg'>
-            <Image
-              src='/flowmind-logo-2.png'
-              alt='FlowMind Logo'
-              width={20}
-              height={20}
-              className='drop-shadow-sm'
-            />
-          </div>
+          <FlowMindLogo size={20} animated={false} className='w-8 h-8' />
           <span className='text-lg font-bold text-slate-800'>FlowMind</span>
         </div>
 
@@ -270,9 +263,9 @@ export default function ModernLandingPage() {
         className='relative z-10 px-6 lg:px-12 pt-16 pb-24'>
         <div className='max-w-5xl mx-auto text-center'>
           {/* Logo */}
-          <div className='hero-logo mb-8'>
-            <div className='w-20 h-20 mx-auto bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-2xl floating'>
-              <Brain className='w-10 h-10 text-white' />
+          <div className='hero-logo mb-8 floating'>
+            <div className='flex justify-center'>
+              <FlowMindLogo size={50} animated={true} className='w-20 h-20' />
             </div>
           </div>
 
@@ -378,8 +371,8 @@ export default function ModernLandingPage() {
         className='relative z-10 px-6 lg:px-12 py-24 bg-gradient-to-br from-slate-50 to-blue-50'>
         <div className='max-w-4xl mx-auto text-center'>
           <div className='floating mb-8'>
-            <div className='w-16 h-16 mx-auto bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-2xl'>
-              <Sparkles className='w-8 h-8 text-white' />
+            <div className='flex justify-center'>
+              <FlowMindLogo size={40} animated={true} className='w-16 h-16' />
             </div>
           </div>
 
@@ -447,14 +440,7 @@ export default function ModernLandingPage() {
         <div className='max-w-6xl mx-auto'>
           <div className='flex flex-col md:flex-row justify-between items-center'>
             <div className='flex items-center space-x-3 mb-6 md:mb-0'>
-              <div className='w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center'>
-                <Image
-                  src='/flowmind-logo-2.png'
-                  alt='FlowMind'
-                  width={16}
-                  height={16}
-                />
-              </div>
+              <FlowMindLogo size={16} animated={false} className='w-6 h-6' />
               <span className='text-slate-600'>
                 © 2025 FlowMind. All rights reserved.
               </span>

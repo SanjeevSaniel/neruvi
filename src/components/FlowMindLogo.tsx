@@ -26,24 +26,13 @@ const FlowMindLogo = ({ size = 50, className = '', animated = true }: FlowMindLo
         ease: "easeInOut"
       }}
     >
-      <motion.div
-        animate={animated ? {
-          rotate: [0, 2, -2, 0],
-        } : {}}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      >
-        <Image
-          src='/flowmind-logo-2.png'
-          alt='FlowMind Logo'
-          width={size}
-          height={size}
-          className='drop-shadow-sm'
-        />
-      </motion.div>
+      <Image
+        src='/flowmind-logo-2.png'
+        alt='FlowMind Logo'
+        width={size}
+        height={size}
+        className='drop-shadow-sm'
+      />
       
       {/* Subtle thinking particles around the logo */}
       {animated && (
