@@ -88,12 +88,7 @@ export default function ModernLandingPage() {
     }
   ];
 
-  const stats = [
-    { label: "Course Chunks", value: "61+", icon: Code2 },
-    { label: "AI Models", value: "2", icon: Brain },
-    { label: "Response Time", value: "<2s", icon: Zap },
-    { label: "Accuracy", value: "94%", icon: CheckCircle2 }
-  ];
+  // Removed stats section for cleaner design
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -128,69 +123,66 @@ export default function ModernLandingPage() {
         { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '-=0.2'
       );
 
-      // Floating elements animation
+      // Floating elements animation - more fluid
       gsap.to('.floating', {
-        y: -20,
-        duration: 3,
+        y: -15,
+        x: 5,
+        rotation: 2,
+        duration: 4,
         repeat: -1,
         yoyo: true,
-        ease: 'power2.inOut',
-        stagger: 0.5
+        ease: 'sine.inOut',
+        stagger: 0.3
       });
 
-      // Features grid animation
+      // Features grid animation - more fluid
       ScrollTrigger.create({
         trigger: '.features-grid',
-        start: 'top 80%',
+        start: 'top 85%',
         onEnter: () => {
           gsap.fromTo('.feature-card',
-            { y: 100, opacity: 0, scale: 0.8 },
+            { y: 60, opacity: 0, scale: 0.95, rotationY: 15 },
             { 
               y: 0, 
               opacity: 1, 
               scale: 1,
-              duration: 0.6,
-              ease: 'back.out(1.7)',
-              stagger: 0.1
+              rotationY: 0,
+              duration: 0.8,
+              ease: 'power2.out',
+              stagger: 0.15
             }
           );
         }
       });
 
-      // Stats animation
-      ScrollTrigger.create({
-        trigger: '.stats-section',
-        start: 'top 85%',
-        onEnter: () => {
-          gsap.fromTo('.stat-card',
-            { y: 50, opacity: 0 },
-            { 
-              y: 0, 
-              opacity: 1,
-              duration: 0.6,
-              ease: 'power3.out',
-              stagger: 0.1
-            }
-          );
-        }
-      });
-
-      // Gradient orbs animation
+      // Gradient orbs animation - more fluid
       gsap.to('.gradient-orb', {
         rotation: 360,
-        duration: 20,
+        duration: 25,
         repeat: -1,
         ease: 'none'
       });
 
       gsap.to('.gradient-orb', {
-        x: 'random(-50, 50)',
-        y: 'random(-30, 30)',
-        duration: 'random(8, 12)',
+        x: 'random(-80, 80)',
+        y: 'random(-50, 50)',
+        scale: 'random(0.8, 1.2)',
+        duration: 'random(15, 20)',
         repeat: -1,
         yoyo: true,
-        ease: 'power2.inOut',
-        stagger: 'random(0, 2)'
+        ease: 'sine.inOut',
+        stagger: 'random(0, 3)'
+      });
+
+      // Continuous subtle movements
+      gsap.to('.hero-logo', {
+        y: 'random(-3, 3)',
+        x: 'random(-2, 2)',
+        rotation: 'random(-1, 1)',
+        duration: 'random(3, 5)',
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
       });
 
     }, containerRef);
