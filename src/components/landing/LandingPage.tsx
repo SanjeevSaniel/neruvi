@@ -1,29 +1,25 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { 
-  Brain, 
-  Sparkles, 
-  Code2, 
-  MessageSquare, 
-  Zap, 
-  BookOpen, 
-  Users, 
+import {
   ArrowRight,
+  BookOpen,
+  Brain,
   CheckCircle,
-  Play,
+  Code2,
   Github,
-  Star,
-  Layers,
-  Shield,
-  Cpu,
-  Workflow
+  MessageSquare,
+  Play,
+  Sparkles,
+  Users,
+  Zap,
 } from 'lucide-react';
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -155,7 +151,7 @@ export default function LandingPage() {
             </button>
           </SignInButton>
         </div>
-      </motion.nav>
+      </motio.nav>
 
       {/* Hero Section */}
       <motion.section 

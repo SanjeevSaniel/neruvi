@@ -1,19 +1,11 @@
-import { authMiddleware } from "@clerk/nextjs";
- 
-export default authMiddleware({
-  // Routes that can be accessed while signed out
-  publicRoutes: [
-    "/",
-    "/sign-in(.*)",
-    "/sign-up(.*)",
-    "/api/chat",
-    "/architecture-diagram.svg",
-    "/flowmind-logo-2.png",
-    "/flowmind-logo.png",
-    "/grid.svg",
-  ],
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+
+const isProtectedRoute = createRouteMatcher(['/chat(.*)']);
+
+export default clerkMiddleware((auth, req) => {
+  if (isProtectedRoute(req)) auth().protect();
 });
- 
+
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
