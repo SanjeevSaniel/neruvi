@@ -20,7 +20,6 @@ import {
   Search,
   Sparkles,
   Terminal,
-  Twitter,
   X,
   Zap,
 } from 'lucide-react';
