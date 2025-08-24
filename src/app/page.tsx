@@ -1,5 +1,5 @@
-import ModernLandingPage from '@/components/landing/ModernLandingPage';
+import RefreshingLandingPage from '@/components/landing/RefreshingLandingPage';
 
 export default function Home() {
-  return <ModernLandingPage />;
+  return <RefreshingLandingPage />;
 }
