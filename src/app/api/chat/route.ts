@@ -1,6 +1,20 @@
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { qdrantRAG } from '@/lib/qdrant-rag';
+
+// Lazy initialization of OpenAI client to handle missing API key during build
+let openaiClient: ReturnType<typeof createOpenAI> | null = null;
+
+function getOpenAIClient() {
+  if (!openaiClient) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY environment variable is required');
+    }
+    openaiClient = createOpenAI({ apiKey });
+  }
+  return openaiClient;
+}
 
 // Simple in-memory cache
 const responseCache = new Map<string, string>();
@@ -160,7 +174,7 @@ Use the above course material as your primary reference.`
 Provide clear, practical programming guidance. Keep responses focused and under 300 words for faster delivery.`;
 
     const result = streamText({
-      model: openai('gpt-4o-mini'), // Fastest model
+      model: getOpenAIClient()('gpt-4o-mini'), // Fastest model
       system: systemPrompt,
       messages,
       temperature: 0.7, // Lower for speed and focus
