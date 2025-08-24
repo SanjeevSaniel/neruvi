@@ -3,22 +3,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { 
-  Brain, 
-  Sparkles, 
-  Code2, 
-  MessageSquare, 
-  Zap, 
+import {
+  Brain,
+  Sparkles,
+  Code2,
+  MessageSquare,
+  Zap,
   ArrowRight,
   Github,
   Layers,
   Shield,
-  Cpu,
   Workflow,
   PlayCircle,
   CheckCircle2,
   Star,
-  Users
+  Users,
 } from 'lucide-react';
 import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Image from 'next/image';
@@ -33,59 +32,64 @@ export default function ModernLandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const features = [
     {
       icon: Brain,
-      title: "Smart RAG System",
-      description: "Advanced retrieval with HyDE and semantic search for precise course content matching",
-      color: "from-blue-400/20 to-cyan-400/20",
-      iconColor: "text-blue-500",
-      gradient: "from-blue-50 to-cyan-50"
+      title: 'Smart RAG System',
+      description:
+        'Advanced retrieval with HyDE and semantic search for precise course content matching',
+      color: 'from-blue-400/20 to-cyan-400/20',
+      iconColor: 'text-blue-500',
+      gradient: 'from-blue-50 to-cyan-50',
     },
     {
       icon: MessageSquare,
-      title: "Real-time Streaming",
-      description: "Lightning-fast responses with expandable message details and context awareness",
-      color: "from-purple-400/20 to-pink-400/20", 
-      iconColor: "text-purple-500",
-      gradient: "from-purple-50 to-pink-50"
+      title: 'Real-time Streaming',
+      description:
+        'Lightning-fast responses with expandable message details and context awareness',
+      color: 'from-purple-400/20 to-pink-400/20',
+      iconColor: 'text-purple-500',
+      gradient: 'from-purple-50 to-pink-50',
     },
     {
       icon: Code2,
-      title: "Course Navigation",
-      description: "Intelligent Node.js and Python content with timestamp references and sections",
-      color: "from-emerald-400/20 to-green-400/20",
-      iconColor: "text-emerald-500",
-      gradient: "from-emerald-50 to-green-50"
+      title: 'Course Navigation',
+      description:
+        'Intelligent Node.js and Python content with timestamp references and sections',
+      color: 'from-emerald-400/20 to-green-400/20',
+      iconColor: 'text-emerald-500',
+      gradient: 'from-emerald-50 to-green-50',
     },
     {
       icon: Zap,
-      title: "Instant Context",
-      description: "Sub-second search with optimized vector embeddings and relevance scoring",
-      color: "from-orange-400/20 to-yellow-400/20",
-      iconColor: "text-orange-500",
-      gradient: "from-orange-50 to-yellow-50"
+      title: 'Instant Context',
+      description:
+        'Sub-second search with optimized vector embeddings and relevance scoring',
+      color: 'from-orange-400/20 to-yellow-400/20',
+      iconColor: 'text-orange-500',
+      gradient: 'from-orange-50 to-yellow-50',
     },
     {
       icon: Layers,
-      title: "Two-Column UI",
-      description: "Claude-style expandable interface with detailed message exploration",
-      color: "from-indigo-400/20 to-blue-400/20",
-      iconColor: "text-indigo-500",
-      gradient: "from-indigo-50 to-blue-50"
+      title: 'Two-Column UI',
+      description:
+        'Claude-style expandable interface with detailed message exploration',
+      color: 'from-indigo-400/20 to-blue-400/20',
+      iconColor: 'text-indigo-500',
+      gradient: 'from-indigo-50 to-blue-50',
     },
     {
       icon: Workflow,
-      title: "Smart Export",
-      description: "Export conversations in markdown with proper formatting and attribution",
-      color: "from-teal-400/20 to-cyan-400/20",
-      iconColor: "text-teal-500",
-      gradient: "from-teal-50 to-cyan-50"
-    }
+      title: 'Smart Export',
+      description:
+        'Export conversations in markdown with proper formatting and attribution',
+      color: 'from-teal-400/20 to-cyan-400/20',
+      iconColor: 'text-teal-500',
+      gradient: 'from-teal-50 to-cyan-50',
+    },
   ];
 
   // Removed stats section for cleaner design
@@ -105,23 +109,36 @@ export default function ModernLandingPage() {
     const ctx = gsap.context(() => {
       // Hero animations - Vite-style
       const tl = gsap.timeline({ delay: 0.5 });
-      
-      tl.fromTo('.hero-logo', 
+
+      tl.fromTo(
+        '.hero-logo',
         { scale: 0, rotation: -180, opacity: 0 },
-        { scale: 1, rotation: 0, opacity: 1, duration: 1, ease: 'back.out(1.7)' }
+        {
+          scale: 1,
+          rotation: 0,
+          opacity: 1,
+          duration: 1,
+          ease: 'back.out(1.7)',
+        },
       )
-      .fromTo('.hero-title',
-        { y: 100, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }, '-=0.5'
-      )
-      .fromTo('.hero-subtitle',
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '-=0.3'
-      )
-      .fromTo('.hero-buttons',
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, '-=0.2'
-      );
+        .fromTo(
+          '.hero-title',
+          { y: 100, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
+          '-=0.5',
+        )
+        .fromTo(
+          '.hero-subtitle',
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' },
+          '-=0.3',
+        )
+        .fromTo(
+          '.hero-buttons',
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' },
+          '-=0.2',
+        );
 
       // Floating elements animation - more fluid
       gsap.to('.floating', {
@@ -132,7 +149,7 @@ export default function ModernLandingPage() {
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
-        stagger: 0.3
+        stagger: 0.3,
       });
 
       // Features grid animation - more fluid
@@ -140,19 +157,20 @@ export default function ModernLandingPage() {
         trigger: '.features-grid',
         start: 'top 85%',
         onEnter: () => {
-          gsap.fromTo('.feature-card',
+          gsap.fromTo(
+            '.feature-card',
             { y: 60, opacity: 0, scale: 0.95, rotationY: 15 },
-            { 
-              y: 0, 
-              opacity: 1, 
+            {
+              y: 0,
+              opacity: 1,
               scale: 1,
               rotationY: 0,
               duration: 0.8,
               ease: 'power2.out',
-              stagger: 0.15
-            }
+              stagger: 0.15,
+            },
           );
-        }
+        },
       });
 
       // Gradient orbs animation - more fluid
@@ -160,7 +178,7 @@ export default function ModernLandingPage() {
         rotation: 360,
         duration: 25,
         repeat: -1,
-        ease: 'none'
+        ease: 'none',
       });
 
       gsap.to('.gradient-orb', {
@@ -170,8 +188,9 @@ export default function ModernLandingPage() {
         duration: 'random(15, 20)',
         repeat: -1,
         yoyo: true,
+
         ease: 'sine.inOut',
-        stagger: 2
+        stagger: 2,
       });
 
       // Continuous subtle movements
@@ -182,9 +201,8 @@ export default function ModernLandingPage() {
         duration: 'random(3, 5)',
         repeat: -1,
         yoyo: true,
-        ease: 'sine.inOut'
+        ease: 'sine.inOut',
       });
-
     }, containerRef);
 
     return () => ctx.revert();
