@@ -706,7 +706,7 @@ export class QdrantRAGSystem {
     };
     
     Object.entries(topicKeywords).forEach(([topic, keywords]) => {
-      if (keywords.some(keyword => contentLower.includes(keyword))) {
+      if (keywords.some((keyword: string) => contentLower.includes(keyword))) {
         topics.push(topic);
       }
     });

@@ -26,13 +26,12 @@ async function testQdrantConnection() {
     })
 
     console.log('\n🔗 Testing connection...')
-    const info = await qdrant.api('cluster')
+    const collections = await qdrant.getCollections()
     console.log('✅ Qdrant Cloud connection successful!')
-    console.log('Cluster info:', info)
+    console.log('Available collections:', collections)
 
     // List existing collections
     console.log('\n📁 Checking collections...')
-    const collections = await qdrant.getCollections()
     console.log('Existing collections:', collections.collections?.map(c => c.name) || [])
 
   } catch (error) {

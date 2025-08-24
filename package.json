@@ -19,6 +19,7 @@
     "@clerk/nextjs": "^6.31.4",
     "@clerk/themes": "^2.4.13",
     "@qdrant/js-client-rest": "^1.15.1",
+    "@radix-ui/react-dialog": "^1.1.15",
     "@types/react-syntax-highlighter": "^15.5.13",
     "ai": "^5.0.22",
     "class-variance-authority": "^0.7.1",

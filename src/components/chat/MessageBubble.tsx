@@ -136,10 +136,12 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
                   )}
                 </div>
                 
-                {/* Click indicator arrow */}
-                <div className={`flex-shrink-0 ${message.role === 'user' ? 'text-white/70' : 'text-slate-400'}`}>
-                  <ChevronRight className="w-5 h-5" />
-                </div>
+                {/* Click indicator arrow - Only for assistant messages */}
+                {message.role === 'assistant' && (
+                  <div className="flex-shrink-0 text-slate-400">
+                    <ChevronRight className="w-5 h-5" />
+                  </div>
+                )}
               </div>
             </motion.div>
 

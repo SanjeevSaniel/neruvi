@@ -22,7 +22,12 @@
       "Bash(\"%USERPROFILE%\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" --version)",
       "Bash(npm update:*)",
       "Bash(npm show:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(y)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

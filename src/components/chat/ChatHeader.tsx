@@ -54,7 +54,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
     <motion.div
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className='relative h-16 flex items-center justify-center flex-shrink-0 overflow-hidden'>
       {/* Clean gradient background */}
       <div className='absolute inset-0 bg-gradient-to-r from-purple-600/95 via-violet-600/98 to-purple-700/95 backdrop-blur-xl'>

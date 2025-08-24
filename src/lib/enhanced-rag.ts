@@ -622,7 +622,7 @@ export class EnhancedRAGSystem {
     };
     
     Object.entries(topicKeywords).forEach(([topic, keywords]) => {
-      if (keywords.some(keyword => contentLower.includes(keyword))) {
+      if (keywords.some((keyword: string) => contentLower.includes(keyword))) {
         topics.push(topic);
       }
     });
@@ -700,7 +700,9 @@ export class EnhancedRAGSystem {
     // Implement LRU cache behavior
     if (this.cache.queryCache.size >= this.MAX_QUERY_CACHE) {
       const firstKey = this.cache.queryCache.keys().next().value;
-      this.cache.queryCache.delete(firstKey);
+      if (firstKey) {
+        this.cache.queryCache.delete(firstKey);
+      }
     }
     
     this.cache.queryCache.set(key, results);

@@ -224,7 +224,9 @@ Return only valid JSON with no additional text or markdown formatting.`;
     // LRU cache implementation
     if (this.cache.size >= this.CACHE_SIZE) {
       const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
     }
     
     this.cache.set(key, result);

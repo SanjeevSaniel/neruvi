@@ -87,7 +87,7 @@ Points Count: ${info.points_count || 0}
   async testConnection(): Promise<boolean> {
     try {
       console.log('🔗 Testing Qdrant Cloud connection...')
-      const health = await qdrant.api('cluster')
+      await qdrant.getCollections()
       console.log('✅ Qdrant Cloud connection successful!')
       return true
     } catch (error) {

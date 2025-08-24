@@ -239,7 +239,9 @@ Return only valid JSON.`;
     // Implement LRU behavior
     if (this.cache.optimizations.size >= this.MAX_CACHE_SIZE) {
       const firstKey = this.cache.optimizations.keys().next().value;
-      this.cache.optimizations.delete(firstKey);
+      if (firstKey) {
+        this.cache.optimizations.delete(firstKey);
+      }
     }
 
     this.cache.optimizations.set(key, optimization);
