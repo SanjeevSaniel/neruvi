@@ -15,8 +15,8 @@ interface MessageDetailPanelProps {
 export default function MessageDetailPanel({ message, isOpen, onClose }: MessageDetailPanelProps) {
   const [copied, setCopied] = useState(false);
 
-  const formatAsMarkdown = (content: string, role: string, timestamp: Date) => {
-    const timeStr = timestamp.toLocaleString('en-US', {
+  const formatAsMarkdown = (content: string, role: string, timestamp?: Date) => {
+    const timeStr = timestamp ? timestamp.toLocaleString('en-US', {
       weekday: 'short',
       year: 'numeric',
       month: 'short', 
@@ -24,7 +24,7 @@ export default function MessageDetailPanel({ message, isOpen, onClose }: Message
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
-    });
+    }) : 'Just now';
     
     const sender = role === 'assistant' ? 'FlowMind' : 'You';
     
@@ -61,8 +61,8 @@ ${content}
     document.body.removeChild(element);
   };
 
-  const formatTimestamp = (timestamp: Date) => {
-    return timestamp.toLocaleString('en-US', {
+  const formatTimestamp = (timestamp?: Date) => {
+    return timestamp ? timestamp.toLocaleString('en-US', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
@@ -70,7 +70,7 @@ ${content}
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
-    });
+    }) : 'Just now';
   };
 
   return (
