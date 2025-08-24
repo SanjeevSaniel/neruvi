@@ -23,6 +23,7 @@ export default function SignInPage() {
         
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-white/50 shadow-2xl">
           <SignIn 
+            afterSignInUrl="/chat"
             appearance={{
               elements: {
                 formButtonPrimary: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm normal-case rounded-xl shadow-lg hover:shadow-xl transition-all duration-300',

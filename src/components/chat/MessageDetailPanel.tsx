@@ -75,14 +75,14 @@ ${content}
 
   return (
     <motion.div
-      initial={{ x: '100%', opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: '100%', opacity: 0 }}
+      initial={{ x: '100%', opacity: 0, scale: 0.95 }}
+      animate={{ x: 0, opacity: 1, scale: 1 }}
+      exit={{ x: '100%', opacity: 0, scale: 0.95 }}
       transition={{ 
-        type: 'spring', 
-        damping: 25, 
-        stiffness: 200,
-        duration: 0.3 
+        duration: 0.4,
+        ease: [0.25, 0.46, 0.45, 0.94],
+        opacity: { duration: 0.3 },
+        scale: { duration: 0.35 }
       }}
       className="w-full bg-white shadow-2xl flex flex-col border-l border-slate-200 h-full"
     >
@@ -126,7 +126,10 @@ ${content}
                 {/* Action buttons - Copy and Download */}
                 {message && (
                   <>
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                       onClick={handleCopy}
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         copied
@@ -136,15 +139,18 @@ ${content}
                       title={copied ? 'Copied!' : 'Copy message'}
                     >
                       {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    </button>
+                    </motion.button>
 
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                       onClick={handleDownload}
-                      className="p-2 hover:bg-purple-100 rounded-lg transition-colors text-slate-600 hover:text-purple-700"
+                      className="p-2 hover:bg-purple-100 rounded-lg transition-colors duration-200 text-slate-600 hover:text-purple-700"
                       title="Download as text file"
                     >
                       <Download className="w-4 h-4" />
-                    </button>
+                    </motion.button>
                   </>
                 )}
 

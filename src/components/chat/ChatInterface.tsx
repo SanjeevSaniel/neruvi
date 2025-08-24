@@ -2,7 +2,6 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { gsap } from 'gsap';
 import { useEffect, useRef, useState } from 'react';
 import { useConversationStore } from '@/store/conversationStore';
 import ChatHeader from './ChatHeader';
@@ -89,10 +88,9 @@ export default function ChatInterface() {
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
-      gsap.to(messagesContainerRef.current, {
-        scrollTop: messagesContainerRef.current.scrollHeight,
-        duration: 0.8,
-        ease: 'power2.out',
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
       });
     }
   };
@@ -228,30 +226,36 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className='h-screen flex flex-col overflow-hidden bg-gradient-to-br from-purple-200 via-lavender-100 to-purple-300 relative'>
-      {/* Subtle animated overlay for extra depth */}
-      <div className='absolute inset-0 bg-gradient-to-tr from-purple-100/50 via-transparent to-purple-200/30 animate-pulse'></div>
-
-      {/* Conversation Sidebar */}
+    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-br from-purple-200 via-violet-100 to-purple-300 relative">
+      <div className="absolute inset-0 bg-gradient-to-tr from-purple-100/50 via-transparent to-purple-200/30 animate-pulse"></div>
+      
       <ConversationSidebar 
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)} 
       />
 
-      {/* Updated ChatHeader with complementary colors */}
-      <div className='relative z-10'>
+      <div className="relative z-10">
         <ChatHeader 
           onOpenSidebar={() => setSidebarOpen(true)}
           onHeaderClick={handleHeaderClick}
         />
       </div>
 
-      <div className='flex-1 flex min-h-0 relative z-10'>
+      <div className="flex-1 flex min-h-0 relative z-10">
         {/* Main Content Area */}
-        <div className={`${messageDetailOpen ? 'w-1/2' : 'flex-1'} flex justify-center transition-all duration-300`}>
+        <motion.div 
+          animate={{ 
+            width: messageDetailOpen ? '50%' : '100%' 
+          }}
+          transition={{ 
+            duration: 0.4, 
+            ease: [0.25, 0.46, 0.45, 0.94] 
+          }}
+          className="flex justify-center"
+        >
           {(needsCourseSelection || showCourseSelector) ? (
             // Full screen course selection
-            <div className='w-full h-full flex flex-col'>
+            <div className="w-full h-full flex flex-col">
               <CourseSelector
                 selectedCourse={selectedCourse}
                 onCourseSelect={handleCourseSelect}
@@ -261,16 +265,16 @@ export default function ChatInterface() {
             </div>
           ) : shouldShowWelcome ? (
             // Welcome screen after course selection
-            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
+            <div className="w-full max-w-4xl flex flex-col min-h-0 px-4">
               <WelcomeScreen onSubmit={handleSubmit} selectedCourse={selectedCourse} />
             </div>
           ) : (
             // Chat interface
-            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
+            <div className="w-full max-w-4xl flex flex-col min-h-0 px-4">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className='flex-1 flex flex-col min-h-0'>
+                className="flex-1 flex flex-col min-h-0">
                 <MessagesContainer
                   ref={messagesContainerRef}
                   messages={messages}
@@ -295,20 +299,30 @@ export default function ChatInterface() {
               </motion.div>
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Message Detail Panel - Side by side - Only show in chat interface */}
-        {messageDetailOpen && !needsCourseSelection && !showCourseSelector && !shouldShowWelcome && (
-          <div className="w-1/2">
-            <AnimatePresence>
+        <AnimatePresence>
+          {messageDetailOpen && !needsCourseSelection && !showCourseSelector && !shouldShowWelcome && (
+            <motion.div 
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: '50%', opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ 
+                duration: 0.4, 
+                ease: [0.25, 0.46, 0.45, 0.94],
+                opacity: { duration: 0.3 }
+              }}
+              className="overflow-hidden"
+            >
               <MessageDetailPanel
                 message={selectedMessage}
                 isOpen={messageDetailOpen}
                 onClose={handleCloseMessageDetail}
               />
-            </AnimatePresence>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

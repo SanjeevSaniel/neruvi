@@ -50,16 +50,21 @@ export default function ConversationSidebar({ isOpen, onClose }: ConversationSid
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="fixed inset-0 bg-black/50 z-40"
             onClick={onClose}
           />
 
           {/* Sidebar */}
           <motion.div
-            initial={{ x: -320 }}
-            animate={{ x: 0 }}
-            exit={{ x: -320 }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            initial={{ x: -320, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -320, opacity: 0 }}
+            transition={{ 
+              duration: 0.35,
+              ease: [0.25, 0.46, 0.45, 0.94],
+              opacity: { duration: 0.2 }
+            }}
             className="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl z-50 flex flex-col"
           >
             {/* Header */}
@@ -68,16 +73,17 @@ export default function ConversationSidebar({ isOpen, onClose }: ConversationSid
                 <h2 className="text-white font-semibold">Conversations</h2>
                 <button
                   onClick={onClose}
-                  className="text-white hover:text-purple-200 transition-colors"
+                  className="text-white hover:text-purple-200 transition-colors duration-200"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               
+              
               {/* New Conversation Button */}
               <button
                 onClick={handleNewConversation}
-                className="mt-3 w-full bg-white/20 hover:bg-white/30 text-white rounded-lg px-3 py-2 flex items-center justify-center space-x-2 transition-colors"
+                className="mt-3 w-full bg-white/20 hover:bg-white/30 text-white rounded-lg px-3 py-2 flex items-center justify-center space-x-2 transition-all duration-200 hover:scale-105"
               >
                 <Plus className="w-4 h-4" />
                 <span className="text-sm font-medium">New Chat</span>
@@ -99,8 +105,8 @@ export default function ConversationSidebar({ isOpen, onClose }: ConversationSid
                     .map((conversation) => (
                       <motion.div
                         key={conversation.id}
-                        whileHover={{ x: 4 }}
-                        className={`relative p-3 rounded-lg cursor-pointer transition-colors ${
+                        whileHover={{ x: 3, transition: { duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] } }}
+                        className={`relative p-3 rounded-lg cursor-pointer transition-colors duration-200 ${
                           conversation.id === currentConversationId
                             ? 'bg-purple-50 border border-purple-200'
                             : 'hover:bg-slate-50'
@@ -148,8 +154,9 @@ export default function ConversationSidebar({ isOpen, onClose }: ConversationSid
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.8 }}
+                                transition={{ duration: 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
                                 onClick={(e) => handleDeleteConversation(conversation.id, e)}
-                                className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                                className="p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors duration-200"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </motion.button>

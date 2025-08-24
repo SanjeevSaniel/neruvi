@@ -26,14 +26,14 @@ export default function SourcePanel({ sources }: SourcePanelProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+      transition={{ delay: 0.1, duration: 0.15 }}
       className='mt-2 bg-slate-100 border border-slate-300 rounded-lg p-3'>
       <div className='flex items-center space-x-2 mb-2'>
         <Clock className='w-4 h-4 text-slate-600' />
         <span className='text-sm font-medium text-slate-800'>
-          Exact reference:
+          Source References:
         </span>
       </div>
 
@@ -92,7 +92,7 @@ const SourceItem = ({ source }: { source: SourceTimestamp }) => {
     <motion.div 
       className="flex items-center justify-between text-xs bg-white rounded-md px-2 py-1 hover:bg-slate-50 transition-colors border border-slate-200"
       whileHover={{ scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
     >
       <div className='flex items-center space-x-2'>
         <span className='text-slate-700 font-medium'>{source.section}</span>

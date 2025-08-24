@@ -66,102 +66,45 @@ export default function CourseSelector({ selectedCourse, onCourseSelect, onSugge
 
   const handleMouseEnter = (courseId: CourseType) => {
     setHoveredCourse(courseId);
-    const card = cardRefs.current[courseId];
-    if (card) {
-      gsap.to(card, {
-        scale: 1.05,
-        y: -8,
-        boxShadow: '0 20px 40px rgba(139, 92, 246, 0.2)',
-        duration: 0.3,
-        ease: 'power2.out',
-      });
-      
-      // Animate the icon
-      const icon = card.querySelector('.course-icon');
-      if (icon) {
-        gsap.to(icon, {
-          scale: 1.1,
-          rotation: 5,
-          duration: 0.3,
-          ease: 'back.out(1.7)',
-        });
-      }
-
-      // Animate the topics
-      const topics = card.querySelectorAll('.topic-tag');
-      gsap.fromTo(topics, 
-        { scale: 0.9, opacity: 0.7 },
-        { 
-          scale: 1, 
-          opacity: 1, 
-          duration: 0.2, 
-          stagger: 0.05,
-          ease: 'power2.out' 
-        }
-      );
-    }
   };
 
   const handleMouseLeave = (courseId: CourseType) => {
     setHoveredCourse(null);
-    const card = cardRefs.current[courseId];
-    if (card) {
-      gsap.to(card, {
-        scale: 1,
-        y: 0,
-        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-        duration: 0.3,
-        ease: 'power2.out',
-      });
-      
-      // Reset icon
-      const icon = card.querySelector('.course-icon');
-      if (icon) {
-        gsap.to(icon, {
-          scale: 1,
-          rotation: 0,
-          duration: 0.3,
-          ease: 'power2.out',
-        });
-      }
-    }
   };
 
   const containerVariants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    hidden: { opacity: 0, y: 10 },
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1,
       transition: {
-        duration: 0.5,
+        duration: 0.2,
         ease: 'easeOut',
-        staggerChildren: 0.1,
+        staggerChildren: 0.05,
       },
     },
     exit: {
       opacity: 0,
-      y: -20,
-      scale: 0.95,
-      transition: { duration: 0.3, ease: 'easeIn' },
+      y: -10,
+      transition: { duration: 0.15, ease: 'easeIn' },
     },
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 10 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.4, ease: 'easeOut' }
+      transition: { duration: 0.15, ease: 'easeOut' }
     },
     hover: {
       scale: 1.02,
       y: -2,
-      transition: { duration: 0.2, ease: 'easeOut' },
+      transition: { duration: 0.1, ease: 'easeOut' },
     },
     tap: {
       scale: 0.98,
-      transition: { duration: 0.1 },
+      transition: { duration: 0.05 },
     },
   };
 
@@ -290,7 +233,7 @@ export default function CourseSelector({ selectedCourse, onCourseSelect, onSugge
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
                         className="absolute -top-2 -right-2 p-1 bg-white rounded-full shadow-lg"
                       >
                         <CheckCircle className="w-6 h-6 text-green-500" />
@@ -371,7 +314,7 @@ export default function CourseSelector({ selectedCourse, onCourseSelect, onSugge
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
+                transition={{ delay: 0.2, duration: 0.25, ease: 'easeOut' }}
                 className="max-w-5xl mx-auto"
               >
                 {/* Section Header */}
@@ -399,18 +342,16 @@ export default function CourseSelector({ selectedCourse, onCourseSelect, onSugge
                         initial={{ opacity: 0, y: 10, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ 
-                          delay: 0.5 + (index * 0.1), 
-                          duration: 0.3,
-                          type: 'spring',
-                          stiffness: 300,
-                          damping: 25
+                          delay: 0.3 + (index * 0.05), 
+                          duration: 0.15,
+                          ease: 'easeOut'
                         }}
                         whileHover={{ 
-                          scale: 1.05, 
-                          y: -4,
-                          transition: { duration: 0.2 }
+                          scale: 1.02, 
+                          y: -2,
+                          transition: { duration: 0.1 }
                         }}
-                        whileTap={{ scale: 0.98 }}
+                        whileTap={{ scale: 0.98, transition: { duration: 0.05 } }}
                         onClick={() => {
                           if (onSuggestionClick && selectedCourse) {
                             onSuggestionClick(suggestion.text, selectedCourse);
@@ -421,7 +362,7 @@ export default function CourseSelector({ selectedCourse, onCourseSelect, onSugge
                           group relative p-4 rounded-xl border-2 cursor-pointer
                           ${selectedCourseOption?.borderColor} ${selectedCourseOption?.bgColor}
                           hover:${selectedCourseOption?.selectedColor.split(' ')[0]} 
-                          hover:shadow-lg transition-all duration-200
+                          hover:shadow-lg transition-all duration-150
                           text-left overflow-hidden
                           hover:border-opacity-100 hover:shadow-xl
                         `}
