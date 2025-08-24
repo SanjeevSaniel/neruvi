@@ -5,7 +5,6 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
   Brain,
-  Sparkles,
   Code2,
   MessageSquare,
   Zap,
@@ -16,11 +15,9 @@ import {
   Workflow,
   PlayCircle,
   CheckCircle2,
-  Star,
   Users,
 } from 'lucide-react';
 import { SignInButton, SignUpButton } from '@clerk/nextjs';
-import Image from 'next/image';
 import Link from 'next/link';
 import FlowMindLogo from '../FlowMindLogo';
 

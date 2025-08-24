@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Code2, FileText, Sparkles, Zap, Send } from 'lucide-react';
 import { Suggestion } from './types';
-import Image from 'next/image';
 import FlowMindLogo from '../FlowMindLogo';
 
 type CourseType = 'nodejs' | 'python' | 'both';

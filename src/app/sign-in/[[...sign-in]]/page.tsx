@@ -1,7 +1,6 @@
 'use client';
 
 import { SignIn } from '@clerk/nextjs';
-import Image from 'next/image';
 import FlowMindLogo from '@/components/FlowMindLogo';
 
 export default function SignInPage() {
