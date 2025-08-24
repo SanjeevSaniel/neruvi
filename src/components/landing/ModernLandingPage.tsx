@@ -1,24 +1,22 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
+  ArrowRight,
   Brain,
   Code2,
-  MessageSquare,
-  Zap,
-  ArrowRight,
   Github,
   Layers,
-  Shield,
-  Workflow,
+  MessageSquare,
   PlayCircle,
-  CheckCircle2,
   Users,
+  Workflow,
+  Zap,
 } from 'lucide-react';
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
 
 // Register GSAP plugins
@@ -235,7 +233,11 @@ export default function ModernLandingPage() {
       {/* Navigation */}
       <nav className='relative z-20 flex items-center justify-between p-6 lg:px-12'>
         <div className='flex items-center space-x-3'>
-          <FlowMindLogo size={20} animated={false} className='w-8 h-8' />
+          <FlowMindLogo
+            size={20}
+            animated={false}
+            className='w-8 h-8'
+          />
           <span className='text-lg font-bold text-slate-800'>FlowMind</span>
         </div>
 
@@ -262,7 +264,11 @@ export default function ModernLandingPage() {
           {/* Logo */}
           <div className='hero-logo mb-8 floating'>
             <div className='flex justify-center'>
-              <FlowMindLogo size={50} animated={true} className='w-20 h-20' />
+              <FlowMindLogo
+                size={50}
+                animated={true}
+                className='w-20 h-20'
+              />
             </div>
           </div>
 
@@ -369,7 +375,11 @@ export default function ModernLandingPage() {
         <div className='max-w-4xl mx-auto text-center'>
           <div className='floating mb-8'>
             <div className='flex justify-center'>
-              <FlowMindLogo size={40} animated={true} className='w-16 h-16' />
+              <FlowMindLogo
+                size={40}
+                animated={true}
+                className='w-16 h-16'
+              />
             </div>
           </div>
 
@@ -405,30 +415,6 @@ export default function ModernLandingPage() {
               <span className='text-sm font-medium'>Join 1,000+ learners</span>
             </div>
           </div>
-
-          {/* Social proof */}
-          <div className='flex justify-center items-center space-x-6 text-slate-400'>
-            <div className='flex items-center space-x-1'>
-              <Star className='w-4 h-4 fill-yellow-400 text-yellow-400' />
-              <span className='text-sm font-medium text-slate-600'>
-                4.9/5 Rating
-              </span>
-            </div>
-            <div className='w-1 h-1 bg-slate-300 rounded-full' />
-            <div className='flex items-center space-x-1'>
-              <CheckCircle2 className='w-4 h-4 text-green-500' />
-              <span className='text-sm font-medium text-slate-600'>
-                Free to Start
-              </span>
-            </div>
-            <div className='w-1 h-1 bg-slate-300 rounded-full' />
-            <div className='flex items-center space-x-1'>
-              <Shield className='w-4 h-4 text-blue-500' />
-              <span className='text-sm font-medium text-slate-600'>
-                Secure & Private
-              </span>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -437,7 +423,11 @@ export default function ModernLandingPage() {
         <div className='max-w-6xl mx-auto'>
           <div className='flex flex-col md:flex-row justify-between items-center'>
             <div className='flex items-center space-x-3 mb-6 md:mb-0'>
-              <FlowMindLogo size={16} animated={false} className='w-6 h-6' />
+              <FlowMindLogo
+                size={16}
+                animated={false}
+                className='w-6 h-6'
+              />
               <span className='text-slate-600'>
                 © 2025 FlowMind. All rights reserved.
               </span>
