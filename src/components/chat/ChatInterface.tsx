@@ -1,15 +1,15 @@
 // components/chat/ChatInterface.tsx
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
 import { useConversationStore } from '@/store/conversationStore';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import ConversationSidebar from './ConversationSidebar';
 import CourseSelector, { CourseType } from './CourseSelector';
-import MessagesContainer from './MessagesContainer';
 import MessageDetailPanel from './MessageDetailPanel';
+import MessagesContainer from './MessagesContainer';
 import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
 
@@ -19,11 +19,10 @@ export default function ChatInterface() {
     createConversation,
     addMessage,
     updateMessage,
-    setCourseForConversation,
     currentConversationId,
-    getOrCreateConversationForCourse
+    getOrCreateConversationForCourse,
   } = useConversationStore();
-  
+
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasStartedChat, setHasStartedChat] = useState(false);
@@ -32,18 +31,23 @@ export default function ChatInterface() {
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [messageDetailOpen, setMessageDetailOpen] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // Get current conversation or create one if none exists
   const conversation = getCurrentConversation();
-  const messages = conversation?.messages || [];
+  const messages = useMemo(() => conversation?.messages || [], [conversation]);
   const selectedCourse = conversation?.selectedCourse || null;
-  
+
   // Check if we need course selection (no current conversation or no course selected)
-  const needsCourseSelection = (!currentConversationId || !selectedCourse) && !showCourseSelector;
-  
+  const needsCourseSelection =
+    (!currentConversationId || !selectedCourse) && !showCourseSelector;
+
   // Check if we should show welcome screen (course selected but no messages yet)
-  const shouldShowWelcome = currentConversationId && selectedCourse && messages.length === 0 && !showCourseSelector;
-  
+  const shouldShowWelcome =
+    currentConversationId &&
+    selectedCourse &&
+    messages.length === 0 &&
+    !showCourseSelector;
+
   // Handle header click to show course selector
   const handleHeaderClick = () => {
     setShowCourseSelector(!showCourseSelector);
@@ -58,7 +62,7 @@ export default function ChatInterface() {
     setMessageDetailOpen(false);
     setSelectedMessage(null);
   };
-  
+
   // Don't auto-create conversations - wait for course selection
   // useEffect(() => {
   //   if (!currentConversationId) {
@@ -90,7 +94,7 @@ export default function ChatInterface() {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTo({
         top: messagesContainerRef.current.scrollHeight,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
@@ -122,12 +126,15 @@ export default function ChatInterface() {
     setShowCourseSelector(false); // Hide selector after selection
   };
 
-  const handleSuggestionClick = async (suggestion: string, course: CourseType) => {
+  const handleSuggestionClick = async (
+    suggestion: string,
+    course: CourseType,
+  ) => {
     // Ensure we have the right conversation for this course
     getOrCreateConversationForCourse(course);
     setShowCourseSelector(false); // Hide selector after selection
     setHasStartedChat(true); // Mark chat as started immediately
-    
+
     // Start the chat with the suggestion
     await handleSubmit(suggestion);
   };
@@ -135,7 +142,7 @@ export default function ChatInterface() {
   const handleSubmit = async (inputText: string) => {
     if (!inputText.trim() || isLoading) return;
     if (!hasStartedChat) setHasStartedChat(true);
-    
+
     const conversationId = currentConversationId || createConversation();
 
     const userMessage: Message = {
@@ -206,7 +213,11 @@ export default function ChatInterface() {
           const chunk = decoder.decode(value, { stream: true });
           accumulatedContent += chunk;
 
-          updateMessage(conversationId, assistantMessage.id, accumulatedContent);
+          updateMessage(
+            conversationId,
+            assistantMessage.id,
+            accumulatedContent,
+          );
         }
       }
     } catch (error: unknown) {
@@ -226,36 +237,35 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-br from-purple-200 via-violet-100 to-purple-300 relative">
-      <div className="absolute inset-0 bg-gradient-to-tr from-purple-100/50 via-transparent to-purple-200/30 animate-pulse"></div>
-      
-      <ConversationSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
+    <div className='h-screen flex flex-col overflow-hidden bg-gradient-to-br from-purple-200 via-violet-100 to-purple-300 relative'>
+      <div className='absolute inset-0 bg-gradient-to-tr from-purple-100/50 via-transparent to-purple-200/30 animate-pulse'></div>
+
+      <ConversationSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
-      <div className="relative z-10">
-        <ChatHeader 
+      <div className='relative z-10'>
+        <ChatHeader
           onOpenSidebar={() => setSidebarOpen(true)}
           onHeaderClick={handleHeaderClick}
         />
       </div>
 
-      <div className="flex-1 flex min-h-0 relative z-10">
+      <div className='flex-1 flex min-h-0 relative z-10'>
         {/* Main Content Area */}
-        <motion.div 
-          animate={{ 
-            width: messageDetailOpen ? '50%' : '100%' 
+        <motion.div
+          animate={{
+            width: messageDetailOpen ? '50%' : '100%',
           }}
-          transition={{ 
-            duration: 0.4, 
-            ease: [0.25, 0.46, 0.45, 0.94] 
+          transition={{
+            duration: 0.4,
+            ease: [0.25, 0.46, 0.45, 0.94],
           }}
-          className="flex justify-center"
-        >
-          {(needsCourseSelection || showCourseSelector) ? (
+          className='flex justify-center'>
+          {needsCourseSelection || showCourseSelector ? (
             // Full screen course selection
-            <div className="w-full h-full flex flex-col">
+            <div className='w-full h-full flex flex-col'>
               <CourseSelector
                 selectedCourse={selectedCourse}
                 onCourseSelect={handleCourseSelect}
@@ -265,16 +275,19 @@ export default function ChatInterface() {
             </div>
           ) : shouldShowWelcome ? (
             // Welcome screen after course selection
-            <div className="w-full max-w-4xl flex flex-col min-h-0 px-4">
-              <WelcomeScreen onSubmit={handleSubmit} selectedCourse={selectedCourse} />
+            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
+              <WelcomeScreen
+                onSubmit={handleSubmit}
+                selectedCourse={selectedCourse}
+              />
             </div>
           ) : (
             // Chat interface
-            <div className="w-full max-w-4xl flex flex-col min-h-0 px-4">
+            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="flex-1 flex flex-col min-h-0">
+                className='flex-1 flex flex-col min-h-0'>
                 <MessagesContainer
                   ref={messagesContainerRef}
                   messages={messages}
@@ -291,8 +304,14 @@ export default function ChatInterface() {
                   isLoading={isLoading}
                   disabled={!selectedCourse}
                   placeholder={
-                    selectedCourse 
-                      ? `Ask me anything about ${selectedCourse === 'both' ? 'programming' : selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}...`
+                    selectedCourse
+                      ? `Ask me anything about ${
+                          selectedCourse === 'both'
+                            ? 'programming'
+                            : selectedCourse === 'nodejs'
+                            ? 'Node.js'
+                            : 'Python'
+                        }...`
                       : 'Please select a course first...'
                   }
                 />
@@ -303,25 +322,27 @@ export default function ChatInterface() {
 
         {/* Message Detail Panel - Side by side - Only show in chat interface */}
         <AnimatePresence>
-          {messageDetailOpen && !needsCourseSelection && !showCourseSelector && !shouldShowWelcome && (
-            <motion.div 
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: '50%', opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ 
-                duration: 0.4, 
-                ease: [0.25, 0.46, 0.45, 0.94],
-                opacity: { duration: 0.3 }
-              }}
-              className="overflow-hidden"
-            >
-              <MessageDetailPanel
-                message={selectedMessage}
-                isOpen={messageDetailOpen}
-                onClose={handleCloseMessageDetail}
-              />
-            </motion.div>
-          )}
+          {messageDetailOpen &&
+            !needsCourseSelection &&
+            !showCourseSelector &&
+            !shouldShowWelcome && (
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: '50%', opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{
+                  duration: 0.4,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                  opacity: { duration: 0.3 },
+                }}
+                className='overflow-hidden'>
+                <MessageDetailPanel
+                  message={selectedMessage}
+                  isOpen={messageDetailOpen}
+                  onClose={handleCloseMessageDetail}
+                />
+              </motion.div>
+            )}
         </AnimatePresence>
       </div>
     </div>
