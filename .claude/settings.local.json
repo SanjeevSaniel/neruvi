@@ -19,7 +19,8 @@
       "Bash(python:*)",
       "Bash(winget install:*)",
       "Bash(refreshenv)",
-      "Bash(\"%USERPROFILE%\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" --version)"
+      "Bash(\"%USERPROFILE%\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\" --version)",
+      "Bash(npm update:*)"
     ],
     "deny": [],
     "ask": []

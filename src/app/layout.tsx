@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { Figtree } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Figtree } from 'next/font/google';
 import './globals.css';
 
 // const inter = Inter({
@@ -118,23 +118,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang='en'
-      suppressHydrationWarning>
-      <head>
-        <link
-          rel='icon'
-          href='/favicon.svg'
-          type='image/svg+xml'
-        />
-      </head>
-      <body
-        className={`${figtree.variable} font-sans antialiased`}
+    <ClerkProvider>
+      <html
+        lang='en'
         suppressHydrationWarning>
-        <ClerkProvider>
+        <head>
+          <link
+            rel='icon'
+            href='/favicon.svg'
+            type='image/svg+xml'
+          />
+        </head>
+        <body
+          className={`${figtree.variable} font-sans antialiased`}
+          suppressHydrationWarning>
           {children}
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
