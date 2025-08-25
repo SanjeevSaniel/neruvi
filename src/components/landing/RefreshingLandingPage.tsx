@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
 import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
+import { Button } from '../ui/button';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -301,11 +302,11 @@ export default function TranscriptLearningLanding() {
       ref={containerRef}
       className='min-h-screen bg-white'>
       {/* Modern Navigation */}
-      <nav className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-purple-100/50 shadow-sm'>
+      <nav className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
             <div className='flex items-center space-x-4'>
-              <div className='flex items-center space-x-3 p-2 rounded-xl bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100'>
+              <div className='flex items-center space-x-3 p-2'>
                 <FlowMindLogo
                   size={32}
                   animated={true}
@@ -313,14 +314,14 @@ export default function TranscriptLearningLanding() {
                 />
                 <div>
                   <span
-                    className='text-xl font-semibold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent font-comfortaa lowercase'
+                    className='text-xl font-bold bg-clip-text text-black font-comfortaa lowercase'
                     style={{
                       fontFamily:
                         'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif',
                     }}>
                     flowmind
                   </span>
-                  <div className='text-xs text-purple-500 font-medium tracking-wide'>
+                  <div className='text-xs text-purple-500 font-medium'>
                     AI POWERED LEARNING
                   </div>
                 </div>
@@ -338,10 +339,12 @@ export default function TranscriptLearningLanding() {
               <SignInButton
                 mode='modal'
                 appearance={clerkAppearance}>
-                <button className='relative overflow-hidden bg-white text-purple-600 hover:text-white transition-all duration-300 px-6 py-2.5 rounded-xl border-2 border-purple-200 hover:border-purple-400 font-medium cursor-pointer group'>
-                  <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300'></div>
+                <Button
+                  variant='outline'
+                  className='relative overflow-hidden text-md transition-all duration-300 px-4 py-2 rounded-xl hover:bg-none font-medium cursor-pointer group'>
+                  {/* <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300'></div> */}
                   <span className='relative z-10'>Sign In</span>
-                </button>
+                </Button>
               </SignInButton>
             </div>
           </div>
@@ -368,7 +371,7 @@ export default function TranscriptLearningLanding() {
             {/* Left Content - Typography Focus */}
             <div className='space-y-8'>
               {/* Modern Badge */}
-              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-6 py-3 rounded-2xl text-sm font-semibold border border-purple-200/50 shadow-sm backdrop-blur-sm'>
+              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-6 py-3 rounded-2xl text-sm font-semibold border-purple-200/50 shadow-sm backdrop-blur-sm'>
                 <div className='p-1 bg-white rounded-lg shadow-sm'>
                   <Brain className='w-4 h-4 text-purple-600' />
                 </div>
@@ -379,7 +382,7 @@ export default function TranscriptLearningLanding() {
 
               {/* Modern Typography */}
               <div className='space-y-8'>
-                <h1 className='hero-title text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] tracking-tight'>
+                <h1 className='hero-title text-5xl md:text-5xl lg:text-6xl font-medium text-gray-900 leading-[1.1] tracking-tight'>
                   Learn faster with{' '}
                   <span className='relative inline-block'>
                     <span className='bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent'>
