@@ -286,10 +286,12 @@ export default function TranscriptLearningLanding() {
                 <Github className='w-4 h-4' />
                 <span className='hidden sm:inline font-medium'>GitHub</span>
               </Link>
-
-              <SignInButton mode='modal'>
-                <button className='text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 font-medium'>
-                  Sign In
+              <SignInButton
+                mode='modal'
+                appearance={clerkAppearance}>
+                <button className='relative overflow-hidden bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] cursor-pointer group'>
+                  <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                  <span className='relative z-10 text-sm'>Sign In</span>
                 </button>
               </SignInButton>
             </div>
@@ -300,124 +302,132 @@ export default function TranscriptLearningLanding() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className='relative bg-gradient-to-b from-blue-50 via-purple-50/30 to-white pt-20 pb-32 overflow-hidden'>
-        
-        {/* Knowledge Wave Background Animation */}
-        <KnowledgeWaveAnimation className="opacity-40" />
-        
-        {/* Gradient Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/80 pointer-events-none" />
-        
-        <div className='max-w-7xl mx-auto px-6 lg:px-8 relative z-10'>
-          <div className='text-center mb-16'>
-            {/* Enhanced Badge */}
-            <div className='hero-badge inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 px-5 py-2.5 rounded-full text-sm font-semibold mb-8 shadow-lg backdrop-blur-sm border border-blue-200/50'>
-              <Brain className='w-4 h-4' />
-              <span>AI-Powered Knowledge Discovery Platform</span>
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse ml-1" />
-            </div>
+        className='relative bg-gradient-to-br from-white via-purple-50/30 to-violet-50/40 pt-16 pb-24 overflow-hidden'>
+        {/* Dynamic Background Elements */}
+        <div className='absolute inset-0 overflow-hidden'>
+          <KnowledgeWaveAnimation className='opacity-40' />
+          <div className='absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-400/25 to-violet-400/25 rounded-full blur-3xl animate-pulse' />
+          <div
+            className='absolute bottom-1/4 right-1/4 w-[32rem] h-[32rem] bg-gradient-to-r from-violet-400/20 to-indigo-400/20 rounded-full blur-3xl animate-pulse'
+            style={{ animationDelay: '2s' }}
+          />
+          <div
+            className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[24rem] h-[24rem] bg-gradient-to-r from-purple-300/15 to-violet-300/15 rounded-full blur-3xl animate-pulse'
+            style={{ animationDelay: '4s' }}
+          />
+        </div>
 
-            {/* Enhanced Main Title */}
-            <h1 className='hero-title text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-8'>
-              Transform Knowledge Into
-              <br />
-              <span className='bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>
-                Instant Understanding
-              </span>
-            </h1>
+        <div className='max-w-6xl mx-auto px-6 lg:px-8 relative z-10'>
+          {/* Clean, Focused Layout */}
+          <div className='grid lg:grid-cols-2 gap-12 items-center'>
+            {/* Left Content - Typography Focus */}
+            <div className='space-y-6'>
+              {/* Modern Badge */}
+              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 via-violet-100 to-indigo-100 text-purple-800 px-6 py-3 rounded-full text-sm font-bold border border-purple-200/60 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02]'>
+                <div className='p-2 bg-white rounded-full shadow-md'>
+                  <Brain className='w-5 h-5 text-purple-600' />
+                </div>
+                <span className='tracking-wider'>
+                  AI-POWERED LEARNING PLATFORM
+                </span>
+              </div>
 
-            {/* Enhanced Subtitle */}
-            <p className='hero-subtitle text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-12'>
-              Experience the future of learning with AI that understands your questions and delivers 
-              <span className="font-semibold text-purple-700"> precise answers from curated course content</span> with 
-              exact timestamps. No more endless searching - just pure, focused learning.
-            </p>
+              {/* Modern Typography */}
+              <div className='space-y-6'>
+                <h1 className='hero-title text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight'>
+                  Learn faster with{' '}
+                  <span className='relative inline-block'>
+                    <span className='bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent font-extrabold'>
+                      AI-powered
+                    </span>
+                    <div className='absolute -bottom-3 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 rounded-full animate-pulse'></div>
+                  </span>{' '}
+                  course insights
+                </h1>
 
-            {/* Enhanced CTA Buttons */}
-            <div className='hero-buttons flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
-              <SignUpButton mode='modal'>
-                <button className='group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25 flex items-center space-x-3'>
-                  <Brain className='w-5 h-5 group-hover:scale-110 transition-transform' />
-                  <span>Start Learning with AI</span>
-                  <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
-                </button>
-              </SignUpButton>
+                <p className='hero-subtitle text-lg md:text-xl text-gray-700 leading-relaxed max-w-2xl font-medium'>
+                  Get instant answers from programming course transcripts.
+                  FlowMind&apos;s AI finds exactly what you need with{' '}
+                  <span className='text-purple-700 font-bold bg-gradient-to-r from-purple-100 to-violet-100 px-2 py-1 rounded-lg'>
+                    precise timestamps
+                  </span>{' '}
+                  and rich context.
+                </p>
+              </div>
 
-              <button className='group flex items-center space-x-3 px-8 py-4 border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50 rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm'>
-                <PlayCircle className='w-5 h-5 group-hover:scale-110 transition-transform' />
-                <span>Experience Demo</span>
-                <Sparkles className='w-4 h-4 opacity-60' />
-              </button>
-            </div>
-
-            {/* Knowledge Flow Indicators */}
-            <div className="flex justify-center items-center space-x-8 mb-8">
-              {[
-                { icon: Database, label: "Course Content", count: "61+" },
-                { icon: Brain, label: "AI Processing", count: "24/7" },
-                { icon: Clock, label: "Instant Answers", count: "<2s" }
-              ].map((item, index) => (
-                <div key={index} className="flex flex-col items-center space-y-2">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center shadow-md">
-                    <item.icon className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-purple-700">{item.count}</div>
-                    <div className="text-xs text-gray-600 font-medium">{item.label}</div>
-                  </div>
+              {/* Clean CTA Section */}
+              <div className='space-y-4'>
+                <div className='flex flex-col sm:flex-row gap-4'>
+                  <SignUpButton
+                    mode='modal'
+                    appearance={clerkAppearance}>
+                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-700 hover:via-violet-700 hover:to-indigo-700 text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.02] cursor-pointer transform'>
+                      <div className='absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                      <span className='relative z-10'>
+                        Start learning for free
+                      </span>
+                      <ArrowRight className='relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300' />
+                      <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/60 to-violet-400/60 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
+                    </button>
+                  </SignUpButton>
                 </div>
               ))}
             </div>
-
-            {/* Demo Preview */}
-            <div className='hero-demo max-w-4xl mx-auto'>
-              <div className='bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden'>
-                {/* Chat Interface Header */}
-                <div className='bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center space-x-3'>
-                  <div className='flex space-x-2'>
-                    <div className='w-3 h-3 bg-red-400 rounded-full'></div>
-                    <div className='w-3 h-3 bg-yellow-400 rounded-full'></div>
-                    <div className='w-3 h-3 bg-green-400 rounded-full'></div>
-                  </div>
-                  <div className='text-sm font-medium text-gray-600'>
-                    FlowMind AI Chat
+            {/* Right Content - Visual Demo */}
+            <div className='relative'>
+              {/* Clean Demo Card */}
+              <div className='bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-purple-200/50 overflow-hidden hover:shadow-purple-500/10 transition-all duration-500 hover:scale-[1.02]'>
+                {/* Simple Header */}
+                <div className='bg-gradient-to-r from-purple-50 to-violet-50 px-6 py-4 border-b border-purple-200/50'>
+                  <div className='flex items-center space-x-3'>
+                    <div className='flex space-x-2'>
+                      <div className='w-3 h-3 bg-red-400 rounded-full'></div>
+                      <div className='w-3 h-3 bg-yellow-400 rounded-full'></div>
+                      <div className='w-3 h-3 bg-green-400 rounded-full'></div>
+                    </div>
+                    <div
+                      className='text-sm font-medium text-gray-600'
+                      style={{
+                        fontFamily:
+                          'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif',
+                      }}>
+                      flowmind
+                    </div>
                   </div>
                 </div>
 
-                {/* Chat Demo */}
-                <div className='p-6 space-y-4 bg-gradient-to-br from-gray-50 to-white min-h-[300px]'>
+                {/* Clean Chat Interface */}
+                <div className='p-4 space-y-4 bg-white min-h-[280px]'>
                   {/* User Question */}
-                  <div className='flex justify-end mb-4'>
-                    <div className='bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-br-md max-w-xs'>
-                      <p className='text-sm'>
-                        How do I implement JWT authentication in Express.js?
-                      </p>
+                  <div className='flex justify-end'>
+                    <div className='bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 text-white px-5 py-3 rounded-2xl rounded-br-md max-w-xs text-sm font-medium shadow-lg'>
+                      How do I implement authentication in Node.js?
                     </div>
                   </div>
 
                   {/* AI Response */}
                   <div className='flex justify-start space-x-3'>
-                    <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0'>
-                      <Brain className='w-4 h-4 text-white' />
+                    <div className='w-10 h-10 bg-gradient-to-r from-purple-100 to-violet-100 rounded-full flex items-center justify-center flex-shrink-0 shadow-md'>
+                      <Brain className='w-5 h-5 text-purple-600' />
                     </div>
-                    <div className='bg-white border border-gray-200 px-4 py-3 rounded-2xl rounded-bl-md max-w-md shadow-sm'>
-                      <p className='text-sm text-gray-800 mb-3'>
-                        I found the perfect explanation for JWT authentication
-                        in Express.js! Here&apos;s what the tutorial covers:
+                    <div className='bg-gradient-to-r from-gray-50 to-purple-50/30 px-5 py-4 rounded-2xl rounded-bl-md max-w-md text-sm border border-purple-100/50 shadow-sm'>
+                      <p className='text-gray-800 mb-4 font-medium'>
+                        I found detailed authentication implementation in our
+                        Node.js course:
                       </p>
 
-                      {/* Transcript Reference */}
-                      <div className='bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2'>
+                      {/* Source Reference */}
+                      <div className='bg-gradient-to-r from-purple-100 to-violet-100 border border-purple-300/50 rounded-xl p-4 mb-2 shadow-sm'>
                         <div className='flex items-center space-x-2 mb-2'>
-                          <FileText className='w-4 h-4 text-blue-600' />
-                          <span className='text-xs font-semibold text-blue-800'>
-                            Express.js Authentication Tutorial
+                          <FileText className='w-5 h-5 text-purple-700' />
+                          <span className='text-sm font-bold text-purple-800'>
+                            Authentication Tutorial
                           </span>
                         </div>
                         <div className='flex items-center space-x-2'>
-                          <Clock className='w-3 h-3 text-blue-600' />
-                          <span className='text-xs text-blue-700'>
-                            Transcript at 15:32 - JWT Implementation
+                          <Clock className='w-4 h-4 text-purple-600' />
+                          <span className='text-sm text-purple-700 font-semibold'>
+                            Timestamp: 15:32
                           </span>
                           <button className='ml-auto'>
                             <FileText className='w-4 h-4 text-blue-600 hover:text-blue-800 transition-colors' />
