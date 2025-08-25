@@ -85,7 +85,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
               }}
               whileTap={{ scale: 0.95 }}
             >
-              <ConversationHistoryIcon className='w-4 h-4' size={16} />
+              <ConversationHistoryIcon className='w-5 h-5' size={20} />
             </motion.button>
           )}
           
