@@ -302,7 +302,7 @@ export default function TranscriptLearningLanding() {
       ref={containerRef}
       className='min-h-screen bg-white'>
       {/* Modern Navigation */}
-      <nav className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm'>
+      <nav className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
             <div className='flex items-center space-x-4'>
@@ -371,7 +371,7 @@ export default function TranscriptLearningLanding() {
             {/* Left Content - Typography Focus */}
             <div className='space-y-8'>
               {/* Modern Badge */}
-              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-6 py-3 rounded-2xl text-sm font-semibold border-purple-200/50 shadow-sm backdrop-blur-sm'>
+              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-4 py-2 rounded-2xl text-sm font-semibold border-purple-200/50 shadow-sm backdrop-blur-sm'>
                 <div className='p-1 bg-white rounded-lg shadow-sm'>
                   <Brain className='w-4 h-4 text-purple-600' />
                 </div>
@@ -393,7 +393,7 @@ export default function TranscriptLearningLanding() {
                   course insights
                 </h1>
 
-                <p className='hero-subtitle text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl font-light'>
+                <p className='hero-subtitle text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl font-light'>
                   Get instant answers from programming course transcripts.
                   FlowMind&apos;s AI finds exactly what you need with{' '}
                   <span className='text-purple-600 font-medium'>
@@ -730,9 +730,9 @@ export default function TranscriptLearningLanding() {
             </button>
           </div>
 
-          <p className='text-purple-200 text-sm'>
+          {/* <p className='text-purple-200 text-sm'>
             No credit card required • 61+ course segments available
-          </p>
+          </p> */}
         </div>
       </section>
 
