@@ -302,7 +302,7 @@ export default function TranscriptLearningLanding() {
       ref={containerRef}
       className='min-h-screen bg-white'>
       {/* Modern Navigation */}
-      <nav className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl'>
+      <nav className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
             <div className='flex items-center space-x-4'>
@@ -340,8 +340,8 @@ export default function TranscriptLearningLanding() {
                 mode='modal'
                 appearance={clerkAppearance}>
                 <Button
-                  variant='ghost'
-                  className='relative overflow-hidden text-md bg-purple-600 hover:bg-purple-500 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-none font-medium cursor-pointer group'>
+                  variant='outline'
+                  className='relative overflow-hidden text-md transition-all duration-300 px-4 py-2 rounded-xl hover:bg-none font-medium cursor-pointer group'>
                   {/* <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300'></div> */}
                   <span className='relative z-10'>Sign In</span>
                 </Button>
@@ -371,7 +371,7 @@ export default function TranscriptLearningLanding() {
             {/* Left Content - Typography Focus */}
             <div className='space-y-8'>
               {/* Modern Badge */}
-              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-4 py-2 rounded-2xl text-sm font-semibold border-purple-200/50 shadow-sm backdrop-blur-sm'>
+              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-6 py-3 rounded-2xl text-sm font-semibold border-purple-200/50 shadow-sm backdrop-blur-sm'>
                 <div className='p-1 bg-white rounded-lg shadow-sm'>
                   <Brain className='w-4 h-4 text-purple-600' />
                 </div>
@@ -393,7 +393,7 @@ export default function TranscriptLearningLanding() {
                   course insights
                 </h1>
 
-                <p className='hero-subtitle text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl font-light'>
+                <p className='hero-subtitle text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl font-light'>
                   Get instant answers from programming course transcripts.
                   FlowMind&apos;s AI finds exactly what you need with{' '}
                   <span className='text-purple-600 font-medium'>
@@ -409,7 +409,7 @@ export default function TranscriptLearningLanding() {
                   <SignUpButton
                     mode='modal'
                     appearance={clerkAppearance}>
-                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 text-white px-6 py-3 rounded-2xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 cursor-pointer'>
+                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 text-white px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 hover:scale-105 cursor-pointer'>
                       <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                       <span className='relative z-10'>
                         Start learning for free
@@ -420,9 +420,9 @@ export default function TranscriptLearningLanding() {
                   </SignUpButton>
                 </div>
 
-                {/* <p className='text-sm text-gray-500'>
+                <p className='text-sm text-gray-500'>
                   No credit card required • 61+ course segments available
-                </p> */}
+                </p>
               </div>
             </div>
 
@@ -730,9 +730,9 @@ export default function TranscriptLearningLanding() {
             </button>
           </div>
 
-          {/* <p className='text-purple-200 text-sm'>
+          <p className='text-purple-200 text-sm'>
             No credit card required • 61+ course segments available
-          </p> */}
+          </p>
         </div>
       </section>
 
