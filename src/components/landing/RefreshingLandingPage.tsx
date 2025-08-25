@@ -340,8 +340,8 @@ export default function TranscriptLearningLanding() {
                 mode='modal'
                 appearance={clerkAppearance}>
                 <Button
-                  variant='outline'
-                  className='relative overflow-hidden text-md transition-all duration-300 px-4 py-2 rounded-xl hover:bg-none font-medium cursor-pointer group'>
+                  variant='ghost'
+                  className='relative overflow-hidden text-md bg-purple-600 hover:bg-purple-500 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-none font-medium cursor-pointer group'>
                   {/* <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300'></div> */}
                   <span className='relative z-10'>Sign In</span>
                 </Button>
