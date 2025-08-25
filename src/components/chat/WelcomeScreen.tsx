@@ -1,13 +1,9 @@
 // components/chat/WelcomeScreen.tsx
-import React from 'react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Code2, FileText, Sparkles, Zap, Send } from 'lucide-react';
 import { Suggestion } from './types';
 import FlowMindLogo from '../FlowMindLogo';
-import { useSpeechRecognition } from '../../hooks/useSpeechRecognition';
-import SpeechRecognitionButton from '../ui/SpeechRecognitionButton';
-import WaveAnimation from '../ui/WaveAnimation';
 
 type CourseType = 'nodejs' | 'python' | 'both';
 
@@ -19,36 +15,6 @@ interface WelcomeScreenProps {
 export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScreenProps) {
   const [input, setInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const {
-    isListening,
-    transcript,
-    startListening,
-    stopListening,
-    resetTranscript,
-    hasRecognitionSupport
-  } = useSpeechRecognition();
-  
-  // Update input when transcript changes
-  React.useEffect(() => {
-    if (transcript) {
-      setInput(transcript);
-    }
-  }, [transcript]);
-  
-  const handleMicClick = () => {
-    if (!hasRecognitionSupport) {
-      alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
-      return;
-    }
-    
-    if (isListening) {
-      stopListening();
-    } else {
-      resetTranscript();
-      startListening();
-    }
-  };
 
   // Course-specific suggestions
   const getSuggestions = (course: CourseType | null | undefined): Suggestion[] => {
@@ -173,9 +139,7 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
-                  isListening 
-                    ? 'Listening... Speak now'
-                    : selectedCourse 
+                  selectedCourse 
                     ? `Ask me anything about ${selectedCourse === 'nodejs' ? 'Node.js development' : selectedCourse === 'python' ? 'Python programming' : 'programming'}...`
                     : 'Ask me about Node.js or Python programming...'
                 }
@@ -195,31 +159,6 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
                   }
                 }}
               />
-              {/* Speech Recognition with Wave Animation */}
-              <div className="flex items-center mr-2">
-                <SpeechRecognitionButton
-                  isListening={isListening}
-                  isDisabled={isSubmitting}
-                  hasSupport={hasRecognitionSupport}
-                  onClick={handleMicClick}
-                  size="md"
-                  variant="default"
-                  isProcessing={isSubmitting}
-                />
-                
-                {/* Animated Wave Visualization */}
-                {isListening && (
-                  <div className="ml-1">
-                    <WaveAnimation 
-                      isActive={isListening} 
-                      size="sm" 
-                      color="rgb(147 51 234)" 
-                      className="opacity-90"
-                    />
-                  </div>
-                )}
-              </div>
-              
               <motion.button
                 type='submit'
                 disabled={isSubmitting || !input.trim()}
@@ -231,7 +170,7 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
                       : '0 10px 25px rgba(139, 92, 246, 0.4)',
                 }}
                 whileTap={{ scale: isSubmitting || !input.trim() ? 1 : 0.95 }}
-                className={`p-2 rounded-xl transition-all duration-300 ${
+                className={`ml-4 p-2 rounded-xl transition-all duration-300 ${
                   !isSubmitting && input.trim()
                     ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/50 cursor-pointer transform hover:scale-105'
                     : 'bg-purple-200 text-purple-400 cursor-not-allowed opacity-50'

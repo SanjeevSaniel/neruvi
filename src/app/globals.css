@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
 
 /* Landing Page Animations */
 @keyframes blob {
@@ -130,10 +129,15 @@
 body {
   background: #f8fafc;
   color: #1e293b;
+  font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
   font-weight: 400;
   font-variant: common-ligatures;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -173,11 +177,6 @@ body {
 .focus-visible {
   outline: 2px solid rgb(59 130 246);
   outline-offset: 2px;
-}
-
-/* Brand font override */
-.font-comfortaa {
-  font-family: 'Comfortaa', ui-rounded, ui-sans-serif, system-ui, sans-serif !important;
 }
 
 /* Enhanced animations */
