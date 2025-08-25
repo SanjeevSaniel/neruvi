@@ -17,9 +17,9 @@ function getOpenAIClient() {
 }
 
 // Simple in-memory cache
-const responseCache = new Map<string, string>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-const cacheTimestamps = new Map<string, number>();
+// const responseCache = new Map<string, string>();
+// const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// const cacheTimestamps = new Map<string, number>();
 
 interface SourceTimestamp {
   course: string;
@@ -30,30 +30,30 @@ interface SourceTimestamp {
 }
 
 // Helper function to create cache key
-const getCacheKey = (query: string): string => {
-  return query
-    .toLowerCase()
-    .replace(/[^\w\s]/g, '')
-    .trim()
-    .split(/\s+/)
-    .sort()
-    .join(' ');
-};
+// const getCacheKey = (query: string): string => {
+//   return query
+//     .toLowerCase()
+//     .replace(/[^\w\s]/g, '')
+//     .trim()
+//     .split(/\s+/)
+//     .sort()
+//     .join(' ');
+// };
 
 // Clean expired cache entries
-const cleanCache = () => {
-  const now = Date.now();
-  for (const [key, timestamp] of cacheTimestamps.entries()) {
-    if (now - timestamp > CACHE_TTL) {
-      responseCache.delete(key);
-      cacheTimestamps.delete(key);
-    }
-  }
-};
+// const cleanCache = () => {
+//   const now = Date.now();
+//   for (const [key, timestamp] of cacheTimestamps.entries()) {
+//     if (now - timestamp > CACHE_TTL) {
+//       responseCache.delete(key);
+//       cacheTimestamps.delete(key);
+//     }
+//   }
+// };
 
 export const POST = async (req: Request) => {
   try {
-    const startTime = Date.now();
+    // const startTime = Date.now();
     const { messages, course } = await req.json();
     const lastMessage = messages[messages.length - 1];
     const userQuery = lastMessage.content;
@@ -61,14 +61,15 @@ export const POST = async (req: Request) => {
 
     console.log('🔍 User query:', userQuery);
 
-    // Check cache first
-    const cacheKey = getCacheKey(userQuery);
-    cleanCache();
+    // Check cache first (disabled for streaming testing)
+    // const cacheKey = getCacheKey(userQuery);
+    // cleanCache();
 
-    if (responseCache.has(cacheKey)) {
-      console.log('📦 Cache hit for query');
-      return new Response(responseCache.get(cacheKey));
-    }
+    // Temporarily disable cache to test streaming
+    // if (responseCache.has(cacheKey)) {
+    //   console.log('📦 Cache hit for query');
+    //   return new Response(responseCache.get(cacheKey));
+    // }
 
     // Optimize RAG search with Promise.all for parallel processing
     let ragContext = '';
@@ -77,47 +78,61 @@ export const POST = async (req: Request) => {
     const ragPromise = (async () => {
       try {
         await qdrantRAG.initialize();
-        
+
         // Enhanced search with course filtering and HYDE
         const searchResults = await qdrantRAG.search(
-          userQuery, 
+          userQuery,
           8, // Get more results to find the most relevant ones
-          selectedCourse as 'nodejs' | 'python' | 'both'
+          selectedCourse as 'nodejs' | 'python' | 'both',
         );
 
         if (searchResults?.length > 0) {
           // Ensure unique references with proper timestamps
-          const uniqueResults = new Map<string, typeof searchResults[0]>();
-          
-          searchResults.forEach(result => {
-            const key = `${result.metadata.videoId}-${Math.floor(result.metadata.startTime / 10) * 10}`; // 10-second windows
-            if (!uniqueResults.has(key) || (uniqueResults.get(key)!.score < result.score)) {
+          const uniqueResults = new Map<string, (typeof searchResults)[0]>();
+
+          searchResults.forEach((result) => {
+            const key = `${result.metadata.videoId}-${
+              Math.floor(result.metadata.startTime / 10) * 10
+            }`; // 10-second windows
+            if (
+              !uniqueResults.has(key) ||
+              uniqueResults.get(key)!.score < result.score
+            ) {
               uniqueResults.set(key, result);
             }
           });
-          
-          const sortedResults = Array.from(uniqueResults.values())
-            .sort((a, b) => b.score - a.score);
-          
+
+          const sortedResults = Array.from(uniqueResults.values()).sort(
+            (a, b) => b.score - a.score,
+          );
+
           // Natural filtering based on course content structure
-          console.log('📊 Relevance scores:', sortedResults.map((r, i) => `${i}: ${r.score.toFixed(3)}`));
-          
+          console.log(
+            '📊 Relevance scores:',
+            sortedResults.map((r, i) => `${i}: ${r.score.toFixed(3)}`),
+          );
+
           const finalResults = [];
-          
+
           // Return only the single best reference - the exact match
           if (sortedResults.length > 0) {
             finalResults.push(sortedResults[0]);
           }
-          
-          console.log(`📋 Found ${finalResults.length} relevant references from ${sortedResults.length} candidates`);
-          
+
+          console.log(
+            `📋 Found ${finalResults.length} relevant references from ${sortedResults.length} candidates`,
+          );
+
           sourceTimestamps = finalResults.map(
             (result, index): SourceTimestamp => {
               const score = result.score;
               let relevanceMessage = result.metadata.relevance_reason;
-              
+
               // Generate better relevance messages if not provided
-              if (!relevanceMessage || relevanceMessage === 'Relevant content') {
+              if (
+                !relevanceMessage ||
+                relevanceMessage === 'Relevant content'
+              ) {
                 if (index === 0 && score > 0.7) {
                   relevanceMessage = 'Primary explanation';
                 } else if (score > 0.8) {
@@ -130,7 +145,7 @@ export const POST = async (req: Request) => {
                   relevanceMessage = 'Additional context';
                 }
               }
-              
+
               return {
                 course: result.metadata.course || 'Unknown',
                 section: result.metadata.section || 'General',
@@ -138,14 +153,18 @@ export const POST = async (req: Request) => {
                 timestamp: formatTimestamp(result.metadata.startTime),
                 relevance: `${(score * 100).toFixed(0)}`, // Store as percentage for dynamic display
               };
-            }
+            },
           );
 
           // Create rich context from unique results with better formatting
           ragContext = finalResults
             .map(
               (result, index) =>
-                `## Context ${index + 1}: ${result.metadata.course.toUpperCase()} - ${result.metadata.section} (${formatTimestamp(result.metadata.startTime)})
+                `## Context ${
+                  index + 1
+                }: ${result.metadata.course.toUpperCase()} - ${
+                  result.metadata.section
+                } (${formatTimestamp(result.metadata.startTime)})
 **Relevance**: ${result.metadata.relevance_reason}
 **Content**: ${result.content.trim()}`,
             )
@@ -182,24 +201,21 @@ Provide clear, practical programming guidance. Keep responses focused and under 
       topP: 1,
     });
 
-    const response = result.toTextStreamResponse();
+    // Create streaming response with proper headers
+    const stream = result.textStream;
+    const headers = new Headers({
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    });
 
     // Add sources header
     if (sourceTimestamps.length > 0) {
-      response.headers.set('X-Sources', JSON.stringify(sourceTimestamps));
+      headers.set('X-Sources', JSON.stringify(sourceTimestamps));
     }
 
-    // Cache the response for common queries
-    const responseText = await response.text();
-    responseCache.set(cacheKey, responseText);
-    cacheTimestamps.set(cacheKey, Date.now());
-
-    const endTime = Date.now();
-    console.log(`⚡ Response time: ${endTime - startTime}ms`);
-
-    return new Response(responseText, {
-      headers: response.headers,
-    });
+    // Return the streaming response directly
+    return new Response(stream, { headers });
   } catch (error: unknown) {
     console.error('Chat API error:', error);
     return new Response('Internal Server Error', { status: 500 });

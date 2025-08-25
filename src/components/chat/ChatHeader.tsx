@@ -5,45 +5,45 @@ import { UserButton } from '@clerk/nextjs';
 import FlowMindLogo from '../FlowMindLogo';
 import ConversationHistoryIcon from '../ui/ConversationHistoryIcon';
 
-const AIStatusIndicator = () => {
-  return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg'>
-      {/* AI Brain Icon with Animation */}
-      <div className='relative'>
-        <Brain className='w-4 h-4 text-white drop-shadow-sm' />
+// const AIStatusIndicator = () => {
+//   return (
+//     <motion.div
+//       whileHover={{ scale: 1.05 }}
+//       className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg'>
+//       {/* AI Brain Icon with Animation */}
+//       <div className='relative'>
+//         <Brain className='w-4 h-4 text-white drop-shadow-sm' />
 
-        {/* Status dot */}
-        <div className='absolute -top-0.5 -right-0.5'>
-          <motion.div
-            className='w-2 h-2 rounded-full bg-emerald-400 shadow-sm'
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [1, 0.7, 1],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
+//         {/* Status dot */}
+//         <div className='absolute -top-0.5 -right-0.5'>
+//           <motion.div
+//             className='w-2 h-2 rounded-full bg-emerald-400 shadow-sm'
+//             animate={{
+//               scale: [1, 1.2, 1],
+//               opacity: [1, 0.7, 1],
+//             }}
+//             transition={{
+//               duration: 2,
+//               repeat: Infinity,
+//               ease: 'easeInOut',
+//             }}
+//           />
 
-          {/* Ping effect */}
-          <motion.div className='absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-30' />
-        </div>
-      </div>
+//           {/* Ping effect */}
+//           <motion.div className='absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping opacity-30' />
+//         </div>
+//       </div>
 
-      {/* Status Text */}
-      <div className='flex flex-col'>
-        <span className='text-white text-xs font-semibold tracking-wide'>
-          AI ACTIVE
-        </span>
-        <span className='text-purple-100 text-[10px] opacity-90'>GPT-4o-Mini</span>
-      </div>
-    </motion.div>
-  );
-};
+//       {/* Status Text */}
+//       <div className='flex flex-col'>
+//         <span className='text-white text-xs font-semibold tracking-wide'>
+//           AI ACTIVE
+//         </span>
+//         <span className='text-purple-100 text-[10px] opacity-90'>GPT-4o-Mini</span>
+//       </div>
+//     </motion.div>
+//   );
+// };
 
 interface ChatHeaderProps {
   onOpenSidebar?: () => void;
@@ -85,7 +85,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
               }}
               whileTap={{ scale: 0.95 }}
             >
-              <ConversationHistoryIcon className='w-4 h-4' size={16} />
+              <ConversationHistoryIcon className='w-5 h-5' size={20} />
             </motion.button>
           )}
           
@@ -101,8 +101,8 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
 
             {/* Brand Text */}
             <div className='text-left'>
-              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-tight'>
-                FlowMind
+              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-wide font-comfortaa lowercase' style={{ fontFamily: 'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif' }}>
+                flowmind
               </h1>
               <p className='text-[10px] text-purple-100/90 font-medium -mt-0.5 drop-shadow-sm'>
                 AI Programming Assistant
@@ -138,14 +138,30 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
             </motion.div>
           </div>
 
-          {/* User Profile - Compact */}
+          {/* Modern User Profile */}
           <UserButton 
             appearance={{
               elements: {
-                avatarBox: "w-8 h-8 border-2 border-white/30 shadow-lg",
-                userButtonPopoverCard: "bg-white/95 backdrop-blur-sm border border-white/20 shadow-2xl",
-                userButtonPopoverActionButton: "hover:bg-purple-50",
+                avatarBox: "w-9 h-9 border-2 border-white/40 shadow-xl rounded-full ring-2 ring-purple-500/20",
+                userButtonPopoverCard: "bg-white/90 backdrop-blur-2xl border border-purple-200/50 shadow-2xl rounded-2xl",
+                userButtonPopoverActionButton: "hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 text-gray-700 hover:text-purple-700 rounded-xl transition-all duration-300 font-medium",
+                userButtonPopoverActionButtonText: "font-semibold",
+                userButtonPopoverActionButtonIcon: "text-purple-500",
+                userButtonPopoverFooter: "hidden",
+                userPreviewTextContainer: "text-gray-800",
+                userPreviewMainIdentifier: "text-gray-900 font-bold",
+                userPreviewSecondaryIdentifier: "text-purple-600 text-sm font-medium",
+                userButtonPopoverActions: "space-y-1",
               },
+              variables: {
+                colorPrimary: "#9333ea",
+                colorBackground: "rgba(255, 255, 255, 0.9)",
+                colorText: "#374151",
+                colorTextSecondary: "#9333ea",
+                borderRadius: "16px",
+                fontFamily: "'Figtree', ui-sans-serif, system-ui, sans-serif",
+                spacingUnit: "1rem"
+              }
             }}
             afterSignOutUrl="/"
           />
