@@ -43,18 +43,21 @@
 FlowMind's AI assistant is designed as a **focused learning companion** that exclusively uses pre-processed course materials:
 
 #### **✅ What FlowMind Uses:**
+
 - **Course Transcripts**: Pre-processed VTT files from Node.js & Python courses
 - **Local Vector Database**: 61+ chunks of educational content with embeddings
 - **Curated Knowledge**: Only verified, course-aligned educational material
 - **Timestamp References**: Precise video timestamps for source verification
 
 #### **❌ What FlowMind Does NOT Use:**
+
 - **No Web Search**: No external internet searches or real-time data
 - **No External APIs**: No Wikipedia, Stack Overflow, or documentation fetching
 - **No General Knowledge**: Responses are limited to course content only
 - **No Real-time Info**: No current events, latest updates, or trending topics
 
 #### **🎯 Benefits of This Approach:**
+
 - **Accuracy**: Responses are verified against actual course content
 - **Relevance**: All answers align with your specific learning curriculum
 - **Consistency**: Same teaching style and terminology throughout
@@ -62,6 +65,7 @@ FlowMind's AI assistant is designed as a **focused learning companion** that exc
 - **Focus**: No distractions from unrelated or conflicting information
 
 #### **📊 Response Flow:**
+
 ```mermaid
 graph TD
     A[User Question] --> B[RAG System Search]
