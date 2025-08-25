@@ -339,12 +339,10 @@ export default function TranscriptLearningLanding() {
               <SignInButton
                 mode='modal'
                 appearance={clerkAppearance}>
-                <Button
-                  variant='ghost'
-                  className='relative overflow-hidden text-md bg-purple-600 hover:bg-purple-500 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-none font-medium cursor-pointer group'>
-                  {/* <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300'></div> */}
-                  <span className='relative z-10'>Sign In</span>
-                </Button>
+                <button className='relative overflow-hidden bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] cursor-pointer group'>
+                  <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                  <span className='relative z-10 text-sm'>Sign In</span>
+                </button>
               </SignInButton>
             </div>
           </div>
@@ -354,52 +352,56 @@ export default function TranscriptLearningLanding() {
       {/* Modern Hero Section */}
       <section
         ref={heroRef}
-        className='relative bg-gradient-to-br from-white via-purple-50/20 to-violet-50/30 pt-20 pb-32 overflow-hidden'>
+        className='relative bg-gradient-to-br from-white via-purple-50/30 to-violet-50/40 pt-16 pb-24 overflow-hidden'>
         {/* Dynamic Background Elements */}
         <div className='absolute inset-0 overflow-hidden'>
-          <KnowledgeWaveAnimation className='opacity-30' />
-          <div className='absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-purple-400/20 to-violet-400/20 rounded-full blur-3xl animate-pulse' />
+          <KnowledgeWaveAnimation className='opacity-40' />
+          <div className='absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-400/25 to-violet-400/25 rounded-full blur-3xl animate-pulse' />
           <div
-            className='absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-violet-400/15 to-purple-400/15 rounded-full blur-3xl animate-pulse'
+            className='absolute bottom-1/4 right-1/4 w-[32rem] h-[32rem] bg-gradient-to-r from-violet-400/20 to-indigo-400/20 rounded-full blur-3xl animate-pulse'
             style={{ animationDelay: '2s' }}
+          />
+          <div
+            className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[24rem] h-[24rem] bg-gradient-to-r from-purple-300/15 to-violet-300/15 rounded-full blur-3xl animate-pulse'
+            style={{ animationDelay: '4s' }}
           />
         </div>
 
         <div className='max-w-6xl mx-auto px-6 lg:px-8 relative z-10'>
           {/* Clean, Focused Layout */}
-          <div className='grid lg:grid-cols-2 gap-16 items-center'>
+          <div className='grid lg:grid-cols-2 gap-12 items-center'>
             {/* Left Content - Typography Focus */}
-            <div className='space-y-8'>
+            <div className='space-y-6'>
               {/* Modern Badge */}
-              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-4 py-2 rounded-2xl text-sm font-semibold border-purple-200/50 shadow-sm backdrop-blur-sm'>
-                <div className='p-1 bg-white rounded-lg shadow-sm'>
-                  <Brain className='w-4 h-4 text-purple-600' />
+              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 via-violet-100 to-indigo-100 text-purple-800 px-6 py-3 rounded-full text-sm font-bold border border-purple-200/60 shadow-lg backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02]'>
+                <div className='p-2 bg-white rounded-full shadow-md'>
+                  <Brain className='w-5 h-5 text-purple-600' />
                 </div>
-                <span className='tracking-wide'>
+                <span className='tracking-wider'>
                   AI-POWERED LEARNING PLATFORM
                 </span>
               </div>
 
               {/* Modern Typography */}
-              <div className='space-y-8'>
-                <h1 className='hero-title text-5xl md:text-5xl lg:text-6xl font-medium text-gray-900 leading-[1.1] tracking-tight'>
+              <div className='space-y-6'>
+                <h1 className='hero-title text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-tight'>
                   Learn faster with{' '}
                   <span className='relative inline-block'>
-                    <span className='bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent'>
+                    <span className='bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 bg-clip-text text-transparent font-extrabold'>
                       AI-powered
                     </span>
-                    <div className='absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-violet-400 rounded-full'></div>
+                    <div className='absolute -bottom-3 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 rounded-full animate-pulse'></div>
                   </span>{' '}
                   course insights
                 </h1>
 
-                <p className='hero-subtitle text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl font-light'>
+                <p className='hero-subtitle text-lg md:text-xl text-gray-700 leading-relaxed max-w-2xl font-medium'>
                   Get instant answers from programming course transcripts.
                   FlowMind&apos;s AI finds exactly what you need with{' '}
-                  <span className='text-purple-600 font-medium'>
+                  <span className='text-purple-700 font-bold bg-gradient-to-r from-purple-100 to-violet-100 px-2 py-1 rounded-lg'>
                     precise timestamps
                   </span>{' '}
-                  and context.
+                  and rich context.
                 </p>
               </div>
 
@@ -409,13 +411,13 @@ export default function TranscriptLearningLanding() {
                   <SignUpButton
                     mode='modal'
                     appearance={clerkAppearance}>
-                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 text-white px-6 py-3 rounded-2xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 cursor-pointer'>
-                      <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-700 hover:via-violet-700 hover:to-indigo-700 text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.02] cursor-pointer transform'>
+                      <div className='absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                       <span className='relative z-10'>
                         Start learning for free
                       </span>
-                      <ArrowRight className='relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300' />
-                      <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/50 to-violet-400/50 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
+                      <ArrowRight className='relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300' />
+                      <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/60 to-violet-400/60 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
                     </button>
                   </SignUpButton>
                 </div>
@@ -429,9 +431,9 @@ export default function TranscriptLearningLanding() {
             {/* Right Content - Visual Demo */}
             <div className='relative'>
               {/* Clean Demo Card */}
-              <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
+              <div className='bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-purple-200/50 overflow-hidden hover:shadow-purple-500/10 transition-all duration-500 hover:scale-[1.02]'>
                 {/* Simple Header */}
-                <div className='bg-gray-50 px-6 py-4 border-b border-gray-200'>
+                <div className='bg-gradient-to-r from-purple-50 to-violet-50 px-6 py-4 border-b border-purple-200/50'>
                   <div className='flex items-center space-x-3'>
                     <div className='flex space-x-2'>
                       <div className='w-3 h-3 bg-red-400 rounded-full'></div>
@@ -450,36 +452,36 @@ export default function TranscriptLearningLanding() {
                 </div>
 
                 {/* Clean Chat Interface */}
-                <div className='p-6 space-y-4 bg-white min-h-[320px]'>
+                <div className='p-4 space-y-4 bg-white min-h-[280px]'>
                   {/* User Question */}
                   <div className='flex justify-end'>
-                    <div className='bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-3 rounded-2xl rounded-br-md max-w-xs text-sm'>
+                    <div className='bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 text-white px-5 py-3 rounded-2xl rounded-br-md max-w-xs text-sm font-medium shadow-lg'>
                       How do I implement authentication in Node.js?
                     </div>
                   </div>
 
                   {/* AI Response */}
                   <div className='flex justify-start space-x-3'>
-                    <div className='w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0'>
-                      <Brain className='w-4 h-4 text-purple-600' />
+                    <div className='w-10 h-10 bg-gradient-to-r from-purple-100 to-violet-100 rounded-full flex items-center justify-center flex-shrink-0 shadow-md'>
+                      <Brain className='w-5 h-5 text-purple-600' />
                     </div>
-                    <div className='bg-gray-50 px-4 py-3 rounded-2xl rounded-bl-md max-w-md text-sm'>
-                      <p className='text-gray-800 mb-3'>
+                    <div className='bg-gradient-to-r from-gray-50 to-purple-50/30 px-5 py-4 rounded-2xl rounded-bl-md max-w-md text-sm border border-purple-100/50 shadow-sm'>
+                      <p className='text-gray-800 mb-4 font-medium'>
                         I found detailed authentication implementation in our
                         Node.js course:
                       </p>
 
                       {/* Source Reference */}
-                      <div className='bg-purple-50 border border-purple-200 rounded-lg p-3 mb-2'>
-                        <div className='flex items-center space-x-2 mb-1'>
-                          <FileText className='w-4 h-4 text-purple-600' />
-                          <span className='text-xs font-medium text-purple-800'>
+                      <div className='bg-gradient-to-r from-purple-100 to-violet-100 border border-purple-300/50 rounded-xl p-4 mb-2 shadow-sm'>
+                        <div className='flex items-center space-x-2 mb-2'>
+                          <FileText className='w-5 h-5 text-purple-700' />
+                          <span className='text-sm font-bold text-purple-800'>
                             Authentication Tutorial
                           </span>
                         </div>
                         <div className='flex items-center space-x-2'>
-                          <Clock className='w-3 h-3 text-purple-600' />
-                          <span className='text-xs text-purple-700'>
+                          <Clock className='w-4 h-4 text-purple-600' />
+                          <span className='text-sm text-purple-700 font-semibold'>
                             Timestamp: 15:32
                           </span>
                         </div>
