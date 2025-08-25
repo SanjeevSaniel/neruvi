@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Figtree, Comfortaa } from 'next/font/google';
+import { Figtree } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
@@ -18,12 +18,6 @@ import './globals.css';
 
 const figtree = Figtree({
   variable: '--font-figtree',
-  subsets: ['latin'],
-  display: 'swap',
-});
-
-const comfortaa = Comfortaa({
-  variable: '--font-comfortaa',
   subsets: ['latin'],
   display: 'swap',
 });
@@ -137,7 +131,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${figtree.variable} ${comfortaa.variable} font-sans antialiased`}
+          className={`${figtree.variable} font-sans antialiased`}
           suppressHydrationWarning>
           {children}
           <Toaster 

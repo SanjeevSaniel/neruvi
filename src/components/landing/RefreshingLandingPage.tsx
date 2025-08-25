@@ -16,7 +16,10 @@ import {
   Github,
   Linkedin,
   MessageCircle,
+  PlayCircle,
   Search,
+  Sparkles,
+  Terminal,
   X,
   Zap,
 } from 'lucide-react';
@@ -24,56 +27,11 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
 import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
-import { Button } from '../ui/button';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
-
-// Modern Clerk appearance configuration
-const clerkAppearance = {
-  elements: {
-    modalContent:
-      'bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-purple-200/50',
-    modalCloseButton:
-      'text-gray-400 hover:text-purple-600 transition-colors cursor-pointer',
-    headerTitle:
-      'text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent font-comfortaa lowercase tracking-tight',
-    headerSubtitle: 'text-gray-500 font-medium',
-    socialButtonsBlockButton:
-      'relative overflow-hidden bg-white border-2 border-gray-200 hover:border-purple-300 text-gray-700 rounded-2xl font-semibold transition-all duration-300 py-4 cursor-pointer group hover:shadow-lg',
-    socialButtonsBlockButtonText: 'relative z-10 font-semibold',
-    dividerLine:
-      'bg-gradient-to-r from-transparent via-purple-200 to-transparent',
-    dividerText: 'text-purple-500 font-medium text-sm bg-white px-4',
-    formFieldLabel: 'text-gray-700 font-semibold text-sm tracking-wide',
-    formFieldInput:
-      'border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:ring-0 focus:shadow-lg focus:shadow-purple-500/10 transition-all duration-300 py-4 bg-gray-50/50 focus:bg-white',
-    formButtonPrimary:
-      'relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 rounded-2xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/25 py-4 text-white cursor-pointer group hover:scale-105',
-    footerActionLink:
-      'text-purple-600 hover:text-purple-700 font-semibold cursor-pointer transition-colors duration-200 hover:underline decoration-2 underline-offset-2',
-    userButtonPopoverActionButton:
-      'hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 text-gray-700 hover:text-purple-700 rounded-2xl transition-all duration-200 cursor-pointer font-medium',
-    identityPreviewText: 'text-gray-800 font-medium',
-    identityPreviewEditButtonIcon: 'text-purple-500 hover:text-purple-600',
-    formFieldSuccessText: 'text-purple-600 font-medium',
-    formFieldErrorText: 'text-red-500 font-medium',
-  },
-  variables: {
-    colorPrimary: '#9333ea',
-    colorBackground: '#ffffff',
-    colorInputBackground: 'rgba(249, 250, 251, 0.5)',
-    colorInputText: '#374151',
-    colorText: '#374151',
-    colorTextSecondary: '#6b7280',
-    borderRadius: '16px',
-    fontFamily: "'Figtree', ui-sans-serif, system-ui, sans-serif",
-    fontSize: '16px',
-    spacingUnit: '1.25rem',
-  },
-};
 
 export default function TranscriptLearningLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -301,189 +259,207 @@ export default function TranscriptLearningLanding() {
     <div
       ref={containerRef}
       className='min-h-screen bg-white'>
-      {/* Modern Navigation */}
-      <nav className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl shadow-sm'>
+      {/* Navigation */}
+      <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
-            <div className='flex items-center space-x-4'>
-              <div className='flex items-center space-x-3 p-2'>
-                <FlowMindLogo
-                  size={32}
-                  animated={true}
-                  className='w-9 h-9'
-                />
-                <div>
-                  <span
-                    className='text-xl font-bold bg-clip-text text-black font-comfortaa lowercase'
-                    style={{
-                      fontFamily:
-                        'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif',
-                    }}>
-                    flowmind
-                  </span>
-                  <div className='text-xs text-purple-500 font-medium'>
-                    AI POWERED LEARNING
-                  </div>
+            <div className='flex items-center space-x-3'>
+              <FlowMindLogo
+                size={28}
+                animated={true}
+                className='w-8 h-8'
+              />
+              <div>
+                <span className='text-xl font-bold text-gray-900'>
+                  FlowMind
+                </span>
+                <div className='text-xs text-gray-500 font-medium'>
+                  AI Powered Learning
                 </div>
               </div>
             </div>
 
-            <div className='flex items-center space-x-4'>
+            <div className='flex items-center space-x-6'>
               <Link
                 href='https://github.com/SanjeevSaniel/flowmind-ai-chat'
-                className='flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-purple-50 group'>
-                <Github className='w-4 h-4 group-hover:scale-110 transition-transform' />
+                className='flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50'>
+                <Github className='w-4 h-4' />
                 <span className='hidden sm:inline font-medium'>GitHub</span>
               </Link>
 
-              <SignInButton
-                mode='modal'
-                appearance={clerkAppearance}>
-                <Button
-                  variant='outline'
-                  className='relative overflow-hidden text-md transition-all duration-300 px-4 py-2 rounded-xl hover:bg-none font-medium cursor-pointer group'>
-                  {/* <div className='absolute inset-0 bg-gradient-to-r from-purple-600 to-violet-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300'></div> */}
-                  <span className='relative z-10'>Sign In</span>
-                </Button>
+              <SignInButton mode='modal'>
+                <button className='text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50 font-medium'>
+                  Sign In
+                </button>
               </SignInButton>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Modern Hero Section */}
+      {/* Hero Section */}
       <section
         ref={heroRef}
-        className='relative bg-gradient-to-br from-white via-purple-50/20 to-violet-50/30 pt-20 pb-32 overflow-hidden'>
-        {/* Dynamic Background Elements */}
-        <div className='absolute inset-0 overflow-hidden'>
-          <KnowledgeWaveAnimation className='opacity-30' />
-          <div className='absolute top-1/4 left-1/4 w-72 h-72 bg-gradient-to-r from-purple-400/20 to-violet-400/20 rounded-full blur-3xl animate-pulse' />
-          <div
-            className='absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-violet-400/15 to-purple-400/15 rounded-full blur-3xl animate-pulse'
-            style={{ animationDelay: '2s' }}
-          />
-        </div>
-
-        <div className='max-w-6xl mx-auto px-6 lg:px-8 relative z-10'>
-          {/* Clean, Focused Layout */}
-          <div className='grid lg:grid-cols-2 gap-16 items-center'>
-            {/* Left Content - Typography Focus */}
-            <div className='space-y-8'>
-              {/* Modern Badge */}
-              <div className='hero-badge inline-flex items-center space-x-3 bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 px-6 py-3 rounded-2xl text-sm font-semibold border-purple-200/50 shadow-sm backdrop-blur-sm'>
-                <div className='p-1 bg-white rounded-lg shadow-sm'>
-                  <Brain className='w-4 h-4 text-purple-600' />
-                </div>
-                <span className='tracking-wide'>
-                  AI-POWERED LEARNING PLATFORM
-                </span>
-              </div>
-
-              {/* Modern Typography */}
-              <div className='space-y-8'>
-                <h1 className='hero-title text-5xl md:text-5xl lg:text-6xl font-medium text-gray-900 leading-[1.1] tracking-tight'>
-                  Learn faster with{' '}
-                  <span className='relative inline-block'>
-                    <span className='bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 bg-clip-text text-transparent'>
-                      AI-powered
-                    </span>
-                    <div className='absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-purple-400 to-violet-400 rounded-full'></div>
-                  </span>{' '}
-                  course insights
-                </h1>
-
-                <p className='hero-subtitle text-xl md:text-2xl text-gray-600 leading-relaxed max-w-2xl font-light'>
-                  Get instant answers from programming course transcripts.
-                  FlowMind&apos;s AI finds exactly what you need with{' '}
-                  <span className='text-purple-600 font-medium'>
-                    precise timestamps
-                  </span>{' '}
-                  and context.
-                </p>
-              </div>
-
-              {/* Clean CTA Section */}
-              <div className='space-y-4'>
-                <div className='flex flex-col sm:flex-row gap-4'>
-                  <SignUpButton
-                    mode='modal'
-                    appearance={clerkAppearance}>
-                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 text-white px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 hover:scale-105 cursor-pointer'>
-                      <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-                      <span className='relative z-10'>
-                        Start learning for free
-                      </span>
-                      <ArrowRight className='relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300' />
-                      <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400/50 to-violet-400/50 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
-                    </button>
-                  </SignUpButton>
-                </div>
-
-                <p className='text-sm text-gray-500'>
-                  No credit card required • 61+ course segments available
-                </p>
-              </div>
+        className='relative bg-gradient-to-b from-blue-50 via-purple-50/30 to-white pt-20 pb-32 overflow-hidden'>
+        
+        {/* Knowledge Wave Background Animation */}
+        <KnowledgeWaveAnimation className="opacity-40" />
+        
+        {/* Gradient Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/80 pointer-events-none" />
+        
+        <div className='max-w-7xl mx-auto px-6 lg:px-8 relative z-10'>
+          <div className='text-center mb-16'>
+            {/* Enhanced Badge */}
+            <div className='hero-badge inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 px-5 py-2.5 rounded-full text-sm font-semibold mb-8 shadow-lg backdrop-blur-sm border border-blue-200/50'>
+              <Brain className='w-4 h-4' />
+              <span>AI-Powered Knowledge Discovery Platform</span>
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse ml-1" />
             </div>
 
-            {/* Right Content - Visual Demo */}
-            <div className='relative'>
-              {/* Clean Demo Card */}
-              <div className='bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden'>
-                {/* Simple Header */}
-                <div className='bg-gray-50 px-6 py-4 border-b border-gray-200'>
-                  <div className='flex items-center space-x-3'>
-                    <div className='flex space-x-2'>
-                      <div className='w-3 h-3 bg-red-400 rounded-full'></div>
-                      <div className='w-3 h-3 bg-yellow-400 rounded-full'></div>
-                      <div className='w-3 h-3 bg-green-400 rounded-full'></div>
-                    </div>
-                    <div
-                      className='text-sm font-medium text-gray-600'
-                      style={{
-                        fontFamily:
-                          'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif',
-                      }}>
-                      flowmind
-                    </div>
+            {/* Enhanced Main Title */}
+            <h1 className='hero-title text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-8'>
+              Transform Knowledge Into
+              <br />
+              <span className='bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>
+                Instant Understanding
+              </span>
+            </h1>
+
+            {/* Enhanced Subtitle */}
+            <p className='hero-subtitle text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-12'>
+              Experience the future of learning with AI that understands your questions and delivers 
+              <span className="font-semibold text-purple-700"> precise answers from curated course content</span> with 
+              exact timestamps. No more endless searching - just pure, focused learning.
+            </p>
+
+            {/* Enhanced CTA Buttons */}
+            <div className='hero-buttons flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
+              <SignUpButton mode='modal'>
+                <button className='group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25 flex items-center space-x-3'>
+                  <Brain className='w-5 h-5 group-hover:scale-110 transition-transform' />
+                  <span>Start Learning with AI</span>
+                  <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
+                </button>
+              </SignUpButton>
+
+              <button className='group flex items-center space-x-3 px-8 py-4 border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50 rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm'>
+                <PlayCircle className='w-5 h-5 group-hover:scale-110 transition-transform' />
+                <span>Experience Demo</span>
+                <Sparkles className='w-4 h-4 opacity-60' />
+              </button>
+            </div>
+
+            {/* Knowledge Flow Indicators */}
+            <div className="flex justify-center items-center space-x-8 mb-8">
+              {[
+                { icon: Database, label: "Course Content", count: "61+" },
+                { icon: Brain, label: "AI Processing", count: "24/7" },
+                { icon: Clock, label: "Instant Answers", count: "<2s" }
+              ].map((item, index) => (
+                <div key={index} className="flex flex-col items-center space-y-2">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center shadow-md">
+                    <item.icon className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-purple-700">{item.count}</div>
+                    <div className="text-xs text-gray-600 font-medium">{item.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Demo Preview */}
+            <div className='hero-demo max-w-4xl mx-auto'>
+              <div className='bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden'>
+                {/* Chat Interface Header */}
+                <div className='bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center space-x-3'>
+                  <div className='flex space-x-2'>
+                    <div className='w-3 h-3 bg-red-400 rounded-full'></div>
+                    <div className='w-3 h-3 bg-yellow-400 rounded-full'></div>
+                    <div className='w-3 h-3 bg-green-400 rounded-full'></div>
+                  </div>
+                  <div className='text-sm font-medium text-gray-600'>
+                    FlowMind AI Chat
                   </div>
                 </div>
 
-                {/* Clean Chat Interface */}
-                <div className='p-6 space-y-4 bg-white min-h-[320px]'>
+                {/* Chat Demo */}
+                <div className='p-6 space-y-4 bg-gradient-to-br from-gray-50 to-white min-h-[300px]'>
                   {/* User Question */}
-                  <div className='flex justify-end'>
-                    <div className='bg-gradient-to-r from-purple-600 to-violet-600 text-white px-4 py-3 rounded-2xl rounded-br-md max-w-xs text-sm'>
-                      How do I implement authentication in Node.js?
+                  <div className='flex justify-end mb-4'>
+                    <div className='bg-blue-600 text-white px-4 py-3 rounded-2xl rounded-br-md max-w-xs'>
+                      <p className='text-sm'>
+                        How do I implement JWT authentication in Express.js?
+                      </p>
                     </div>
                   </div>
 
                   {/* AI Response */}
                   <div className='flex justify-start space-x-3'>
-                    <div className='w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0'>
-                      <Brain className='w-4 h-4 text-purple-600' />
+                    <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0'>
+                      <Brain className='w-4 h-4 text-white' />
                     </div>
-                    <div className='bg-gray-50 px-4 py-3 rounded-2xl rounded-bl-md max-w-md text-sm'>
-                      <p className='text-gray-800 mb-3'>
-                        I found detailed authentication implementation in our
-                        Node.js course:
+                    <div className='bg-white border border-gray-200 px-4 py-3 rounded-2xl rounded-bl-md max-w-md shadow-sm'>
+                      <p className='text-sm text-gray-800 mb-3'>
+                        I found the perfect explanation for JWT authentication
+                        in Express.js! Here&apos;s what the tutorial covers:
                       </p>
 
-                      {/* Source Reference */}
-                      <div className='bg-purple-50 border border-purple-200 rounded-lg p-3 mb-2'>
-                        <div className='flex items-center space-x-2 mb-1'>
-                          <FileText className='w-4 h-4 text-purple-600' />
-                          <span className='text-xs font-medium text-purple-800'>
-                            Authentication Tutorial
+                      {/* Transcript Reference */}
+                      <div className='bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2'>
+                        <div className='flex items-center space-x-2 mb-2'>
+                          <FileText className='w-4 h-4 text-blue-600' />
+                          <span className='text-xs font-semibold text-blue-800'>
+                            Express.js Authentication Tutorial
                           </span>
                         </div>
                         <div className='flex items-center space-x-2'>
-                          <Clock className='w-3 h-3 text-purple-600' />
-                          <span className='text-xs text-purple-700'>
-                            Timestamp: 15:32
+                          <Clock className='w-3 h-3 text-blue-600' />
+                          <span className='text-xs text-blue-700'>
+                            Transcript at 15:32 - JWT Implementation
                           </span>
+                          <button className='ml-auto'>
+                            <FileText className='w-4 h-4 text-blue-600 hover:text-blue-800 transition-colors' />
+                          </button>
                         </div>
                       </div>
+
+                      {/* Transcript Preview */}
+                      <div className='bg-gray-50 border border-gray-200 rounded-lg p-3 mb-2'>
+                        <p className='text-xs text-gray-700 font-mono leading-relaxed'>
+                          &quot;Now let&apos;s implement JWT authentication.
+                          First, we&apos;ll create middleware to verify tokens.
+                          Install jsonwebtoken package, then create a function
+                          that checks the Authorization header...&quot;
+                        </p>
+                      </div>
+
+                      <p className='text-xs text-gray-600'>
+                        The transcript covers middleware setup, token
+                        generation, and route protection with practical
+                        examples.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Typing Indicator */}
+                  <div className='flex justify-start space-x-3'>
+                    <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center'>
+                      <div className='flex space-x-1'>
+                        <div className='w-1 h-1 bg-white rounded-full animate-pulse'></div>
+                        <div
+                          className='w-1 h-1 bg-white rounded-full animate-pulse'
+                          style={{ animationDelay: '0.2s' }}></div>
+                        <div
+                          className='w-1 h-1 bg-white rounded-full animate-pulse'
+                          style={{ animationDelay: '0.4s' }}></div>
+                      </div>
+                    </div>
+                    <div className='bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-md'>
+                      <p className='text-sm text-gray-500'>
+                        AI is analyzing transcripts...
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -493,17 +469,17 @@ export default function TranscriptLearningLanding() {
         </div>
       </section>
 
-      {/* How It Works - Overleaf Inspired */}
+      {/* How It Works */}
       <section
         ref={howItWorksRef}
-        className='py-20 bg-gray-50'>
-        <div className='max-w-6xl mx-auto px-6 lg:px-8'>
-          <div className='text-center mb-16 space-y-4'>
-            <h2 className='text-3xl md:text-4xl font-light text-gray-900'>
-              How it works
+        className='py-24 bg-gray-50'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+              How FlowMind Works
             </h2>
-            <p className='text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed'>
-              Simple steps to get instant answers from programming course
+            <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+              Our AI-powered system transforms how you learn from transcript
               content
             </p>
           </div>
@@ -516,7 +492,7 @@ export default function TranscriptLearningLanding() {
                   key={index}
                   className={`workflow-step flex items-start space-x-4 p-6 rounded-2xl transition-all duration-500 ${
                     currentStep === index
-                      ? 'bg-white shadow-lg border-2 border-purple-200'
+                      ? 'bg-white shadow-lg border-2 border-blue-200'
                       : 'bg-white/50 hover:bg-white/80'
                   }`}>
                   <div
@@ -583,42 +559,38 @@ export default function TranscriptLearningLanding() {
         </div>
       </section>
 
-      {/* Key Features - Modern & Compact */}
+      {/* Key Features */}
       <section
         ref={featuresRef}
-        className='py-16 bg-white relative overflow-hidden'>
-        {/* Subtle Wave Background */}
-        <div className='absolute inset-0 opacity-5'>
-          <KnowledgeWaveAnimation />
-        </div>
-
-        <div className='max-w-6xl mx-auto px-6 lg:px-8 relative z-10'>
-          <div className='text-center mb-12 space-y-4'>
-            <h2 className='text-3xl md:text-4xl font-light text-gray-900'>
-              Why choose flowmind?
+        className='py-24 bg-white'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+              Why Choose FlowMind?
             </h2>
-            <p className='text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed'>
-              Precision learning features designed for modern developers
+            <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+              Revolutionary features that make learning from transcripts
+              effortless and efficient
             </p>
           </div>
 
-          <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6'>
+          <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-8'>
             {keyFeatures.map((feature, index) => (
               <div
                 key={index}
-                className='feature-card group relative bg-white p-6 rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300'>
-                <div className='w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors duration-300'>
-                  <feature.icon className='w-5 h-5 text-purple-600' />
+                className='feature-card group relative bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300'>
+                <div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300'>
+                  <feature.icon className='w-6 h-6 text-white' />
                 </div>
 
-                <h3 className='text-lg font-medium text-gray-900 mb-2'>
+                <h3 className='text-lg font-bold text-gray-900 mb-3'>
                   {feature.title}
                 </h3>
-                <p className='text-gray-600 text-sm mb-3 leading-relaxed'>
+                <p className='text-gray-600 text-sm mb-4'>
                   {feature.description}
                 </p>
 
-                <div className='inline-flex items-center text-xs font-medium text-purple-700 bg-purple-50 px-3 py-1 rounded-full border border-purple-200'>
+                <div className='inline-flex items-center text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full'>
                   <CheckCircle2 className='w-3 h-3 mr-1' />
                   {feature.highlight}
                 </div>
@@ -628,65 +600,54 @@ export default function TranscriptLearningLanding() {
         </div>
       </section>
 
-      {/* Interactive Demo - Compact */}
+      {/* Interactive Demo */}
       <section
         ref={demoRef}
-        className='py-16 bg-gray-50 relative overflow-hidden'>
-        {/* Wave Animation Background */}
-        <div className='absolute inset-0 opacity-8'>
-          <KnowledgeWaveAnimation />
-        </div>
-
-        <div className='max-w-6xl mx-auto px-6 lg:px-8 relative z-10'>
-          <div className='text-center mb-12 space-y-4'>
-            <h2 className='text-3xl md:text-4xl font-light text-gray-900'>
-              Try it yourself
+        className='py-24 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='text-center mb-16'>
+            <h2 className='text-4xl md:text-5xl font-bold text-gray-900 mb-6'>
+              Try It Yourself
             </h2>
-            <p className='text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed'>
-              Experience instant answers from programming course transcripts
+            <p className='text-xl text-gray-600 max-w-3xl mx-auto'>
+              See how FlowMind answers common programming questions with
+              transcript timestamps
             </p>
           </div>
 
           <div className='max-w-4xl mx-auto'>
-            <div className='bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden'>
-              <div className='bg-gradient-to-r from-purple-600 to-violet-600 text-white p-3 flex items-center space-x-3'>
-                <Brain className='w-4 h-4' />
-                <span
-                  className='font-medium text-sm'
-                  style={{
-                    fontFamily:
-                      'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif',
-                  }}>
-                  flowmind demo
+            <div className='bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden'>
+              <div className='bg-gray-900 text-white p-4 flex items-center space-x-3'>
+                <Terminal className='w-5 h-5' />
+                <span className='font-mono text-sm'>
+                  FlowMind Interactive Demo
                 </span>
               </div>
 
-              <div className='p-6'>
-                <h3 className='text-lg font-medium text-gray-900 mb-4'>
-                  Popular questions
+              <div className='p-8'>
+                <h3 className='text-lg font-semibold text-gray-900 mb-6'>
+                  Popular Questions
                 </h3>
-                <div className='grid md:grid-cols-2 gap-3'>
+                <div className='grid md:grid-cols-2 gap-4'>
                   {testimonialQuestions.map((question, index) => (
                     <div
                       key={index}
-                      className='demo-element group p-3 bg-gray-50 hover:bg-purple-50 rounded-lg border border-gray-200 hover:border-purple-300 cursor-pointer transition-all duration-300'>
+                      className='demo-element group p-4 bg-gray-50 hover:bg-blue-50 rounded-lg border border-gray-200 hover:border-blue-300 cursor-pointer transition-all duration-300'>
                       <div className='flex items-center space-x-3'>
-                        <MessageCircle className='w-4 h-4 text-gray-400 group-hover:text-purple-500 transition-colors' />
-                        <p className='text-sm text-gray-700 group-hover:text-gray-900 flex-1'>
+                        <MessageCircle className='w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors' />
+                        <p className='text-sm text-gray-700 group-hover:text-gray-900'>
                           {question}
                         </p>
-                        <ChevronRight className='w-4 h-4 text-gray-300 group-hover:text-purple-500 transition-colors' />
+                        <ChevronRight className='w-4 h-4 text-gray-300 group-hover:text-blue-500 ml-auto transition-colors' />
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className='mt-6 text-center'>
-                  <SignUpButton
-                    mode='modal'
-                    appearance={clerkAppearance}>
-                    <button className='bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer'>
-                      Try these questions free
+                <div className='mt-8 text-center'>
+                  <SignUpButton mode='modal'>
+                    <button className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg'>
+                      Try These Questions Free
                     </button>
                   </SignUpButton>
                 </div>
@@ -696,86 +657,72 @@ export default function TranscriptLearningLanding() {
         </div>
       </section>
 
-      {/* Final CTA - Modern & Compact */}
+      {/* Final CTA */}
       <section
         ref={ctaRef}
-        className='py-16 bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 relative overflow-hidden'>
-        {/* Subtle Wave Background */}
-        <div className='absolute inset-0 opacity-10'>
-          <KnowledgeWaveAnimation />
-        </div>
-
-        <div className='max-w-6xl mx-auto px-6 lg:px-8 text-center relative z-10'>
-          <h2 className='text-3xl md:text-4xl font-light text-white mb-4'>
-            Ready to transform your learning?
+        className='py-24 bg-gradient-to-r from-blue-600 to-purple-600'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8 text-center'>
+          <h2 className='text-4xl md:text-5xl font-bold text-white mb-6'>
+            Ready to Transform Your Learning?
           </h2>
-          <p className='text-lg text-purple-100 max-w-2xl mx-auto mb-8 leading-relaxed'>
-            Get instant, precise answers from course transcripts with exact
-            timestamps
+          <p className='text-xl text-blue-100 max-w-3xl mx-auto mb-12'>
+            Stop wasting time searching through hours of content. Get instant,
+            precise answers from detailed transcripts with exact timestamps.
           </p>
 
-          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-8'>
-            <SignUpButton
-              mode='modal'
-              appearance={clerkAppearance}>
-              <button className='bg-white text-purple-600 hover:bg-gray-50 px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-3 cursor-pointer'>
-                <span>Start learning free</span>
-                <ArrowRight className='w-4 h-4' />
+          <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
+            <SignUpButton mode='modal'>
+              <button className='bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-3'>
+                <span>Start Learning Free</span>
+                <ArrowRight className='w-5 h-5' />
               </button>
             </SignUpButton>
 
-            <button className='border-2 border-white text-white hover:bg-white hover:text-purple-600 px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center space-x-3 cursor-pointer'>
-              <FileText className='w-4 h-4' />
-              <span>View sample transcripts</span>
+            <button className='border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center space-x-3'>
+              <FileText className='w-5 h-5' />
+              <span>View Sample Transcripts</span>
             </button>
           </div>
 
-          <p className='text-purple-200 text-sm'>
-            No credit card required • 61+ course segments available
+          <p className='text-blue-200 text-sm'>
+            No credit card required • Free forever plan available
           </p>
         </div>
       </section>
 
-      {/* Footer - Compact */}
-      <footer className='bg-gray-900 text-white py-12'>
-        <div className='max-w-6xl mx-auto px-6 lg:px-8'>
-          <div className='grid lg:grid-cols-2 gap-8 items-center'>
-            <div className='space-y-4'>
+      {/* Footer */}
+      <footer className='bg-gray-900 text-white py-16'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='grid lg:grid-cols-2 gap-12 items-center'>
+            <div className='space-y-6'>
               <div className='flex items-center space-x-3'>
                 <FlowMindLogo
-                  size={24}
+                  size={28}
                   animated={false}
-                  className='w-7 h-7'
+                  className='w-8 h-8'
                 />
                 <div>
-                  <span
-                    className='text-xl font-medium font-comfortaa lowercase'
-                    style={{
-                      fontFamily:
-                        'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif',
-                    }}>
-                    flowmind
-                  </span>
-                  <div className='text-gray-400 text-xs'>
-                    © 2025 AI-Powered Learning
+                  <span className='text-2xl font-bold'>FlowMind</span>
+                  <div className='text-gray-400 text-sm'>
+                    © 2025 Transcript Learning AI
                   </div>
                 </div>
               </div>
 
-              <div className='space-y-1'>
-                <p className='text-gray-300 font-medium text-sm'>
+              <div className='space-y-2'>
+                <p className='text-gray-300 font-semibold'>
                   Crafted with ❤️ by Sanjeev Saniel
                 </p>
-                <p className='text-gray-400 text-xs flex items-center space-x-2'>
-                  <Brain className='w-3 h-3' />
+                <p className='text-gray-400 flex items-center space-x-2'>
+                  <FileText className='w-4 h-4' />
                   <span>
-                    Revolutionizing learning through AI transcript search
+                    Revolutionizing transcript-based learning through AI
                   </span>
                 </p>
               </div>
             </div>
 
-            <div className='flex flex-wrap gap-3 justify-start lg:justify-end'>
+            <div className='flex flex-wrap gap-4 justify-start lg:justify-end'>
               {[
                 {
                   href: 'https://github.com/SanjeevSaniel',
@@ -803,7 +750,7 @@ export default function TranscriptLearningLanding() {
                   href={link.href}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='flex items-center space-x-2 px-3 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg text-gray-300 hover:text-white transition-all duration-300 text-sm'>
+                  className='flex items-center space-x-2 px-4 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg text-gray-300 hover:text-white transition-all duration-300'>
                   <link.icon className='w-4 h-4' />
                   <span className='text-sm font-medium'>{link.label}</span>
                 </Link>

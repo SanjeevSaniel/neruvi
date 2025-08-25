@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Code2, Database, Lightbulb, BookOpen, Zap } from 'lucide-react'
 
@@ -9,31 +9,19 @@ interface KnowledgeWaveAnimationProps {
 }
 
 export default function KnowledgeWaveAnimation({ className = '' }: KnowledgeWaveAnimationProps) {
-  const [isClient, setIsClient] = useState(false)
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  // Fixed positions to avoid hydration issues
+  // Generate floating knowledge particles
   const knowledgeIcons = [Brain, Code2, Database, Lightbulb, BookOpen, Zap]
   const particles = Array.from({ length: 12 }, (_, i) => {
     const Icon = knowledgeIcons[i % knowledgeIcons.length]
-    // Use deterministic positioning based on index
     return {
       id: i,
       Icon,
-      x: (i * 23 + 15) % 100, // Deterministic x position
-      y: (i * 17 + 20) % 100, // Deterministic y position
-      delay: (i * 0.5) % 4, // Deterministic delay
-      duration: 8 + (i % 4), // Deterministic duration
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 4,
+      duration: 8 + Math.random() * 4,
     }
   })
-
-  if (!isClient) {
-    // Static version for SSR - no animations
-    return <div className={`absolute inset-0 overflow-hidden ${className}`} />
-  }
 
   // Generate wave paths for knowledge flow
   const generateKnowledgeWave = (amplitude: number, frequency: number, phase: number = 0) => {
@@ -159,7 +147,7 @@ export default function KnowledgeWaveAnimation({ className = '' }: KnowledgeWave
           }}
           animate={{
             y: [0, -20, 0],
-            x: [0, (particle.id % 2 === 0 ? 10 : -10), 0], // Deterministic movement
+            x: [0, Math.sin(particle.id) * 10, 0],
             rotate: [0, 360],
             opacity: [0.1, 0.3, 0.1],
           }}
