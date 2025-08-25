@@ -8,8 +8,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'figtree': ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        'sans': ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'figtree': ['var(--font-figtree)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'comfortaa': ['var(--font-comfortaa)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        'sans': ['var(--font-figtree)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

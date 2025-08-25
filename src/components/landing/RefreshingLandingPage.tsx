@@ -270,8 +270,8 @@ export default function TranscriptLearningLanding() {
                 className='w-8 h-8'
               />
               <div>
-                <span className='text-xl font-bold text-gray-900'>
-                  FlowMind
+                <span className='text-xl font-bold text-gray-900 font-comfortaa lowercase'>
+                  flowmind
                 </span>
                 <div className='text-xs text-gray-500 font-medium'>
                   AI Powered Learning
@@ -702,7 +702,7 @@ export default function TranscriptLearningLanding() {
                   className='w-8 h-8'
                 />
                 <div>
-                  <span className='text-2xl font-bold'>FlowMind</span>
+                  <span className='text-2xl font-bold font-comfortaa lowercase'>flowmind</span>
                   <div className='text-gray-400 text-sm'>
                     © 2025 Transcript Learning AI
                   </div>

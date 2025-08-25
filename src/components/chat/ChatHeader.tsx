@@ -101,8 +101,8 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
 
             {/* Brand Text */}
             <div className='text-left'>
-              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-tight'>
-                FlowMind
+              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-wide font-comfortaa lowercase'>
+                flowmind
               </h1>
               <p className='text-[10px] text-purple-100/90 font-medium -mt-0.5 drop-shadow-sm'>
                 AI Programming Assistant
