@@ -27,7 +27,6 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
 import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
-import AuthRedirect from '../AuthRedirect';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -309,7 +308,6 @@ export default function TranscriptLearningLanding() {
     <div
       ref={containerRef}
       className='min-h-screen bg-white'>
-      <AuthRedirect />
       {/* Navigation */}
       <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
