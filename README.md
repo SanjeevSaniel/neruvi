@@ -76,7 +76,7 @@ graph TD
 
 ## 🏗️ **Technical Architecture**
 
-> 📊 **[View Complete Architecture Flow Diagram →](./ARCHITECTURE.md)**
+> 📊 **[View Complete Architecture Flow Diagram →](./docs/ARCHITECTURE.md)**
 
 ![FlowMind Architecture](./public/architecture-diagram.svg)
 
@@ -455,6 +455,18 @@ RUN npm run build
 EXPOSE 3000
 CMD ["npm", "start"]
 ```
+
+---
+
+## 📚 **Documentation**
+
+Complete documentation is available in the [`docs/`](./docs/) folder:
+
+- **[Architecture Overview](./docs/ARCHITECTURE.md)** - System design and technical flow
+- **[Speech Recognition Guide](./docs/SPEECH_RECOGNITION.md)** - Voice input implementation details
+- **[User Experience Design](./docs/UX_ENHANCEMENTS.md)** - UI/UX improvements and animations
+- **[Release Notes](./docs/RELEASE_NOTES.md)** - Version history and changes
+- **[Installation Guide](./docs/INSTALLATION.md)** - Setup and development instructions
 
 ---
 

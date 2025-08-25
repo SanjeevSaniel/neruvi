@@ -26,6 +26,7 @@ import {
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
+import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -299,44 +300,73 @@ export default function TranscriptLearningLanding() {
       {/* Hero Section */}
       <section
         ref={heroRef}
-        className='relative bg-gradient-to-b from-blue-50 to-white pt-20 pb-32'>
-        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+        className='relative bg-gradient-to-b from-blue-50 via-purple-50/30 to-white pt-20 pb-32 overflow-hidden'>
+        
+        {/* Knowledge Wave Background Animation */}
+        <KnowledgeWaveAnimation className="opacity-40" />
+        
+        {/* Gradient Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/10 to-white/80 pointer-events-none" />
+        
+        <div className='max-w-7xl mx-auto px-6 lg:px-8 relative z-10'>
           <div className='text-center mb-16'>
-            {/* Badge */}
-            <div className='hero-badge inline-flex items-center space-x-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium mb-8'>
-              <Sparkles className='w-4 h-4' />
-              <span>AI-Powered Transcript Learning Platform</span>
+            {/* Enhanced Badge */}
+            <div className='hero-badge inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 px-5 py-2.5 rounded-full text-sm font-semibold mb-8 shadow-lg backdrop-blur-sm border border-blue-200/50'>
+              <Brain className='w-4 h-4' />
+              <span>AI-Powered Knowledge Discovery Platform</span>
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse ml-1" />
             </div>
 
-            {/* Main Title */}
+            {/* Enhanced Main Title */}
             <h1 className='hero-title text-5xl md:text-7xl font-black text-gray-900 leading-tight mb-8'>
-              Ask Questions,
+              Transform Knowledge Into
               <br />
-              <span className='bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'>
-                Get Transcript Answers
+              <span className='bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'>
+                Instant Understanding
               </span>
             </h1>
 
-            {/* Subtitle */}
-            <p className='hero-subtitle text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-12'>
-              Chat with AI to get precise answers from programming tutorial
-              transcripts with exact timestamps. Skip the searching, jump
-              straight to learning from detailed content.
+            {/* Enhanced Subtitle */}
+            <p className='hero-subtitle text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-12'>
+              Experience the future of learning with AI that understands your questions and delivers 
+              <span className="font-semibold text-purple-700"> precise answers from curated course content</span> with 
+              exact timestamps. No more endless searching - just pure, focused learning.
             </p>
 
-            {/* CTA Buttons */}
+            {/* Enhanced CTA Buttons */}
             <div className='hero-buttons flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
               <SignUpButton mode='modal'>
-                <button className='group bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-blue-500/25 flex items-center space-x-3'>
-                  <span>Start Learning Now</span>
+                <button className='group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-purple-500/25 flex items-center space-x-3'>
+                  <Brain className='w-5 h-5 group-hover:scale-110 transition-transform' />
+                  <span>Start Learning with AI</span>
                   <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
                 </button>
               </SignUpButton>
 
-              <button className='group flex items-center space-x-3 px-8 py-4 border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 rounded-xl font-semibold text-lg transition-all duration-300'>
-                <PlayCircle className='w-5 h-5' />
-                <span>See Demo</span>
+              <button className='group flex items-center space-x-3 px-8 py-4 border-2 border-purple-200 text-purple-700 hover:border-purple-300 hover:bg-purple-50 rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm'>
+                <PlayCircle className='w-5 h-5 group-hover:scale-110 transition-transform' />
+                <span>Experience Demo</span>
+                <Sparkles className='w-4 h-4 opacity-60' />
               </button>
+            </div>
+
+            {/* Knowledge Flow Indicators */}
+            <div className="flex justify-center items-center space-x-8 mb-8">
+              {[
+                { icon: Database, label: "Course Content", count: "61+" },
+                { icon: Brain, label: "AI Processing", count: "24/7" },
+                { icon: Clock, label: "Instant Answers", count: "<2s" }
+              ].map((item, index) => (
+                <div key={index} className="flex flex-col items-center space-y-2">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center shadow-md">
+                    <item.icon className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-purple-700">{item.count}</div>
+                    <div className="text-xs text-gray-600 font-medium">{item.label}</div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Demo Preview */}

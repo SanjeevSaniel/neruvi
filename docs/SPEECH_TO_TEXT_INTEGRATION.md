@@ -1,6 +1,8 @@
 # Speech-to-Text Integration Guide
 
-This guide shows how to easily add or remove speech-to-text functionality from FlowMind components.
+> **Enhanced with Modern Sine Wave Animations & React Hot Toast Error Handling**
+
+This guide shows how to easily add or remove speech-to-text functionality from FlowMind components with advanced visual feedback.
 
 ## 🚀 Quick Integration
 

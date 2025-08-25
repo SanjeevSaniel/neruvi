@@ -1,8 +1,9 @@
 // components/chat/ChatHeader.tsx
 import { motion } from 'framer-motion';
-import { Brain, Menu } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import FlowMindLogo from '../FlowMindLogo';
+import ConversationHistoryIcon from '../ui/ConversationHistoryIcon';
 
 const AIStatusIndicator = () => {
   return (
@@ -55,7 +56,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className='relative h-16 flex items-center justify-center flex-shrink-0 overflow-hidden'>
+      className='relative h-12 flex items-center justify-center flex-shrink-0 overflow-hidden'>
       {/* Clean gradient background */}
       <div className='absolute inset-0 bg-gradient-to-r from-purple-600/95 via-violet-600/98 to-purple-700/95 backdrop-blur-xl'>
         {/* Subtle animated overlay */}
@@ -69,63 +70,79 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
       {/* Bottom border */}
       <div className='absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent' />
 
-      <div className='relative w-full max-w-6xl mx-auto px-6 flex items-center justify-between'>
+      <div className='relative w-full max-w-6xl mx-auto px-4 flex items-center justify-between'>
         {/* Left Side - Menu and Logo */}
-        <div className='flex items-center space-x-4'>
-          {/* Menu Button */}
+        <div className='flex items-center space-x-3'>
+          {/* Conversation History Button */}
           {onOpenSidebar && (
-            <button
+            <motion.button
               onClick={onOpenSidebar}
-              className='p-2 text-white hover:text-purple-200 hover:bg-white/10 rounded-lg transition-colors'
-              title='Open conversations'
+              className='p-1.5 text-white hover:text-purple-200 hover:bg-white/10 rounded-lg transition-all duration-300'
+              title='View conversation history'
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: '0 4px 8px rgba(255, 255, 255, 0.1)'
+              }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Menu className='w-5 h-5' />
-            </button>
+              <ConversationHistoryIcon className='w-4 h-4' size={16} />
+            </motion.button>
           )}
           
           {/* Logo Section - Clickable */}
           <button
             onClick={onHeaderClick}
-            className='flex justify-center items-center gap-2 p-2 rounded-lg cursor-pointer'
+            className='flex justify-center items-center gap-2 p-1.5 rounded-lg cursor-pointer'
             title='Show course selection'
           >
-            <div>
+            <div className="scale-90">
               <FlowMindLogo animated={true} />
             </div>
 
             {/* Brand Text */}
             <div className='text-left'>
-              <h1 className='text-xl font-semibold text-white drop-shadow-lg tracking-tight'>
+              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-tight'>
                 FlowMind
               </h1>
-              <p className='text-xs text-purple-100/90 font-semibold -mt-0.5 drop-shadow-sm'>
+              <p className='text-[10px] text-purple-100/90 font-medium -mt-0.5 drop-shadow-sm'>
                 AI Programming Assistant
               </p>
             </div>
           </button>
         </div>
 
-        <div className="flex items-center space-x-4">
-          {/* Single AI Status Indicator */}
+        <div className="flex items-center space-x-3">
+          {/* Compact AI Status Indicator */}
           <div className='hidden md:block'>
-            <AIStatusIndicator />
-          </div>
-
-          {/* Mobile compact version */}
-          <div className='md:hidden'>
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
-              <div className='w-2 h-2 rounded-full bg-emerald-400 animate-pulse' />
-              <span className='text-white text-xs font-semibold'>AI Ready</span>
+              className='flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
+              <div className='relative'>
+                <Brain className='w-3 h-3 text-white' />
+                <motion.div
+                  className='absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400'
+                  animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              </div>
+              <span className='text-white text-xs font-medium'>AI Ready</span>
             </motion.div>
           </div>
 
-          {/* User Profile */}
+          {/* Mobile version */}
+          <div className='md:hidden'>
+            <motion.div
+              className='flex items-center space-x-1 px-2 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
+              <div className='w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' />
+              <span className='text-white text-xs font-medium'>AI</span>
+            </motion.div>
+          </div>
+
+          {/* User Profile - Compact */}
           <UserButton 
             appearance={{
               elements: {
-                avatarBox: "w-9 h-9 border-2 border-white/30 shadow-lg",
+                avatarBox: "w-8 h-8 border-2 border-white/30 shadow-lg",
                 userButtonPopoverCard: "bg-white/95 backdrop-blur-sm border border-white/20 shadow-2xl",
                 userButtonPopoverActionButton: "hover:bg-purple-50",
               },
