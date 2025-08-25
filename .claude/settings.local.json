@@ -28,7 +28,9 @@
       "Bash(npx shadcn@latest add:*)",
       "Bash(y)",
       "Bash(npx tsc:*)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "WebFetch(domain:www.overleaf.com)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
