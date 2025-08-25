@@ -409,7 +409,7 @@ export default function TranscriptLearningLanding() {
                   <SignUpButton
                     mode='modal'
                     appearance={clerkAppearance}>
-                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 text-white px-10 py-5 rounded-2xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 hover:scale-105 cursor-pointer'>
+                    <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 text-white px-6 py-3 rounded-2xl font-semibold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/25 cursor-pointer'>
                       <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                       <span className='relative z-10'>
                         Start learning for free
@@ -420,9 +420,9 @@ export default function TranscriptLearningLanding() {
                   </SignUpButton>
                 </div>
 
-                <p className='text-sm text-gray-500'>
+                {/* <p className='text-sm text-gray-500'>
                   No credit card required • 61+ course segments available
-                </p>
+                </p> */}
               </div>
             </div>
 
