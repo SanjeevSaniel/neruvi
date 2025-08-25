@@ -30,6 +30,10 @@ export default function ChatInterface() {
   const [showCourseSelector, setShowCourseSelector] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [messageDetailOpen, setMessageDetailOpen] = useState(false);
+  const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
+  const [keepPanelOpen, setKeepPanelOpen] = useState(false);
+  const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingContentRef = useRef<string>('');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Get current conversation or create one if none exists
@@ -61,7 +65,9 @@ export default function ChatInterface() {
   const handleCloseMessageDetail = () => {
     setMessageDetailOpen(false);
     setSelectedMessage(null);
+    setKeepPanelOpen(false); // Reset the flag when manually closed
   };
+  
 
   // Don't auto-create conversations - wait for course selection
   // useEffect(() => {
@@ -70,17 +76,29 @@ export default function ChatInterface() {
   //   }
   // }, [currentConversationId, createConversation]);
 
+  // Track previous conversation ID to detect actual conversation changes
+  const prevConversationIdRef = useRef<string | null>(null);
+
   // Reset chat state when conversation changes
   useEffect(() => {
     const conversation = getCurrentConversation();
     if (conversation) {
       setHasStartedChat(conversation.messages.length > 0);
       setShowCourseSelector(false); // Hide course selector when switching conversations
-      // Close message detail panel when switching conversations
-      setMessageDetailOpen(false);
-      setSelectedMessage(null);
+      
+      // Close message detail panel only when actually switching to a different conversation
+      const conversationChanged = prevConversationIdRef.current !== null && 
+                                 prevConversationIdRef.current !== currentConversationId;
+      
+      if (conversationChanged && !streamingMessage && !keepPanelOpen) {
+        setMessageDetailOpen(false);
+        setSelectedMessage(null);
+      }
+      
+      // Update the previous conversation ID reference
+      prevConversationIdRef.current = currentConversationId;
     }
-  }, [currentConversationId, getCurrentConversation]);
+  }, [currentConversationId, getCurrentConversation, streamingMessage, keepPanelOpen]);
 
   // Close panel when navigating away from chat (when course selector is shown)
   useEffect(() => {
@@ -156,6 +174,8 @@ export default function ChatInterface() {
     addMessage(conversationId, userMessage);
     setInput(''); // Clear input box immediately after sending
     setIsLoading(true);
+    
+    let accumulatedContent = ''; // Move to broader scope
 
     try {
       const response = await fetch('/api/chat', {
@@ -170,6 +190,7 @@ export default function ChatInterface() {
         }),
       });
 
+      
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       if (!response.body) throw new Error('No response body');
 
@@ -201,9 +222,49 @@ export default function ChatInterface() {
       };
 
       addMessage(conversationId, assistantMessage);
+      
+      // Auto-show the right panel when streaming starts
+      setStreamingMessage(assistantMessage);
+      setSelectedMessage(assistantMessage);
+      setMessageDetailOpen(true);
+      setKeepPanelOpen(true); // Flag to keep panel open after streaming
 
       let done = false;
-      let accumulatedContent = '';
+      let displayContent = '';
+      let contentQueue = '';
+
+      // Smooth streaming with slower, word-by-word display for better readability
+      const updateStreamingContent = (newContent: string) => {
+        contentQueue = newContent;
+        
+        // Clear existing timeout
+        if (streamingTimeoutRef.current) {
+          clearTimeout(streamingTimeoutRef.current);
+        }
+        
+        // Process content gradually for smoother display
+        const processNextChunk = () => {
+          if (displayContent.length < contentQueue.length) {
+            // Add content word by word or in small chunks for smoother streaming
+            const remaining = contentQueue.slice(displayContent.length);
+            const nextChunkSize = Math.min(3, remaining.length); // 3 characters at a time
+            displayContent += remaining.slice(0, nextChunkSize);
+            
+            updateMessage(conversationId, assistantMessage.id, displayContent);
+            setStreamingMessage({
+              ...assistantMessage,
+              content: displayContent
+            });
+            
+            // Continue processing if there's more content
+            if (displayContent.length < contentQueue.length) {
+              streamingTimeoutRef.current = setTimeout(processNextChunk, 80); // 80ms between chunks
+            }
+          }
+        };
+        
+        processNextChunk();
+      };
 
       while (!done) {
         const { value, done: readerDone } = await reader.read();
@@ -212,14 +273,26 @@ export default function ChatInterface() {
         if (value) {
           const chunk = decoder.decode(value, { stream: true });
           accumulatedContent += chunk;
-
-          updateMessage(
-            conversationId,
-            assistantMessage.id,
-            accumulatedContent,
-          );
+          updateStreamingContent(accumulatedContent);
         }
       }
+      
+      // Ensure final content is set after streaming completes
+      if (streamingTimeoutRef.current) {
+        clearTimeout(streamingTimeoutRef.current);
+      }
+      
+      // Set final content and ensure display catches up
+      displayContent = accumulatedContent;
+      updateMessage(conversationId, assistantMessage.id, accumulatedContent);
+      
+      // Create final message object for panel
+      const finalMessage = {
+        ...assistantMessage,
+        content: accumulatedContent
+      };
+      
+      setStreamingMessage(finalMessage);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
@@ -231,8 +304,26 @@ export default function ChatInterface() {
         sources: [],
       };
       addMessage(conversationId, errorMsg);
+      
+      // If we were streaming and got an error, show the error in the panel
+      if (streamingMessage) {
+        setSelectedMessage(errorMsg);
+      }
     } finally {
       setIsLoading(false);
+      // Clear streaming state when done but keep panel open with final message
+      setTimeout(() => {
+        // Create final message from the accumulated content
+        const finalMessage: Message = {
+          ...assistantMessage,
+          content: accumulatedContent
+        };
+        
+        // Clear streaming state but keep panel open
+        setStreamingMessage(null);
+        setSelectedMessage(finalMessage);
+        setMessageDetailOpen(true); // Explicitly ensure panel stays open
+      }, 500);
     }
   };
 
@@ -337,9 +428,10 @@ export default function ChatInterface() {
                 }}
                 className='overflow-hidden'>
                 <MessageDetailPanel
-                  message={selectedMessage}
+                  message={streamingMessage || selectedMessage}
                   isOpen={messageDetailOpen}
                   onClose={handleCloseMessageDetail}
+                  isStreaming={!!streamingMessage}
                 />
               </motion.div>
             )}
