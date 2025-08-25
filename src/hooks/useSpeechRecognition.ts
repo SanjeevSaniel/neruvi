@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import toast from 'react-hot-toast'
 import { SpeechConfig, DEFAULT_SPEECH_CONFIG, checkSpeechRecognitionSupport } from '@/lib/speech-config'
 
 interface SpeechRecognitionOptions extends Partial<SpeechConfig> {}
@@ -111,25 +112,34 @@ export const useSpeechRecognition = (
 
       // Handle errors
       recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        console.error('Speech recognition error:', event.error)
+        let errorMessage = ''
         
         switch (event.error) {
           case 'not-allowed':
-            setError('Microphone access denied. Please enable microphone permissions.')
+            errorMessage = 'Microphone access denied. Please enable microphone permissions.'
+            toast.error(errorMessage)
             break
           case 'no-speech':
-            setError('No speech detected. Please try again.')
+            errorMessage = 'No speech detected. Please try speaking again.'
+            toast.error(errorMessage, {
+              duration: 2000,
+              position: 'top-center'
+            })
             break
           case 'network':
-            setError('Network error. Please check your internet connection.')
+            errorMessage = 'Network error. Please check your internet connection.'
+            toast.error(errorMessage)
             break
           case 'audio-capture':
-            setError('No microphone found. Please connect a microphone.')
+            errorMessage = 'No microphone found. Please connect a microphone.'
+            toast.error(errorMessage)
             break
           default:
-            setError(`Speech recognition error: ${event.error}`)
+            errorMessage = `Speech recognition error: ${event.error}`
+            toast.error(errorMessage)
         }
         
+        setError(errorMessage)
         setIsListening(false)
       }
 
@@ -190,8 +200,9 @@ export const useSpeechRecognition = (
       try {
         recognitionRef.current.start()
       } catch (error) {
-        console.error('Error starting speech recognition:', error)
-        setError('Failed to start speech recognition')
+        const errorMessage = 'Failed to start speech recognition'
+        toast.error(errorMessage)
+        setError(errorMessage)
       }
     }
   }, [hasRecognitionSupport, isListening])

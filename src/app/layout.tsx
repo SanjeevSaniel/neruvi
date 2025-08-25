@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Figtree } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
 import './globals.css';
 
 // const inter = Inter({
@@ -133,6 +134,43 @@ export default function RootLayout({
           className={`${figtree.variable} font-sans antialiased`}
           suppressHydrationWarning>
           {children}
+          <Toaster 
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#fff',
+                color: '#374151',
+                borderRadius: '8px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                border: '1px solid #e5e7eb',
+                fontSize: '14px',
+                fontFamily: 'var(--font-figtree), system-ui, sans-serif',
+              },
+              error: {
+                style: {
+                  background: '#fef2f2',
+                  color: '#dc2626',
+                  border: '1px solid #fecaca',
+                },
+                iconTheme: {
+                  primary: '#dc2626',
+                  secondary: '#fef2f2',
+                },
+              },
+              success: {
+                style: {
+                  background: '#f0fdf4',
+                  color: '#16a34a',
+                  border: '1px solid #bbf7d0',
+                },
+                iconTheme: {
+                  primary: '#16a34a',
+                  secondary: '#f0fdf4',
+                },
+              },
+            }}
+          />
         </body>
       </html>
     </ClerkProvider>

@@ -5,6 +5,7 @@ import { Send } from 'lucide-react';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import SpeechRecognitionButton from '@/components/ui/SpeechRecognitionButton';
 import SpeechStatus from '@/components/ui/SpeechStatus';
+import WaveAnimation from '@/components/ui/WaveAnimation';
 
 interface ChatInputProps {
   value: string;
@@ -155,17 +156,30 @@ export default function ChatInput({
               }}
             />
             
-            {/* Speech Recognition Button */}
-            <SpeechRecognitionButton
-              isListening={isListening}
-              isDisabled={disabled || isLoading}
-              hasSupport={hasRecognitionSupport}
-              onClick={handleMicClick}
-              className="ml-2"
-              size="md"
-              variant="default"
-              isProcessing={isLoading}
-            />
+            {/* Speech Recognition with Wave Animation */}
+            <div className="flex items-center ml-2 space-x-2">
+              <SpeechRecognitionButton
+                isListening={isListening}
+                isDisabled={disabled || isLoading}
+                hasSupport={hasRecognitionSupport}
+                onClick={handleMicClick}
+                size="md"
+                variant="default"
+                isProcessing={isLoading}
+              />
+              
+              {/* Animated Wave Visualization */}
+              {isListening && (
+                <div className="flex items-center">
+                  <WaveAnimation 
+                    isActive={isListening} 
+                    size="md" 
+                    color="rgb(147 51 234)" 
+                    className="opacity-80"
+                  />
+                </div>
+              )}
+            </div>
             <motion.button
               type='submit'
               disabled={isLoading || !value.trim() || disabled}

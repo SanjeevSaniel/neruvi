@@ -2,7 +2,9 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Mic, MicOff } from 'lucide-react'
+import { Mic } from 'lucide-react'
+import WaveAnimation from './WaveAnimation'
+import StopIcon from './StopIcon'
 
 interface SpeechRecognitionButtonProps {
   isListening: boolean
@@ -105,7 +107,9 @@ export default function SpeechRecognitionButton({
       aria-pressed={isListening}
     >
       {isListening ? (
-        <MicOff className={iconSizes[size]} />
+        <div className="flex items-center justify-center">
+          <StopIcon className="text-white" size={parseInt(iconSizes[size].match(/w-(\d+)/)?.[1] || '4') * 4} />
+        </div>
       ) : (
         <Mic className={iconSizes[size]} />
       )}

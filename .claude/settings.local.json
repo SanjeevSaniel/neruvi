@@ -27,7 +27,8 @@
       "Bash(git push:*)",
       "Bash(npx shadcn@latest add:*)",
       "Bash(y)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(gh:*)"
     ],
     "deny": [],
     "ask": []

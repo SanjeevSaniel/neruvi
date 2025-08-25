@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 import SpeechRecognitionButton from '@/components/ui/SpeechRecognitionButton'
 import SpeechStatus from '@/components/ui/SpeechStatus'
+import WaveAnimation from '@/components/ui/WaveAnimation'
 import { SUPPORTED_LANGUAGES, SpeechConfig } from '@/lib/speech-config'
 import { Settings, Info, CheckCircle, XCircle } from 'lucide-react'
 
@@ -230,7 +231,7 @@ export default function SpeechToTextDemo() {
             <label className="text-sm font-medium text-gray-700">
               Speech Input
             </label>
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-2">
               <SpeechRecognitionButton
                 isListening={isListening}
                 isDisabled={false}
@@ -239,6 +240,16 @@ export default function SpeechToTextDemo() {
                 size="sm"
                 variant="default"
               />
+              
+              {/* Wave Animation during recording */}
+              {isListening && (
+                <WaveAnimation 
+                  isActive={isListening} 
+                  size="sm" 
+                  color="rgb(147 51 234)"
+                />
+              )}
+              
               <button
                 onClick={clearInput}
                 className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md transition-colors"
