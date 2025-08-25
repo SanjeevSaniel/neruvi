@@ -30,7 +30,9 @@
       "Bash(npx tsc:*)",
       "Bash(gh:*)",
       "WebFetch(domain:www.overleaf.com)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

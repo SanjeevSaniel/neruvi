@@ -25,6 +25,7 @@ export default function SignUpPage() {
           <SignUp 
             afterSignUpUrl="/chat"
             redirectUrl="/chat"
+            forceRedirectUrl="/chat"
             appearance={{
               elements: {
                 formButtonPrimary: 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-sm normal-case rounded-xl shadow-lg hover:shadow-xl transition-all duration-300',
