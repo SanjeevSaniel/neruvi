@@ -170,14 +170,12 @@ export default function ChatInput({
               
               {/* Animated Wave Visualization */}
               {isListening && (
-                <div className="flex items-center">
-                  <WaveAnimation 
-                    isActive={isListening} 
-                    size="md" 
-                    color="rgb(147 51 234)" 
-                    className="opacity-80"
-                  />
-                </div>
+                <WaveAnimation 
+                  isActive={isListening} 
+                  size="sm" 
+                  color="rgb(147 51 234)" 
+                  className="opacity-90"
+                />
               )}
             </div>
             <motion.button
