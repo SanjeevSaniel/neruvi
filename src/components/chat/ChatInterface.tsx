@@ -195,7 +195,7 @@ export default function ChatInterface() {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       if (!response.body) throw new Error('No response body');
 
-      // Extract sources from headers
+      // Extract sources from headers (optional for deployment compatibility)
       const sourcesHeader = response.headers.get('X-Sources');
       let sources: SourceTimestamp[] = [];
 
@@ -208,8 +208,11 @@ export default function ChatInterface() {
           }));
         } catch (error) {
           console.error('Error parsing sources:', error);
+          // Continue without sources - deployment compatibility
         }
       }
+      
+      // For deployment: No sources available, but still show AI response
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
