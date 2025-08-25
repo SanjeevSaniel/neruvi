@@ -10,6 +10,12 @@ interface SourcePanelProps {
 }
 
 export default function SourcePanel({ sources }: SourcePanelProps) {
+  // Get dynamic title based on source count
+  const getSourceTitle = (count: number): string => {
+    if (count === 1) return 'Source Reference:';
+    return 'Source References:';
+  };
+
   // Group sources by course first, then sort by timestamp within each course
   const groupedSources = sources.reduce((acc, source) => {
     const courseKey = source.course.toLowerCase();
@@ -48,7 +54,7 @@ export default function SourcePanel({ sources }: SourcePanelProps) {
       <div className='flex items-center space-x-2 mb-2'>
         <Clock className='w-4 h-4 text-slate-600' />
         <span className='text-sm font-medium text-slate-800'>
-          Source References:
+          {getSourceTitle(sources.length)}
         </span>
       </div>
 
@@ -137,17 +143,10 @@ const SourceItem = ({
   // Check if relevance is a reason text or percentage
   const isPercentage = /^\d+\.?\d*$/.test(source.relevance);
 
-  const getDynamicRelevanceMessage = (score: number): string => {
-    if (score >= 85) return 'Exact match';
-    if (score >= 75) return 'Highly relevant';
-    if (score >= 60) return 'Good match';
-    if (score >= 45) return 'Related content';
-    if (score >= 30) return 'Supplementary';
-    return 'Background info';
-  };
+  // Removed relevance text labels for cleaner display
 
   const getRelevanceColor = (relevance: string): string => {
-    if (!isPercentage) return 'text-blue-600'; // Default color for text reasons
+    if (!isPercentage) return 'text-slate-600';
     const percentage = parseFloat(relevance);
     if (percentage >= 80) return 'text-green-600';
     if (percentage >= 60) return 'text-blue-600';
@@ -157,7 +156,7 @@ const SourceItem = ({
   };
 
   const getRelevanceDot = (relevance: string): string => {
-    if (!isPercentage) return 'bg-blue-500'; // Default dot for text reasons
+    if (!isPercentage) return 'bg-slate-400';
     const percentage = parseFloat(relevance);
     if (percentage >= 80) return 'bg-green-500';
     if (percentage >= 60) return 'bg-blue-500';
@@ -212,22 +211,12 @@ const SourceItem = ({
           {source.timestamp}
         </button>
       </div>
-      <div className='flex items-center space-x-2'>
-        <span
-          className={`font-medium text-xs ${getRelevanceColor(
+      <div className='flex items-center'>
+        <div
+          className={`w-2 h-2 rounded-full ${getRelevanceDot(
             source.relevance,
-          )}`}>
-          {isPercentage
-            ? getDynamicRelevanceMessage(parseFloat(source.relevance))
-            : source.relevance}
-        </span>
-        <div className='flex items-center space-x-1'>
-          <div
-            className={`w-2 h-2 rounded-full ${getRelevanceDot(
-              source.relevance,
-            )}`}
-          />
-        </div>
+          )}`}
+        />
       </div>
     </motion.div>
   );

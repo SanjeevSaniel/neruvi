@@ -109,7 +109,7 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
               onClick={() => onClick?.(message)}
-              className={`relative px-4 py-3 rounded-2xl shadow-md cursor-pointer transition-all duration-200 ${
+              className={`relative px-4 py-3 rounded-2xl shadow-md cursor-pointer transition-all duration-200 hover:shadow-lg ${
                 message.role === 'user'
                   ? `bg-gradient-to-br from-purple-500/90 via-violet-500/90 to-indigo-500/90 text-white shadow-purple-500/20 ml-6 ${
                       isSelected ? 'ring-2 ring-purple-300 ring-offset-2' : ''
@@ -130,17 +130,34 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
                   {getPreviewText(message.content, 200)}
                   
                   {message.sources && message.sources.length > 0 && (
-                    <div className={`mt-2 text-xs ${message.role === 'user' ? 'text-purple-200' : 'text-purple-600'}`}>
-                      {message.sources.length} source{message.sources.length > 1 ? 's' : ''}
+                    <div className={`mt-2 text-xs ${message.role === 'user' ? 'text-purple-200' : 'text-purple-600'} flex items-center space-x-1`}>
+                      <span>{message.sources.length} source{message.sources.length > 1 ? 's' : ''}</span>
+                      <span className="text-slate-400">• Click for details</span>
                     </div>
                   )}
                 </div>
                 
-                {/* Click indicator arrow - Only for assistant messages */}
+                {/* Enhanced click indicator - Only for assistant messages */}
                 {message.role === 'assistant' && (
-                  <div className="flex-shrink-0 text-slate-400">
-                    <ChevronRight className="w-5 h-5" />
-                  </div>
+                  <motion.div 
+                    className="flex-shrink-0 flex items-center justify-center w-8 h-8 bg-purple-100 hover:bg-purple-200 rounded-full transition-all duration-200 group/arrow shadow-sm hover:shadow-md"
+                    whileHover={{ scale: 1.1, x: 2 }}
+                    whileTap={{ scale: 0.95 }}
+                    animate={{ 
+                      boxShadow: ["0 2px 4px rgba(139, 92, 246, 0.1)", "0 4px 8px rgba(139, 92, 246, 0.2)", "0 2px 4px rgba(139, 92, 246, 0.1)"]
+                    }}
+                    transition={{ 
+                      boxShadow: { duration: 2, repeat: Infinity, repeatType: "reverse" }
+                    }}
+                    title="Click to view detailed analysis and sources"
+                  >
+                    <motion.div
+                      animate={{ x: [0, 1, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
+                    >
+                      <ChevronRight className="w-4 h-4 text-purple-600 group-hover/arrow:text-purple-700 transition-colors" />
+                    </motion.div>
+                  </motion.div>
                 )}
               </div>
             </motion.div>
