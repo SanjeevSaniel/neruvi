@@ -33,6 +33,50 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+// Modern Clerk appearance configuration
+const clerkAppearance = {
+  elements: {
+    modalContent:
+      'bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-purple-200/50',
+    modalCloseButton:
+      'text-gray-400 hover:text-purple-600 transition-colors cursor-pointer',
+    headerTitle:
+      'text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent font-comfortaa lowercase tracking-tight',
+    headerSubtitle: 'text-gray-500 font-medium',
+    socialButtonsBlockButton:
+      'relative overflow-hidden bg-white border-2 border-gray-200 hover:border-purple-300 text-gray-700 rounded-2xl font-semibold transition-all duration-300 py-4 cursor-pointer group hover:shadow-lg',
+    socialButtonsBlockButtonText: 'relative z-10 font-semibold',
+    dividerLine:
+      'bg-gradient-to-r from-transparent via-purple-200 to-transparent',
+    dividerText: 'text-purple-500 font-medium text-sm bg-white px-4',
+    formFieldLabel: 'text-gray-700 font-semibold text-sm tracking-wide',
+    formFieldInput:
+      'border-2 border-gray-200 rounded-2xl focus:border-purple-500 focus:ring-0 focus:shadow-lg focus:shadow-purple-500/10 transition-all duration-300 py-4 bg-gray-50/50 focus:bg-white',
+    formButtonPrimary:
+      'relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-purple-700 hover:from-purple-700 hover:via-violet-700 hover:to-purple-800 rounded-2xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-purple-500/25 py-4 text-white cursor-pointer group hover:scale-105',
+    footerActionLink:
+      'text-purple-600 hover:text-purple-700 font-semibold cursor-pointer transition-colors duration-200 hover:underline decoration-2 underline-offset-2',
+    userButtonPopoverActionButton:
+      'hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 text-gray-700 hover:text-purple-700 rounded-2xl transition-all duration-200 cursor-pointer font-medium',
+    identityPreviewText: 'text-gray-800 font-medium',
+    identityPreviewEditButtonIcon: 'text-purple-500 hover:text-purple-600',
+    formFieldSuccessText: 'text-purple-600 font-medium',
+    formFieldErrorText: 'text-red-500 font-medium',
+  },
+  variables: {
+    colorPrimary: '#9333ea',
+    colorBackground: '#ffffff',
+    colorInputBackground: 'rgba(249, 250, 251, 0.5)',
+    colorInputText: '#374151',
+    colorText: '#374151',
+    colorTextSecondary: '#6b7280',
+    borderRadius: '16px',
+    fontFamily: "'Figtree', ui-sans-serif, system-ui, sans-serif",
+    fontSize: '16px',
+    spacingUnit: '1.25rem',
+  },
+};
+
 export default function TranscriptLearningLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -371,7 +415,7 @@ export default function TranscriptLearningLanding() {
                     </button>
                   </SignUpButton>
                 </div>
-              ))}
+              </div>
             </div>
             {/* Right Content - Visual Demo */}
             <div className='relative'>
@@ -655,7 +699,9 @@ export default function TranscriptLearningLanding() {
                 </div>
 
                 <div className='mt-8 text-center'>
-                  <SignUpButton mode='modal'>
+                  <SignUpButton 
+                    mode='modal'
+                    appearance={clerkAppearance}>
                     <button className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg'>
                       Try These Questions Free
                     </button>
@@ -681,7 +727,9 @@ export default function TranscriptLearningLanding() {
           </p>
 
           <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
-            <SignUpButton mode='modal'>
+            <SignUpButton 
+              mode='modal'
+              appearance={clerkAppearance}>
               <button className='bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-3'>
                 <span>Start Learning Free</span>
                 <ArrowRight className='w-5 h-5' />
