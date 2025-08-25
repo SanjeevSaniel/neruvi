@@ -11,7 +11,6 @@ import CourseSelector, { CourseType } from './CourseSelector';
 import MessageDetailPanel from './MessageDetailPanel';
 import MessagesContainer from './MessagesContainer';
 import { Message, SourceTimestamp } from './types';
-import WelcomeScreen from './WelcomeScreen';
 
 export default function ChatInterface() {
   const {
@@ -45,12 +44,7 @@ export default function ChatInterface() {
   const needsCourseSelection =
     (!currentConversationId || !selectedCourse) && !showCourseSelector;
 
-  // Check if we should show welcome screen (course selected but no messages yet)
-  const shouldShowWelcome =
-    currentConversationId &&
-    selectedCourse &&
-    messages.length === 0 &&
-    !showCourseSelector;
+  // Skip welcome screen - go directly to chat interface
 
   // Handle header click to show course selector
   const handleHeaderClick = () => {
@@ -374,16 +368,8 @@ export default function ChatInterface() {
                 isVisible={needsCourseSelection || showCourseSelector}
               />
             </div>
-          ) : shouldShowWelcome ? (
-            // Welcome screen after course selection
-            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
-              <WelcomeScreen
-                onSubmit={handleSubmit}
-                selectedCourse={selectedCourse}
-              />
-            </div>
           ) : (
-            // Chat interface
+            // Chat interface - no welcome screen
             <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -425,8 +411,7 @@ export default function ChatInterface() {
         <AnimatePresence>
           {messageDetailOpen &&
             !needsCourseSelection &&
-            !showCourseSelector &&
-            !shouldShowWelcome && (
+            !showCourseSelector && (
               <motion.div
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ width: '50%', opacity: 1 }}
