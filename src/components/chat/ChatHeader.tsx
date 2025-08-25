@@ -1,8 +1,9 @@
 // components/chat/ChatHeader.tsx
 import { motion } from 'framer-motion';
-import { Brain, Menu } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import FlowMindLogo from '../FlowMindLogo';
+import ConversationHistoryIcon from '../ui/ConversationHistoryIcon';
 
 const AIStatusIndicator = () => {
   return (
@@ -72,15 +73,20 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
       <div className='relative w-full max-w-6xl mx-auto px-4 flex items-center justify-between'>
         {/* Left Side - Menu and Logo */}
         <div className='flex items-center space-x-3'>
-          {/* Menu Button */}
+          {/* Conversation History Button */}
           {onOpenSidebar && (
-            <button
+            <motion.button
               onClick={onOpenSidebar}
-              className='p-1.5 text-white hover:text-purple-200 hover:bg-white/10 rounded-lg transition-colors'
-              title='Open conversations'
+              className='p-1.5 text-white hover:text-purple-200 hover:bg-white/10 rounded-lg transition-all duration-300'
+              title='View conversation history'
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: '0 4px 8px rgba(255, 255, 255, 0.1)'
+              }}
+              whileTap={{ scale: 0.95 }}
             >
-              <Menu className='w-4 h-4' />
-            </button>
+              <ConversationHistoryIcon className='w-4 h-4' size={16} />
+            </motion.button>
           )}
           
           {/* Logo Section - Clickable */}
