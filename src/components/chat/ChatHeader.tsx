@@ -101,7 +101,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
 
             {/* Brand Text */}
             <div className='text-left'>
-              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-wide font-comfortaa lowercase'>
+              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-wide font-comfortaa lowercase' style={{ fontFamily: 'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif' }}>
                 flowmind
               </h1>
               <p className='text-[10px] text-purple-100/90 font-medium -mt-0.5 drop-shadow-sm'>
