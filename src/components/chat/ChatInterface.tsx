@@ -176,6 +176,7 @@ export default function ChatInterface() {
     setIsLoading(true);
     
     let accumulatedContent = ''; // Move to broader scope
+    let assistantMessage: Message | null = null; // Declare in broader scope
 
     try {
       const response = await fetch('/api/chat', {
@@ -213,7 +214,7 @@ export default function ChatInterface() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
-      const assistantMessage: Message = {
+      assistantMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: '',
@@ -250,11 +251,13 @@ export default function ChatInterface() {
             const nextChunkSize = Math.min(3, remaining.length); // 3 characters at a time
             displayContent += remaining.slice(0, nextChunkSize);
             
-            updateMessage(conversationId, assistantMessage.id, displayContent);
-            setStreamingMessage({
-              ...assistantMessage,
-              content: displayContent
-            });
+            if (assistantMessage) {
+              updateMessage(conversationId, assistantMessage.id, displayContent);
+              setStreamingMessage({
+                ...assistantMessage,
+                content: displayContent
+              });
+            }
             
             // Continue processing if there's more content
             if (displayContent.length < contentQueue.length) {
@@ -283,16 +286,18 @@ export default function ChatInterface() {
       }
       
       // Set final content and ensure display catches up
-      displayContent = accumulatedContent;
-      updateMessage(conversationId, assistantMessage.id, accumulatedContent);
-      
-      // Create final message object for panel
-      const finalMessage = {
-        ...assistantMessage,
-        content: accumulatedContent
-      };
-      
-      setStreamingMessage(finalMessage);
+      if (assistantMessage) {
+        displayContent = accumulatedContent;
+        updateMessage(conversationId, assistantMessage.id, accumulatedContent);
+        
+        // Create final message object for panel
+        const finalMessage = {
+          ...assistantMessage,
+          content: accumulatedContent
+        };
+        
+        setStreamingMessage(finalMessage);
+      }
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
@@ -313,16 +318,18 @@ export default function ChatInterface() {
       setIsLoading(false);
       // Clear streaming state when done but keep panel open with final message
       setTimeout(() => {
-        // Create final message from the accumulated content
-        const finalMessage: Message = {
-          ...assistantMessage,
-          content: accumulatedContent
-        };
-        
-        // Clear streaming state but keep panel open
-        setStreamingMessage(null);
-        setSelectedMessage(finalMessage);
-        setMessageDetailOpen(true); // Explicitly ensure panel stays open
+        // Create final message from the accumulated content if assistantMessage exists
+        if (assistantMessage) {
+          const finalMessage: Message = {
+            ...assistantMessage,
+            content: accumulatedContent
+          };
+          
+          // Clear streaming state but keep panel open
+          setStreamingMessage(null);
+          setSelectedMessage(finalMessage);
+          setMessageDetailOpen(true); // Explicitly ensure panel stays open
+        }
       }, 500);
     }
   };

@@ -27,6 +27,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
 import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
+import AuthRedirect from '../AuthRedirect';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -42,7 +43,6 @@ const clerkAppearance = {
       'text-gray-400 hover:text-purple-600 transition-colors cursor-pointer',
     headerTitle:
       'text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent font-comfortaa lowercase tracking-tight',
-    headerSubtitle: 'text-gray-500 font-medium',
     socialButtonsBlockButton:
       'relative overflow-hidden bg-white border-2 border-gray-200 hover:border-purple-300 text-gray-700 rounded-2xl font-semibold transition-all duration-300 py-4 cursor-pointer group hover:shadow-lg',
     socialButtonsBlockButtonText: 'relative z-10 font-semibold',
@@ -309,6 +309,7 @@ export default function TranscriptLearningLanding() {
     <div
       ref={containerRef}
       className='min-h-screen bg-white'>
+      <AuthRedirect />
       {/* Navigation */}
       <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
@@ -338,9 +339,7 @@ export default function TranscriptLearningLanding() {
               </Link>
               <SignInButton
                 mode='modal'
-                appearance={clerkAppearance}
-                redirectUrl="/chat"
-                afterSignInUrl="/chat">
+                appearance={clerkAppearance}>
                 <button className='relative overflow-hidden bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] cursor-pointer group'>
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                   <span className='relative z-10 text-sm'>Sign In</span>
@@ -412,9 +411,7 @@ export default function TranscriptLearningLanding() {
                 <div className='flex flex-col sm:flex-row gap-4'>
                   <SignUpButton
                     mode='modal'
-                    appearance={clerkAppearance}
-                    afterSignUpUrl="/chat"
-                    redirectUrl="/chat">
+                    appearance={clerkAppearance}>
                     <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-700 hover:via-violet-700 hover:to-indigo-700 text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.02] cursor-pointer transform'>
                       <div className='absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                       <span className='relative z-10'>
@@ -712,8 +709,7 @@ export default function TranscriptLearningLanding() {
                   <SignUpButton 
                     mode='modal'
                     appearance={clerkAppearance}
-                    afterSignUpUrl="/chat"
-                    redirectUrl="/chat">
+>
                     <button className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg'>
                       Try These Questions Free
                     </button>
@@ -742,8 +738,7 @@ export default function TranscriptLearningLanding() {
             <SignUpButton 
               mode='modal'
               appearance={clerkAppearance}
-              afterSignUpUrl="/chat"
-              redirectUrl="/chat">
+>
               <button className='bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-3'>
                 <span>Start Learning Free</span>
                 <ArrowRight className='w-5 h-5' />
