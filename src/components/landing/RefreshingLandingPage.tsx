@@ -62,6 +62,12 @@ const clerkAppearance = {
     identityPreviewEditButtonIcon: 'text-purple-500 hover:text-purple-600',
     formFieldSuccessText: 'text-purple-600 font-medium',
     formFieldErrorText: 'text-red-500 font-medium',
+    // Hide the "You're signing back in to Clerk" text
+    headerSubtitle: 'hidden',
+    // Custom branding text
+    cardBox: 'shadow-none bg-transparent',
+    card: 'bg-transparent shadow-none',
+    rootBox: 'bg-transparent',
   },
   variables: {
     colorPrimary: '#9333ea',
@@ -332,7 +338,9 @@ export default function TranscriptLearningLanding() {
               </Link>
               <SignInButton
                 mode='modal'
-                appearance={clerkAppearance}>
+                appearance={clerkAppearance}
+                redirectUrl="/chat"
+                afterSignInUrl="/chat">
                 <button className='relative overflow-hidden bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] cursor-pointer group'>
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                   <span className='relative z-10 text-sm'>Sign In</span>
@@ -404,7 +412,9 @@ export default function TranscriptLearningLanding() {
                 <div className='flex flex-col sm:flex-row gap-4'>
                   <SignUpButton
                     mode='modal'
-                    appearance={clerkAppearance}>
+                    appearance={clerkAppearance}
+                    afterSignUpUrl="/chat"
+                    redirectUrl="/chat">
                     <button className='group relative overflow-hidden bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-purple-700 hover:via-violet-700 hover:to-indigo-700 text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/30 hover:scale-[1.02] cursor-pointer transform'>
                       <div className='absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                       <span className='relative z-10'>
@@ -701,7 +711,9 @@ export default function TranscriptLearningLanding() {
                 <div className='mt-8 text-center'>
                   <SignUpButton 
                     mode='modal'
-                    appearance={clerkAppearance}>
+                    appearance={clerkAppearance}
+                    afterSignUpUrl="/chat"
+                    redirectUrl="/chat">
                     <button className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg'>
                       Try These Questions Free
                     </button>
@@ -729,7 +741,9 @@ export default function TranscriptLearningLanding() {
           <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
             <SignUpButton 
               mode='modal'
-              appearance={clerkAppearance}>
+              appearance={clerkAppearance}
+              afterSignUpUrl="/chat"
+              redirectUrl="/chat">
               <button className='bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-3'>
                 <span>Start Learning Free</span>
                 <ArrowRight className='w-5 h-5' />

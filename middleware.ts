@@ -3,7 +3,15 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 const isProtectedRoute = createRouteMatcher(['/chat(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) await auth().protect()
+  if (isProtectedRoute(req)) {
+    await auth().protect()
+  }
+  
+  // Force redirect to chat after successful authentication
+  const { userId } = auth()
+  if (userId && req.nextUrl.pathname === '/') {
+    return Response.redirect(new URL('/chat', req.url))
+  }
 })
 
 export const config = {
