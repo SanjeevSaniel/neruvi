@@ -1,7 +1,7 @@
 // components/chat/MessageDetailPanel.tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Download, Check, MessageSquare, Clock, User, Bot, Sparkles, Info } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Message } from './types';
 import EnhancedMessageRenderer from './EnhancedMessageRenderer';
 import SourcePanel from './SourcePanel';
@@ -10,10 +10,29 @@ interface MessageDetailPanelProps {
   message: Message | null;
   isOpen: boolean;
   onClose: () => void;
+  isStreaming?: boolean;
 }
 
-export default function MessageDetailPanel({ message, isOpen, onClose }: MessageDetailPanelProps) {
+export default function MessageDetailPanel({ message, isOpen, onClose, isStreaming = false }: MessageDetailPanelProps) {
   const [copied, setCopied] = useState(false);
+  const [displayContent, setDisplayContent] = useState('');
+  
+  // Update display content when message changes
+  useEffect(() => {
+    if (message) {
+      setDisplayContent(message.content);
+    }
+  }, [message?.content, message?.id]);
+  
+  // Auto-scroll to bottom when content updates during streaming
+  useEffect(() => {
+    if (isStreaming && message?.content) {
+      const scrollContainer = document.querySelector('.message-detail-scroll');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
+    }
+  }, [message?.content, isStreaming]);
 
   const formatAsMarkdown = (content: string, role: string, timestamp?: Date) => {
     const timeStr = timestamp ? timestamp.toLocaleString('en-US', {
@@ -84,7 +103,9 @@ ${content}
         opacity: { duration: 0.3 },
         scale: { duration: 0.35 }
       }}
-      className="w-full bg-white shadow-2xl flex flex-col border-l border-slate-200 h-full"
+      className={`w-full bg-white shadow-2xl flex flex-col border-l h-full ${
+        isStreaming ? 'border-l-purple-300 shadow-purple-100' : 'border-slate-200'
+      }`}
     >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-gradient-to-r from-purple-50 to-violet-50">
@@ -101,11 +122,23 @@ ${content}
                       </div>
                     )}
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-800">
-                        {message.role === 'assistant' ? 'FlowMind' : 'You'}
-                      </h2>
+                      <div className="flex items-center space-x-2">
+                        <h2 className="text-lg font-semibold text-slate-800">
+                          {message.role === 'assistant' ? 'FlowMind' : 'You'}
+                        </h2>
+                        {isStreaming && message.role === 'assistant' && (
+                          <div className="flex items-center space-x-1">
+                            <div className="flex space-x-1">
+                              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                              <div className="w-2 h-2 bg-violet-500 rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
+                            <span className="text-xs font-medium text-purple-600">Streaming...</span>
+                          </div>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-500">
-                        {message.timestamp ? formatTimestamp(message.timestamp) : 'Just now'}
+                        {isStreaming ? 'Generating response...' : (message.timestamp ? formatTimestamp(message.timestamp) : 'Just now')}
                       </p>
                     </div>
                   </>
@@ -199,11 +232,18 @@ ${content}
             </div>
 
         {message ? (
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto message-detail-scroll">
                 {/* Message Content */}
                 <div className="p-4">
                   <div className="prose prose-sm max-w-none">
-                    <EnhancedMessageRenderer content={message.content} role={message.role} />
+                    <EnhancedMessageRenderer content={displayContent} role={message.role} />
+                    {isStreaming && message.role === 'assistant' && (
+                      <div className="mt-3 flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-violet-400 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }}></div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
