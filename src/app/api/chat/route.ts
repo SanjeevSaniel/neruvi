@@ -15,9 +15,6 @@ function getOpenAIClient() {
   return openaiClient;
 }
 
-// Check if we're in a deployment environment
-const isDeployment = process.env.VERCEL || process.env.NODE_ENV === 'production';
-
 interface SourceTimestamp {
   course: string;
   section: string;
@@ -74,21 +71,77 @@ export const POST = async (req: Request) => {
     const selectedCourse = course || 'both';
     console.log('🔍 User query:', userQuery);
 
-    // Simplified system prompt without RAG for deployment
-    const systemPrompt = `You are FlowMind, an AI assistant specializing in Node.js and Python programming.
+    // Try to use Qdrant RAG if available, fallback gracefully if not
+    let ragContext = '';
+    let sourceTimestamps: SourceTimestamp[] = [];
 
-You are an expert programming tutor with deep knowledge of:
-- Node.js: Express.js, async/await, modules, npm, API development, middleware
-- Python: Functions, classes, data structures, libraries, web frameworks like Flask/Django
-- General programming concepts: debugging, best practices, code optimization
+    try {
+      // Dynamic import to avoid build issues when dependencies aren't available
+      const { qdrantRAG } = await import('@/lib/qdrant-rag');
+      
+      await qdrantRAG.initialize();
+      
+      const searchResults = await qdrantRAG.search(
+        userQuery, 
+        8,
+        selectedCourse as 'nodejs' | 'python' | 'both'
+      );
 
-Provide clear, practical programming guidance with working code examples. Keep responses focused and under 300 words for faster delivery. Always include:
-1. Direct answer to the question
-2. Working code example when applicable  
-3. Brief explanation of key concepts
-4. Best practices or common pitfalls to avoid
+      if (searchResults?.length > 0) {
+        const uniqueResults = new Map<string, typeof searchResults[0]>();
+        
+        searchResults.forEach(result => {
+          const key = `${result.metadata.videoId}-${Math.floor(result.metadata.startTime / 10) * 10}`;
+          if (!uniqueResults.has(key) || (uniqueResults.get(key)!.score < result.score)) {
+            uniqueResults.set(key, result);
+          }
+        });
+        
+        const sortedResults = Array.from(uniqueResults.values())
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3); // Top 3 results
+        
+        sourceTimestamps = sortedResults.map(result => ({
+          course: result.metadata.course || 'Unknown',
+          section: result.metadata.section || 'General',
+          videoId: result.metadata.videoId || 'unknown',
+          timestamp: formatTimestamp(result.metadata.startTime),
+          relevance: `${(result.score * 100).toFixed(0)}%`,
+        }));
 
-Focus on ${selectedCourse === 'both' ? 'both Node.js and Python' : selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} when possible.`;
+        ragContext = sortedResults
+          .map((result, index) =>
+            `## Context ${index + 1}: ${result.metadata.course.toUpperCase()} - ${result.metadata.section} (${formatTimestamp(result.metadata.startTime)})
+**Content**: ${result.content.trim()}`)
+          .join('\n\n');
+      }
+    } catch (error) {
+      console.log('⚠️ RAG system not available in this environment:', error);
+      // Continue without RAG - will show appropriate message
+    }
+
+    const systemPrompt = `You are FlowMind, an AI assistant that ONLY provides information from programming course transcripts.
+
+${ragContext ? 
+`## Relevant Course Material:
+${ragContext}
+
+IMPORTANT: Base your response EXCLUSIVELY on the course material above. Do not add information from general knowledge.` 
+: 
+`No relevant transcript content was found for this query.
+
+Respond with: "I don't have information about that topic in the available course transcripts. Please try asking about topics covered in the Node.js or Python courses, such as:
+
+For Node.js: Express.js, HTTP servers, authentication, modules, file system operations
+For Python: Functions, classes, data types, loops, error handling, OOP concepts"`}
+
+If course material is available:
+- Answer based solely on the transcript content provided
+- Reference specific videos and timestamps when relevant  
+- Keep responses focused and under 300 words for faster delivery
+- If the transcripts don't fully answer the question, acknowledge the limitation
+
+Focus on ${selectedCourse === 'both' ? 'both Node.js and Python' : selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} course content when possible.`;
 
     const result = streamText({
       model: getOpenAIClient()('gpt-4o-mini'),
@@ -99,6 +152,11 @@ Focus on ${selectedCourse === 'both' ? 'both Node.js and Python' : selectedCours
     });
 
     const response = result.toTextStreamResponse();
+
+    // Add sources header if we found transcript content
+    if (sourceTimestamps.length > 0) {
+      response.headers.set('X-Sources', JSON.stringify(sourceTimestamps));
+    }
 
     const endTime = Date.now();
     console.log(`⚡ Response time: ${endTime - startTime}ms`);
@@ -122,4 +180,22 @@ Focus on ${selectedCourse === 'both' ? 'both Node.js and Python' : selectedCours
       }
     );
   }
+};
+
+const formatTimestamp = (seconds: number | undefined): string => {
+  if (!seconds || isNaN(seconds) || seconds <= 0) {
+    return '0:00';
+  }
+  
+  const validSeconds = Math.max(0, Math.floor(seconds));
+  const totalMinutes = Math.floor(validSeconds / 60);
+  const remainingSeconds = validSeconds % 60;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+  
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
