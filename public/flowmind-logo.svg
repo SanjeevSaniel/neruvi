@@ -20,115 +20,118 @@
     </radialGradient>
   </defs>
   
-  <!-- Main circular container -->
-  <circle cx="256" cy="256" r="180" fill="url(#centerGradient)" stroke="url(#primaryGradient)" stroke-width="8"/>
+  <!-- Main circular container - expanded to fill more space -->
+  <circle cx="256" cy="256" r="240" fill="url(#centerGradient)" stroke="url(#primaryGradient)" stroke-width="10"/>
   
-  <!-- Stylized "F" integrated with flow concept -->
-  <g transform="translate(200, 180)">
-    <!-- Main vertical stroke of F -->
-    <path d="M0 20 Q0 0 20 0 L80 0 Q100 0 100 20 Q100 40 80 40 L40 40 L40 70 L70 70 Q90 70 90 90 Q90 110 70 110 L40 110 L40 140 Q40 160 20 160 Q0 160 0 140 L0 20 Z" 
+  <!-- Stylized "F" integrated with flow concept - scaled and repositioned -->
+  <g transform="translate(160, 140)">
+    <!-- Main vertical stroke of F - enlarged -->
+    <path d="M0 25 Q0 0 25 0 L120 0 Q145 0 145 25 Q145 50 120 50 L55 55 L55 95 L95 95 Q120 95 120 120 Q120 145 95 145 L55 145 L55 185 Q55 210 25 210 Q0 210 0 185 L0 25 Z" 
           fill="url(#primaryGradient)">
       <animate attributeName="opacity" values="1;0.9;1" dur="3s" repeatCount="indefinite"/>
     </path>
   </g>
   
-  <!-- Flowing elements representing knowledge streams -->
+  <!-- Flowing elements representing knowledge streams - expanded paths -->
   <g opacity="0.8">
-    <!-- Flow stream 1 -->
-    <path d="M120 200 Q180 150 250 180 Q320 210 380 160" 
+    <!-- Flow stream 1 - extended to edges -->
+    <path d="M40 160 Q120 80 200 120 Q280 160 400 100 Q450 80 500 120" 
           stroke="url(#flowGradient)" 
-          stroke-width="6" 
+          stroke-width="8" 
           fill="none" 
           stroke-linecap="round">
       <animate attributeName="opacity" values="0.8;0.4;0.8" dur="4s" repeatCount="indefinite"/>
     </path>
     
-    <!-- Flow stream 2 -->
-    <path d="M140 320 Q200 270 270 300 Q340 330 400 280" 
+    <!-- Flow stream 2 - extended to edges -->
+    <path d="M60 380 Q140 320 220 360 Q300 400 420 340 Q460 320 500 360" 
           stroke="url(#flowGradient)" 
-          stroke-width="6" 
+          stroke-width="8" 
           fill="none" 
           stroke-linecap="round">
       <animate attributeName="opacity" values="0.6;0.3;0.6" dur="3.5s" repeatCount="indefinite" begin="0.8s"/>
     </path>
     
-    <!-- Flow stream 3 -->
-    <path d="M160 256 Q220 220 280 250 Q340 280 380 240" 
+    <!-- Flow stream 3 - extended across full width -->
+    <path d="M20 256 Q120 200 220 240 Q320 280 420 220 Q460 200 500 240" 
           stroke="url(#flowGradient)" 
-          stroke-width="4" 
+          stroke-width="6" 
           fill="none" 
           stroke-linecap="round">
       <animate attributeName="opacity" values="0.7;0.35;0.7" dur="4.2s" repeatCount="indefinite" begin="1.2s"/>
     </path>
   </g>
   
-  <!-- Knowledge nodes -->
+  <!-- Knowledge nodes - spread across larger area -->
   <g opacity="0.9">
-    <circle cx="180" cy="190" r="6" fill="#4ea674">
-      <animate attributeName="r" values="6;9;6" dur="3s" repeatCount="indefinite"/>
+    <circle cx="120" cy="140" r="8" fill="#4ea674">
+      <animate attributeName="r" values="8;12;8" dur="3s" repeatCount="indefinite"/>
     </circle>
-    <circle cx="250" cy="170" r="5" fill="#5fad81">
-      <animate attributeName="r" values="5;8;5" dur="2.8s" repeatCount="indefinite" begin="0.5s"/>
+    <circle cx="200" cy="110" r="7" fill="#5fad81">
+      <animate attributeName="r" values="7;11;7" dur="2.8s" repeatCount="indefinite" begin="0.5s"/>
     </circle>
-    <circle cx="320" cy="200" r="4" fill="#459071">
-      <animate attributeName="r" values="4;7;4" dur="3.2s" repeatCount="indefinite" begin="1s"/>
+    <circle cx="320" cy="150" r="6" fill="#459071">
+      <animate attributeName="r" values="6;10;6" dur="3.2s" repeatCount="indefinite" begin="1s"/>
     </circle>
-    <circle cx="200" cy="280" r="5" fill="#5fad81">
-      <animate attributeName="r" values="5;8;5" dur="2.6s" repeatCount="indefinite" begin="1.5s"/>
+    <circle cx="140" cy="340" r="7" fill="#5fad81">
+      <animate attributeName="r" values="7;11;7" dur="2.6s" repeatCount="indefinite" begin="1.5s"/>
     </circle>
-    <circle cx="280" cy="300" r="6" fill="#4ea674">
-      <animate attributeName="r" values="6;9;6" dur="3.4s" repeatCount="indefinite" begin="0.3s"/>
+    <circle cx="260" cy="380" r="8" fill="#4ea674">
+      <animate attributeName="r" values="8;12;8" dur="3.4s" repeatCount="indefinite" begin="0.3s"/>
+    </circle>
+    <circle cx="380" cy="200" r="6" fill="#459071">
+      <animate attributeName="r" values="6;10;6" dur="2.9s" repeatCount="indefinite" begin="0.7s"/>
     </circle>
   </g>
   
-  <!-- Animated flow particles -->
+  <!-- Animated flow particles - longer paths -->
   <g opacity="0.7">
     <!-- Particle 1 -->
-    <circle r="3" fill="#4ea674">
-      <animateMotion dur="6s" repeatCount="indefinite">
-        <path d="M120,200 Q180,150 250,180 Q320,210 380,160"/>
+    <circle r="4" fill="#4ea674">
+      <animateMotion dur="8s" repeatCount="indefinite">
+        <path d="M40,160 Q120,80 200,120 Q280,160 400,100 Q450,80 500,120"/>
       </animateMotion>
-      <animate attributeName="opacity" values="0;1;1;0" dur="6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="8s" repeatCount="indefinite"/>
     </circle>
     
     <!-- Particle 2 -->
-    <circle r="2.5" fill="#5fad81">
-      <animateMotion dur="5.5s" repeatCount="indefinite" begin="2s">
-        <path d="M140,320 Q200,270 270,300 Q340,330 400,280"/>
+    <circle r="3.5" fill="#5fad81">
+      <animateMotion dur="7s" repeatCount="indefinite" begin="2s">
+        <path d="M60,380 Q140,320 220,360 Q300,400 420,340 Q460,320 500,360"/>
       </animateMotion>
-      <animate attributeName="opacity" values="0;1;1;0" dur="5.5s" repeatCount="indefinite" begin="2s"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="7s" repeatCount="indefinite" begin="2s"/>
     </circle>
     
     <!-- Particle 3 -->
-    <circle r="2" fill="#459071">
-      <animateMotion dur="5s" repeatCount="indefinite" begin="4s">
-        <path d="M160,256 Q220,220 280,250 Q340,280 380,240"/>
+    <circle r="3" fill="#459071">
+      <animateMotion dur="6.5s" repeatCount="indefinite" begin="4s">
+        <path d="M20,256 Q120,200 220,240 Q320,280 420,220 Q460,200 500,240"/>
       </animateMotion>
-      <animate attributeName="opacity" values="0;1;1;0" dur="5s" repeatCount="indefinite" begin="4s"/>
+      <animate attributeName="opacity" values="0;1;1;0" dur="6.5s" repeatCount="indefinite" begin="4s"/>
     </circle>
   </g>
   
-  <!-- Central mind/intelligence symbol -->
-  <g transform="translate(340, 260)">
-    <circle cx="0" cy="0" r="25" fill="url(#primaryGradient)" opacity="0.9">
-      <animate attributeName="r" values="25;30;25" dur="4s" repeatCount="indefinite"/>
+  <!-- Central mind/intelligence symbol - repositioned and enlarged -->
+  <g transform="translate(380, 280)">
+    <circle cx="0" cy="0" r="35" fill="url(#primaryGradient)" opacity="0.9">
+      <animate attributeName="r" values="35;42;35" dur="4s" repeatCount="indefinite"/>
     </circle>
     
-    <circle cx="0" cy="0" r="12" fill="white" opacity="0.95"/>
+    <circle cx="0" cy="0" r="18" fill="white" opacity="0.95"/>
     
-    <!-- Neural connections in center -->
+    <!-- Neural connections in center - enlarged -->
     <g opacity="0.8">
-      <path d="M-8 -8 L8 8" stroke="#4ea674" stroke-width="2" stroke-linecap="round"/>
-      <path d="M8 -8 L-8 8" stroke="#4ea674" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="0" cy="-15" r="2" fill="#5fad81"/>
-      <circle cx="15" cy="0" r="2" fill="#459071"/>
-      <circle cx="0" cy="15" r="2" fill="#5fad81"/>
-      <circle cx="-15" cy="0" r="2" fill="#459071"/>
+      <path d="M-12 -12 L12 12" stroke="#4ea674" stroke-width="3" stroke-linecap="round"/>
+      <path d="M12 -12 L-12 12" stroke="#4ea674" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="0" cy="-22" r="3" fill="#5fad81"/>
+      <circle cx="22" cy="0" r="3" fill="#459071"/>
+      <circle cx="0" cy="22" r="3" fill="#5fad81"/>
+      <circle cx="-22" cy="0" r="3" fill="#459071"/>
     </g>
   </g>
   
-  <!-- Subtle outer ring decoration -->
-  <circle cx="256" cy="256" r="200" fill="none" stroke="url(#flowGradient)" stroke-width="2" opacity="0.3" stroke-dasharray="20,30">
+  <!-- Subtle outer ring decoration - expanded to edge -->
+  <circle cx="256" cy="256" r="250" fill="none" stroke="url(#flowGradient)" stroke-width="3" opacity="0.3" stroke-dasharray="25,35">
     <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="0 256 256;360 256 256" dur="20s" repeatCount="indefinite"/>
   </circle>
 </svg>
