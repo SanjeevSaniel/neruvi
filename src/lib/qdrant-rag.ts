@@ -403,10 +403,19 @@ export class QdrantRAGSystem {
       const { queryOptimizer } = await import('./query-optimizer');
       const queryEmbedding = await queryOptimizer.getOptimizedEmbedding(query);
       
-      // Use HYDE enhancement for better query understanding
-      const { hydeEnhanced } = await import('./hyde-enhanced');
-      const hydeResult = await hydeEnhanced.generateEnhancedHyde(query, course);
-      const searchStrategy = await hydeEnhanced.createSearchStrategy(hydeResult);
+      // Use HYDE enhancement for better query understanding (with fallback)
+      let hydeResult = null;
+      let searchStrategy = null;
+      
+      try {
+        const { hydeEnhanced } = await import('./hyde-enhanced');
+        hydeResult = await hydeEnhanced.generateEnhancedHyde(query, course);
+        searchStrategy = await hydeEnhanced.createSearchStrategy(hydeResult);
+        console.log('✅ HYDE enhancement successful');
+      } catch (error) {
+        console.log('⚠️ HYDE enhancement failed, using standard search:', error?.message || 'Unknown error');
+        // Continue without HYDE - standard embedding search will still work
+      }
       
       // Search only - no indexing of VTT files
       const collectionsToSearch = this.getCollectionsForCourse(course);
@@ -415,24 +424,31 @@ export class QdrantRAGSystem {
       const searchPromises = collectionsToSearch.map(async (collectionName) => {
         const courseType = collectionName === COLLECTIONS.NODEJS_TRANSCRIPTS ? 'nodejs' : 'python';
         
-        return Promise.all([
+        const searches = [
           // Primary search with original query
           this.searchCollection(
             collectionName, 
             queryEmbedding, 
-            Math.ceil(limit * 0.6),
-            filters,
-            courseType
-          ),
-          // HYDE enhanced search
-          this.searchCollection(
-            collectionName,
-            searchStrategy.primaryEmbedding,
-            Math.ceil(limit * 0.4),
+            searchStrategy ? Math.ceil(limit * 0.6) : limit, // Use full limit if no HYDE
             filters,
             courseType
           )
-        ]);
+        ];
+
+        // Add HYDE enhanced search only if available
+        if (searchStrategy?.primaryEmbedding) {
+          searches.push(
+            this.searchCollection(
+              collectionName,
+              searchStrategy.primaryEmbedding,
+              Math.ceil(limit * 0.4),
+              filters,
+              courseType
+            )
+          );
+        }
+
+        return Promise.all(searches);
       });
       
       const allSearchResults = await Promise.all(searchPromises);
