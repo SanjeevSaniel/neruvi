@@ -68,7 +68,7 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const selectedCourse = course || 'both';
+    const selectedCourse = course || 'nodejs'; // Default to nodejs since we removed 'both'
     console.log('🔍 User query:', userQuery);
 
     // Try to use Qdrant RAG if available, fallback gracefully if not
@@ -83,23 +83,30 @@ export const POST = async (req: Request) => {
       
       const searchResults = await qdrantRAG.search(
         userQuery, 
-        8,
-        selectedCourse as 'nodejs' | 'python' | 'both'
+        20, // Get more candidates to find the absolute best match
+        selectedCourse as 'nodejs' | 'python'
       );
 
       if (searchResults?.length > 0) {
         const uniqueResults = new Map<string, typeof searchResults[0]>();
         
         searchResults.forEach(result => {
-          const key = `${result.metadata.videoId}-${Math.floor(result.metadata.startTime / 10) * 10}`;
+          // Very strict deduplication - remove if timestamps are within 2 minutes or same section
+          const key = `${result.metadata.videoId}-${result.metadata.section}-${Math.floor(result.metadata.startTime / 120) * 120}`;
           if (!uniqueResults.has(key) || (uniqueResults.get(key)!.score < result.score)) {
             uniqueResults.set(key, result);
           }
         });
         
         const sortedResults = Array.from(uniqueResults.values())
+          .filter(result => result.score > 0.4) // Balanced threshold to ensure sources appear
           .sort((a, b) => b.score - a.score)
-          .slice(0, 3); // Top 3 results
+          .slice(0, 1); // Only the single most relevant result
+          
+        console.log(`🔍 Search found ${searchResults.length} initial results, ${uniqueResults.size} unique, ${sortedResults.length} after filtering`);
+        if (sortedResults.length > 0) {
+          console.log('📚 Source found:', sortedResults[0].metadata);
+        }
         
         sourceTimestamps = sortedResults.map(result => ({
           course: result.metadata.course || 'Unknown',
@@ -110,52 +117,77 @@ export const POST = async (req: Request) => {
         }));
 
         ragContext = sortedResults
-          .map((result, index) =>
-            `## Context ${index + 1}: ${result.metadata.course.toUpperCase()} - ${result.metadata.section} (${formatTimestamp(result.metadata.startTime)})
-**Content**: ${result.content.trim()}`)
-          .join('\n\n');
+          .map((result) =>
+            `## ${result.metadata.course.toUpperCase()} Course - ${result.metadata.section} at ${formatTimestamp(result.metadata.startTime)}
+${result.content.trim()}`)
+          .join('\n\n---\n\n');
       }
     } catch (error) {
-      console.log('⚠️ RAG system not available in this environment:', error);
-      // Continue without RAG - will show appropriate message
+      console.log('⚠️ RAG system not available in this environment:', error?.message || error);
+      // Add some mock sources for testing if RAG fails completely
+      if (process.env.NODE_ENV === 'development') {
+        sourceTimestamps = [
+          {
+            course: selectedCourse === 'python' ? 'python' : 'nodejs',
+            section: selectedCourse === 'python' ? 'Python Fundamentals' : 'Node.js Basics',
+            videoId: 'test-123',
+            timestamp: '5:23',
+            relevance: '75%'
+          }
+        ];
+        ragContext = `Test context for debugging source display in ${selectedCourse} course`;
+        console.log('🧪 Added test sources for debugging:', sourceTimestamps);
+      }
     }
 
-    const systemPrompt = `You are FlowMind, an AI assistant that ONLY provides information from programming course transcripts.
+    const systemPrompt = `You are FlowMind, an expert programming tutor specializing in Node.js and Python. You provide detailed, comprehensive explanations based on course transcript content.
 
 ${ragContext ? 
 `## Relevant Course Material:
 ${ragContext}
 
-IMPORTANT: Base your response EXCLUSIVELY on the course material above. Do not add information from general knowledge.` 
+INSTRUCTIONS FOR DETAILED RESPONSES:
+- Provide comprehensive, step-by-step explanations based on the course material
+- Include practical examples and code snippets when mentioned in the transcripts
+- Explain concepts thoroughly with context and reasoning
+- Reference timestamps naturally (e.g., "at 5:23, the instructor explains..." or "as covered at 12:45...")
+- Instead of saying "Context 1" or "Context 2", reference the actual timestamp and section
+- Break down complex topics into digestible parts with clear explanations
+- Provide detailed implementation guidance when available in the transcripts
+- Give thorough context about why certain approaches are used
+- Include best practices and common pitfalls mentioned in the courses
+- Make responses educational and insightful, not just brief answers
+- Aim for detailed, helpful responses (400-800 words when appropriate for complex topics)
+- Use the exact terminology and explanations from the course content
+- Connect related concepts when mentioned in multiple transcript sections
+- When multiple timestamps cover the same topic, reference them naturally (e.g., "This concept is introduced at 3:15 and expanded upon at 8:42")` 
 : 
-`No relevant transcript content was found for this query.
+`No relevant transcript content was found for this specific query.
 
-Respond with: "I don't have information about that topic in the available course transcripts. Please try asking about topics covered in the Node.js or Python courses, such as:
+I don't have information about that topic in the available course transcripts. Please try asking about topics covered in the Node.js or Python courses, such as:
 
-For Node.js: Express.js, HTTP servers, authentication, modules, file system operations
-For Python: Functions, classes, data types, loops, error handling, OOP concepts"`}
+**For Node.js:** Express.js setup, HTTP servers, middleware, authentication, routing, modules, file system operations, async/await, npm packages
+**For Python:** Functions, classes, data types, loops, error handling, OOP concepts, decorators, list comprehensions, file handling`}
 
-If course material is available:
-- Answer based solely on the transcript content provided
-- Reference specific videos and timestamps when relevant  
-- Keep responses focused and under 300 words for faster delivery
-- If the transcripts don't fully answer the question, acknowledge the limitation
-
-Focus on ${selectedCourse === 'both' ? 'both Node.js and Python' : selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} course content when possible.`;
+Focus on ${selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} course content when possible.`;
 
     const result = streamText({
       model: getOpenAIClient()('gpt-4o-mini'),
       system: systemPrompt,
       messages,
-      temperature: 0.7,
-      topP: 1,
+      temperature: 0.3, // Lower temperature for more focused, accurate responses
+      topP: 0.9, // Slightly more focused sampling
+      maxTokens: 1200, // Allow for longer, more detailed responses
     });
 
     const response = result.toTextStreamResponse();
 
-    // Add sources header if we found transcript content
+    // Add sources header if we found any relevant transcript content
     if (sourceTimestamps.length > 0) {
+      console.log(`📚 Found ${sourceTimestamps.length} sources for response`);
       response.headers.set('X-Sources', JSON.stringify(sourceTimestamps));
+    } else {
+      console.log('📭 No sources found for this query');
     }
 
     const endTime = Date.now();

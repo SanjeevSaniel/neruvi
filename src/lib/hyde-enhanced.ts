@@ -5,7 +5,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
 
-export type CourseType = 'nodejs' | 'python' | 'both';
+export type CourseType = 'nodejs' | 'python';
 
 export interface HydeQuery {
   original: string;
@@ -33,7 +33,7 @@ class HydeEnhancedSystem {
 
   async generateEnhancedHyde(
     query: string, 
-    course: CourseType = 'both'
+    course: CourseType = 'nodejs'
   ): Promise<EnhancedHydeResult> {
     const startTime = Date.now();
     const cacheKey = this.createCacheKey(query, course);
@@ -133,36 +133,41 @@ Return only valid JSON with no additional text or markdown formatting.`;
     
     return {
       original: query,
-      hypotheticalAnswers: result.hypotheticalAnswers || [],
-      technicalContext: result.technicalContext || '',
-      relatedQuestions: result.relatedQuestions || [],
-      expectedTopics: result.expectedTopics || [],
+      hypotheticalAnswers: result.hypotheticalAnswers || result.hypothetical_answers || [],
+      technicalContext: result.technicalContext || result.technical_context || '',
+      relatedQuestions: result.relatedQuestions || result.related_questions || [],
+      expectedTopics: result.expectedTopics || result.expected_topics || [],
       difficulty: result.difficulty || 'intermediate',
-      queryType: result.queryType || 'concept',
+      queryType: result.queryType || result.query_type || 'concept',
     };
   }
 
   private async createSearchEmbeddings(hydeQuery: HydeQuery): Promise<number[][]> {
-    // Prepare texts for embedding
+    // Prepare texts for embedding - filter out empty strings
     const textsToEmbed = [
       // Original query
-      hydeQuery.original,
+      hydeQuery.original || 'search query',
       
       // Hypothetical answers (each one separately for better matching)
-      ...hydeQuery.hypotheticalAnswers,
+      ...(hydeQuery.hypotheticalAnswers || []).filter(answer => answer && answer.trim().length > 0),
       
       // Technical context
-      hydeQuery.technicalContext,
+      hydeQuery.technicalContext || 'technical context',
       
       // Related questions (combined for efficiency)
-      hydeQuery.relatedQuestions.join(' '),
+      (hydeQuery.relatedQuestions || []).join(' ') || 'related questions',
       
       // Expected topics (combined)
-      hydeQuery.expectedTopics.join(' '),
+      (hydeQuery.expectedTopics || []).join(' ') || 'programming topics',
       
       // Query-type specific text
       this.getQueryTypeContext(hydeQuery.queryType, hydeQuery.original),
-    ];
+    ].filter(text => text && typeof text === 'string' && text.trim().length > 0);
+
+    // Ensure we have at least one valid text
+    if (textsToEmbed.length === 0) {
+      textsToEmbed.push(hydeQuery.original || 'programming query');
+    }
 
     // Create embeddings in batch
     const response = await openai.embeddings.create({
@@ -190,10 +195,9 @@ Return only valid JSON with no additional text or markdown formatting.`;
     const contexts = {
       nodejs: 'Node.js backend development, Express.js framework, async/await patterns, REST APIs, middleware, npm packages, server-side JavaScript, MongoDB integration, authentication systems',
       python: 'Python programming fundamentals, data structures, object-oriented programming, functions, classes, Django/Flask frameworks, data science libraries, NumPy, pandas, machine learning basics',
-      both: 'Full-stack programming concepts, software development best practices, algorithms, data structures, web development, API design, database integration, programming fundamentals',
     };
     
-    return contexts[course];
+    return contexts[course] || contexts['nodejs'];
   }
 
   private calculateConfidence(hydeQuery: HydeQuery): number {

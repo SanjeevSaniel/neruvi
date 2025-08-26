@@ -11,7 +11,7 @@ export interface OptimizedQuery {
   technical_terms: string[];
   intent: 'concept' | 'implementation' | 'debugging' | 'comparison' | 'example';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
-  course_preference: 'nodejs' | 'python' | 'both';
+  course_preference: 'nodejs' | 'python';
   search_strategy: 'semantic' | 'keyword' | 'hybrid';
 }
 
@@ -103,7 +103,7 @@ Return only valid JSON.`;
       technical_terms: result.technical_terms || [],
       intent: result.intent || 'concept',
       difficulty: result.difficulty || 'intermediate',
-      course_preference: result.course_preference || 'both',
+      course_preference: result.course_preference || 'nodejs',
       search_strategy: result.search_strategy || 'semantic',
     };
   }
@@ -165,10 +165,8 @@ Return only valid JSON.`;
 
     components.push(contextMap[optimized.intent]);
     
-    // Add course context if specific
-    if (optimized.course_preference !== 'both') {
-      components.push(`${optimized.course_preference} programming`);
-    }
+    // Add course context
+    components.push(`${optimized.course_preference} programming`);
 
     return components.join(' ');
   }
@@ -191,7 +189,7 @@ Return only valid JSON.`;
     const hasPythonTerms = /\b(python|py|def|class|pip|django|flask|pandas)\b/i.test(query);
     
     const course_preference = hasNodeJSTerms && !hasPythonTerms ? 'nodejs' :
-                            hasPythonTerms && !hasNodeJSTerms ? 'python' : 'both';
+                            hasPythonTerms && !hasNodeJSTerms ? 'python' : 'nodejs';
 
     const intent = queryLower.includes('how to') || queryLower.includes('implement') ? 'implementation' :
                   queryLower.includes('what is') || queryLower.includes('explain') ? 'concept' :
