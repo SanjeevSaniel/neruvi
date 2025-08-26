@@ -12,7 +12,7 @@ const AIStatusIndicator = () => {
       className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg'>
       {/* AI Brain Icon with Animation */}
       <div className='relative'>
-        <Brain className='w-4 h-4 text-white drop-shadow-sm' />
+        <Brain className='w-4 h-4 drop-shadow-sm' style={{color: 'white'}} />
 
         {/* Status dot */}
         <div className='absolute -top-0.5 -right-0.5'>
@@ -36,10 +36,10 @@ const AIStatusIndicator = () => {
 
       {/* Status Text */}
       <div className='flex flex-col'>
-        <span className='text-white text-xs font-semibold tracking-wide'>
+        <span className='text-xs font-semibold tracking-wide' style={{color: 'white'}}>
           AI ACTIVE
         </span>
-        <span className='text-purple-100 text-[10px] opacity-90'>GPT-4o-Mini</span>
+        <span className='text-primary-100 text-[10px] opacity-90'>GPT-4o-Mini</span>
       </div>
     </motion.div>
   );
@@ -58,7 +58,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className='relative h-12 flex items-center justify-center flex-shrink-0 overflow-hidden'>
       {/* Clean gradient background */}
-      <div className='absolute inset-0 bg-gradient-to-r from-purple-600/95 via-violet-600/98 to-purple-700/95 backdrop-blur-xl'>
+      <div className='absolute inset-0 backdrop-blur-xl' style={{background: 'linear-gradient(to right, rgba(78, 166, 116, 0.95), rgba(69, 144, 113, 0.98), rgba(69, 144, 113, 0.95))'}}>
         {/* Subtle animated overlay */}
         <motion.div
           className='absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent'
@@ -77,7 +77,8 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
           {onOpenSidebar && (
             <motion.button
               onClick={onOpenSidebar}
-              className='p-1.5 text-white hover:text-purple-200 hover:bg-white/10 rounded-lg transition-all duration-300'
+              className='p-1.5 hover:bg-white/10 rounded-lg transition-all duration-300'
+              style={{color: 'white'}}
               title='View conversation history'
               whileHover={{ 
                 scale: 1.05,
@@ -101,10 +102,10 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
 
             {/* Brand Text */}
             <div className='text-left'>
-              <h1 className='text-lg font-semibold text-white drop-shadow-lg tracking-tight'>
+              <h1 className='text-lg font-semibold drop-shadow-lg tracking-tight lowercase font-comfortaa' style={{color: 'white'}}>
                 FlowMind
               </h1>
-              <p className='text-[10px] text-purple-100/90 font-medium -mt-0.5 drop-shadow-sm'>
+              <p className='text-[10px] text-primary-100/90 font-medium -mt-0.5 drop-shadow-sm'>
                 AI Programming Assistant
               </p>
             </div>
@@ -118,14 +119,14 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
               whileHover={{ scale: 1.05 }}
               className='flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
               <div className='relative'>
-                <Brain className='w-3 h-3 text-white' />
+                <Brain className='w-3 h-3' style={{color: 'white'}} />
                 <motion.div
                   className='absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400'
                   animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                 />
               </div>
-              <span className='text-white text-xs font-medium'>AI Ready</span>
+              <span className='text-xs font-medium' style={{color: 'white'}}>AI Ready</span>
             </motion.div>
           </div>
 
@@ -134,7 +135,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
             <motion.div
               className='flex items-center space-x-1 px-2 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
               <div className='w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' />
-              <span className='text-white text-xs font-medium'>AI</span>
+              <span className='text-xs font-medium' style={{color: 'white'}}>AI</span>
             </motion.div>
           </div>
 
@@ -144,7 +145,7 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
               elements: {
                 avatarBox: "w-8 h-8 border-2 border-white/30 shadow-lg",
                 userButtonPopoverCard: "bg-white/95 backdrop-blur-sm border border-white/20 shadow-2xl",
-                userButtonPopoverActionButton: "hover:bg-purple-50",
+                userButtonPopoverActionButton: "hover:bg-primary-50",
               },
             }}
             afterSignOutUrl="/"
