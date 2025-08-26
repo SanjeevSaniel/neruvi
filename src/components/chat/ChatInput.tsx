@@ -136,18 +136,20 @@ export default function ChatInput({
               disabled={disabled}
               className={`flex-1 bg-transparent resize-none focus:outline-none text-base transition-all duration-300 ${
                 disabled
-                  ? 'text-gray-400 placeholder-gray-400 cursor-not-allowed'
+                  ? 'cursor-not-allowed'
                   : isListening
-                    ? 'text-purple-700 placeholder-purple-500 cursor-default'
-                    : 'text-purple-900 placeholder-purple-500 hover:placeholder-purple-600'
-              } ${
-                isListening ? 'bg-purple-50/50' : ''
+                    ? 'cursor-default'
+                    : ''
               }`}
               style={{ 
                 minHeight: '20px', 
                 maxHeight: '100px',
-                overflow: (value + (isListening && interimTranscript ? ' ' + interimTranscript : '')).split('\n').length > 3 ? 'auto' : 'hidden'
-              }}
+                overflow: (value + (isListening && interimTranscript ? ' ' + interimTranscript : '')).split('\n').length > 3 ? 'auto' : 'hidden',
+                color: disabled ? '#9ca3af' : isListening ? '#7c3aed' : '#1f2937',
+                caretColor: '#459071',
+                backgroundColor: isListening ? 'rgba(139, 92, 246, 0.05)' : 'transparent',
+                '--placeholder-color': disabled ? '#9ca3af' : '#459071'
+              } as React.CSSProperties & { '--placeholder-color': string }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey && !disabled && !isListening) {
                   e.preventDefault();
@@ -191,9 +193,13 @@ export default function ChatInput({
               whileTap={{ scale: isLoading || !value.trim() || disabled ? 1 : 0.9 }}
               className={`ml-2 p-2 rounded-lg transition-all duration-300 ${
                 !isLoading && value.trim() && !disabled
-                  ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/50 cursor-pointer'
-                  : 'bg-purple-200 text-purple-400 cursor-not-allowed opacity-50'
-              }`}>
+                  ? 'shadow-lg hover:shadow-xl cursor-pointer'
+                  : 'cursor-not-allowed opacity-50'
+              }`}
+              style={!isLoading && value.trim() && !disabled
+                ? {backgroundColor: '#4ea674', color: 'white', boxShadow: '0 10px 25px rgba(78, 166, 116, 0.5)'}
+                : {backgroundColor: '#bde0ca', color: '#5fad81'}
+              }>
               <Send className='w-3.5 h-3.5' />
             </motion.button>
           </motion.div>
