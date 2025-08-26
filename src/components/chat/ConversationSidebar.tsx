@@ -72,10 +72,11 @@ export default function ConversationSidebar({
             {/* Header */}
             <div className='p-4 border-b border-slate-200 bg-gradient-to-r from-purple-600 to-violet-600'>
               <div className='flex items-center justify-between'>
-                <h2 className='text-white font-semibold'>Conversations</h2>
+                <h2 className='font-semibold' style={{color: 'white'}}>Conversations</h2>
                 <button
                   onClick={onClose}
-                  className='text-white hover:text-purple-200 transition-colors duration-200'>
+                  className='transition-colors duration-200'
+                  style={{color: 'white'}}>
                   <X className='w-5 h-5' />
                 </button>
               </div>
@@ -123,7 +124,7 @@ export default function ConversationSidebar({
                         <div className='flex items-start justify-between'>
                           <div className='flex-1 min-w-0'>
                             <div className='flex items-center gap-2 mb-1'>
-                              <h3 className='font-medium text-slate-800 truncate flex-1'>
+                              <h3 className='font-medium truncate flex-1' style={{color: '#1f2937'}}>
                                 {conversation.title}
                               </h3>
                               {conversation.selectedCourse && (
@@ -135,8 +136,11 @@ export default function ConversationSidebar({
                                       ? 'bg-green-100 text-green-700'
                                       : conversation.selectedCourse === 'python'
                                       ? 'bg-blue-100 text-blue-700'
-                                      : 'bg-purple-100 text-purple-700'
+                                      : 'bg-primary-100'
                                   }
+                                  style={{
+                                    color: conversation.selectedCourse === 'nodejs' ? '#4ea674' : '#459071'
+                                  }}
                                 `}>
                                   {conversation.selectedCourse === 'nodejs'
                                     ? 'Node.js'
