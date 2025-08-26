@@ -142,14 +142,37 @@ export default function ChatInterface() {
     }
   };
 
-  // Enhanced scrolling during streaming
+  // Enhanced scrolling during streaming with verification
   const scrollToBottomDuringStreaming = () => {
     if (messagesContainerRef.current) {
-      // Use requestAnimationFrame for smoother scrolling during streaming
+      const attemptScroll = (retries = 3) => {
+        if (!messagesContainerRef.current || retries <= 0) return;
+        
+        const container = messagesContainerRef.current;
+        const targetScrollTop = container.scrollHeight - container.clientHeight;
+        
+        // Scroll to bottom
+        container.scrollTop = container.scrollHeight;
+        
+        // Verify we actually reached the bottom and retry if not
+        setTimeout(() => {
+          if (messagesContainerRef.current) {
+            const currentScrollTop = messagesContainerRef.current.scrollTop;
+            const actualTarget = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.clientHeight;
+            
+            // If we're not within 10px of the bottom, try again
+            if (Math.abs(currentScrollTop - actualTarget) > 10) {
+              attemptScroll(retries - 1);
+            }
+          }
+        }, 20);
+      };
+      
+      // Use RAF to ensure DOM updates, then attempt scroll with retries
       requestAnimationFrame(() => {
-        if (messagesContainerRef.current) {
-          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-        }
+        requestAnimationFrame(() => {
+          attemptScroll();
+        });
       });
     }
   };
@@ -164,6 +187,23 @@ export default function ChatInterface() {
   useEffect(() => {
     if (streamingMessage) {
       scrollToBottomDuringStreaming();
+    }
+  }, [streamingMessage?.content]);
+
+  // More aggressive scroll effect specifically for streaming content changes
+  useEffect(() => {
+    if (streamingMessage?.content) {
+      // Use multiple timing strategies to ensure scroll reaches bottom
+      const scrollAttempts = [0, 50, 100, 200]; // Multiple attempts with different delays
+      
+      scrollAttempts.forEach((delay) => {
+        setTimeout(() => {
+          if (messagesContainerRef.current) {
+            const container = messagesContainerRef.current;
+            container.scrollTop = container.scrollHeight;
+          }
+        }, delay);
+      });
     }
   }, [streamingMessage?.content]);
 
@@ -320,6 +360,13 @@ export default function ChatInterface() {
 
               // Ensure scrolling stays at bottom during content updates
               scrollToBottomDuringStreaming();
+              
+              // Additional immediate scroll with setTimeout to catch any DOM delays
+              setTimeout(() => {
+                if (messagesContainerRef.current) {
+                  messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                }
+              }, 20);
             }
 
             // Continue processing if there's more content
@@ -341,8 +388,20 @@ export default function ChatInterface() {
           accumulatedContent += chunk;
           updateStreamingContent(accumulatedContent);
           
-          // Additional scroll trigger for new stream chunks
+          // Multiple scroll triggers for new stream chunks to ensure we reach bottom
           scrollToBottomDuringStreaming();
+          
+          // Immediate scroll
+          if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+          }
+          
+          // Delayed scroll to catch any rendering delays
+          setTimeout(() => {
+            if (messagesContainerRef.current) {
+              messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+            }
+          }, 30);
         }
       }
 
