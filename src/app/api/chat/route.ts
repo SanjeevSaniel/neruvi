@@ -172,12 +172,12 @@ I don't have information about that topic in the available course transcripts. P
 Focus on ${selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} course content when possible.`;
 
     const result = streamText({
-      model: getOpenAIClient()('gpt-4o-mini'),
+      model: getOpenAIClient()('gpt-4o'),
       system: systemPrompt,
       messages,
       temperature: 0.3, // Lower temperature for more focused, accurate responses
-      topP: 0.9, // Slightly more focused sampling
-      maxTokens: 1200, // Allow for longer, more detailed responses
+      topP: 1, // Slightly more focused sampling
+      // maxTokens: 1200, // Allow for longer, more detailed responses
     });
 
     const response = result.toTextStreamResponse();
