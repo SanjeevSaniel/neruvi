@@ -58,7 +58,7 @@ const FlowMindLogo = ({ size = 50, className = '', animated = true }: FlowMindLo
         }}
       >
         <Image
-          src='/flowmind-logo-2.png'
+          src='/flowmind-logo.svg'
           alt='FlowMind Logo'
           width={size}
           height={size}
