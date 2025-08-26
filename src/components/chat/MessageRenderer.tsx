@@ -12,7 +12,7 @@ interface MessageRendererProps {
 
 const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
   if (role === 'user') {
-    return <div className='whitespace-pre-wrap text-white'>{content}</div>;
+    return <div className='whitespace-pre-wrap' style={{color: 'white'}}>{content}</div>;
   }
 
   // For assistant messages - enhanced rendering with code blocks
@@ -42,10 +42,10 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
         inCodeBlock = false;
         result.push(
           <div key={`code-${i}`} className='my-4'>
-            <div className='bg-slate-900 rounded-t-lg px-4 py-2 text-xs text-slate-300 font-mono border-b border-slate-700'>
+            <div className='bg-slate-900 rounded-t-lg px-4 py-2 text-xs font-mono border-b border-slate-700' style={{color: '#dcefe2'}}>
               {codeLanguage || 'code'}
             </div>
-            <pre className='bg-slate-800 rounded-b-lg p-4 text-sm text-slate-100 font-mono overflow-x-auto'>
+            <pre className='bg-slate-800 rounded-b-lg p-4 text-sm font-mono overflow-x-auto' style={{color: '#f0f9f3'}}>
               <code>{codeBlockLines.join('\n')}</code>
             </pre>
           </div>
@@ -68,7 +68,7 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
         result.push(
           <h3
             key={i}
-            className='text-lg font-semibold text-slate-800 mt-3 mb-2'>
+            className='text-lg font-semibold mt-3 mb-2' style={{color: '#459071'}}>
             {trimmedLine.substring(4)}
           </h3>
         );
@@ -76,7 +76,7 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
         result.push(
           <h2
             key={i}
-            className='text-xl font-bold text-slate-900 mt-4 mb-2'>
+            className='text-xl font-bold mt-4 mb-2' style={{color: '#459071'}}>
             {trimmedLine.substring(3)}
           </h2>
         );
@@ -84,7 +84,7 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
         result.push(
           <h1
             key={i}
-            className='text-2xl font-bold text-slate-900 mt-4 mb-3'>
+            className='text-2xl font-bold mt-4 mb-3' style={{color: '#459071'}}>
             {trimmedLine.substring(2)}
           </h1>
         );
@@ -93,8 +93,8 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
           <div
             key={i}
             className='flex items-start mb-1'>
-            <span className='mr-2 text-slate-500'>•</span>
-            <span className='text-slate-700'>{renderInlineFormatting(trimmedLine.substring(2))}</span>
+            <span className='mr-2' style={{color: '#90c9a8'}}>•</span>
+            <span style={{color: '#1f2937'}}>{renderInlineFormatting(trimmedLine.substring(2))}</span>
           </div>
         );
       } else if (/^\d+\.\s/.test(trimmedLine)) {
@@ -102,10 +102,10 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
           <div
             key={i}
             className='flex items-start mb-1'>
-            <span className='mr-2 text-slate-500'>
+            <span className='mr-2' style={{color: '#90c9a8'}}>
               {trimmedLine.match(/^\d+\./)?.[0]}
             </span>
-            <span className='text-slate-700'>
+            <span style={{color: '#1f2937'}}>
               {renderInlineFormatting(trimmedLine.replace(/^\d+\.\s/, ''))}
             </span>
           </div>
@@ -114,7 +114,7 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
         result.push(
           <p
             key={i}
-            className='text-slate-700 mb-2 leading-relaxed'>
+            className='mb-2 leading-relaxed' style={{color: '#1f2937'}}>
             {renderInlineFormatting(trimmedLine)}
           </p>
         );
@@ -129,10 +129,10 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
     if (inCodeBlock && codeBlockLines.length > 0) {
       result.push(
         <div key={`code-final`} className='my-4'>
-          <div className='bg-slate-900 rounded-t-lg px-4 py-2 text-xs text-slate-300 font-mono border-b border-slate-700'>
+          <div className='bg-slate-900 rounded-t-lg px-4 py-2 text-xs font-mono border-b border-slate-700' style={{color: '#dcefe2'}}>
             {codeLanguage || 'code'}
           </div>
-          <pre className='bg-slate-800 rounded-b-lg p-4 text-sm text-slate-100 font-mono overflow-x-auto'>
+          <pre className='bg-slate-800 rounded-b-lg p-4 text-sm font-mono overflow-x-auto' style={{color: '#f0f9f3'}}>
             <code>{codeBlockLines.join('\n')}</code>
           </pre>
         </div>
@@ -152,7 +152,7 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
         return (
           <code
             key={partIndex}
-            className='bg-purple-100 text-purple-800 px-1 py-0.5 rounded text-sm font-mono'>
+            className='px-1 py-0.5 rounded text-sm font-mono' style={{backgroundColor: '#f0f9f3', color: '#459071'}}>
             {part}
           </code>
         );
@@ -166,7 +166,7 @@ const MessageRenderer = memo(({ content, role }: MessageRendererProps) => {
           return (
             <strong
               key={`${partIndex}-${boldIndex}`}
-              className='font-semibold text-slate-900'>
+              className='font-semibold' style={{color: '#459071'}}>
               {boldPart}
             </strong>
           );
