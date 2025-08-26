@@ -642,7 +642,10 @@ export default function TranscriptLearningLanding() {
                     <div
                       key={i}
                       className='flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer'>
-                      <FileText className='w-5 h-5 text-primary-600' />
+                      <FileText
+                        className='w-5 h-5 text-primary-600'
+                        style={{ color: '#394150' }}
+                      />
                       <div className='flex-1'>
                         <div
                           className='text-sm font-medium'
