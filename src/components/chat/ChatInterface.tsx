@@ -11,6 +11,7 @@ import CourseSelector, { CourseType } from './CourseSelector';
 import MessageDetailPanel from './MessageDetailPanel';
 import MessagesContainer from './MessagesContainer';
 import { Message, SourceTimestamp } from './types';
+import WelcomeScreen from './WelcomeScreen';
 
 export default function ChatInterface() {
   const {
@@ -26,10 +27,13 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showCourseSelector, setShowCourseSelector] = useState(false);
+  const [showCourseSelector, setShowCourseSelector] = useState(true); // Start with true to show course selector by default
+  const [isInitialLoad, setIsInitialLoad] = useState(true); // Track if this is the first load
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [messageDetailOpen, setMessageDetailOpen] = useState(false);
-  const [streamingMessage, setStreamingMessage] = useState<Message | null>(null);
+  const [streamingMessage, setStreamingMessage] = useState<Message | null>(
+    null,
+  );
   const [keepPanelOpen, setKeepPanelOpen] = useState(false);
   const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingContentRef = useRef<string>('');
@@ -41,14 +45,20 @@ export default function ChatInterface() {
   const selectedCourse = conversation?.selectedCourse || null;
 
   // Check if we need course selection (no current conversation or no course selected)
-  const needsCourseSelection =
-    (!currentConversationId || !selectedCourse) && !showCourseSelector;
+  const needsCourseSelection = !currentConversationId || !selectedCourse;
 
-  // Skip welcome screen - go directly to chat interface
+  // Check if we should show welcome screen (course selected but no messages yet)
+  const shouldShowWelcome =
+    currentConversationId &&
+    selectedCourse &&
+    messages.length === 0 &&
+    !showCourseSelector;
 
   // Handle header click to show course selector
   const handleHeaderClick = () => {
-    setShowCourseSelector(!showCourseSelector);
+    setShowCourseSelector(true);
+    setMessageDetailOpen(false); // Close message detail panel
+    setSelectedMessage(null);
   };
 
   const handleMessageClick = (message: Message) => {
@@ -61,7 +71,6 @@ export default function ChatInterface() {
     setSelectedMessage(null);
     setKeepPanelOpen(false); // Reset the flag when manually closed
   };
-  
 
   // Don't auto-create conversations - wait for course selection
   // useEffect(() => {
@@ -78,21 +87,31 @@ export default function ChatInterface() {
     const conversation = getCurrentConversation();
     if (conversation) {
       setHasStartedChat(conversation.messages.length > 0);
-      setShowCourseSelector(false); // Hide course selector when switching conversations
       
-      // Close message detail panel only when actually switching to a different conversation
-      const conversationChanged = prevConversationIdRef.current !== null && 
-                                 prevConversationIdRef.current !== currentConversationId;
+      // Only hide course selector when actually switching conversations, not on initial load
+      const conversationChanged =
+        prevConversationIdRef.current !== null &&
+        prevConversationIdRef.current !== currentConversationId;
       
-      if (conversationChanged && !streamingMessage && !keepPanelOpen) {
-        setMessageDetailOpen(false);
-        setSelectedMessage(null);
+      if (conversationChanged && !isInitialLoad) {
+        setShowCourseSelector(false); // Hide course selector only when switching conversations
+        
+        if (!streamingMessage && !keepPanelOpen) {
+          setMessageDetailOpen(false);
+          setSelectedMessage(null);
+        }
       }
-      
+
       // Update the previous conversation ID reference
       prevConversationIdRef.current = currentConversationId;
     }
-  }, [currentConversationId, getCurrentConversation, streamingMessage, keepPanelOpen]);
+  }, [
+    currentConversationId,
+    getCurrentConversation,
+    streamingMessage,
+    keepPanelOpen,
+    isInitialLoad,
+  ]);
 
   // Close panel when navigating away from chat (when course selector is shown)
   useEffect(() => {
@@ -102,11 +121,35 @@ export default function ChatInterface() {
     }
   }, [needsCourseSelection, showCourseSelector]);
 
-  const scrollToBottom = () => {
+  // Ensure course selector is shown on initial load, regardless of stored state
+  useEffect(() => {
+    if (isInitialLoad) {
+      setShowCourseSelector(true);
+      // Mark initial load as complete after a short delay to allow store to load
+      const timer = setTimeout(() => {
+        setIsInitialLoad(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialLoad]);
+
+  const scrollToBottom = (forceBehavior: 'smooth' | 'instant' = 'smooth') => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTo({
         top: messagesContainerRef.current.scrollHeight,
-        behavior: 'smooth',
+        behavior: forceBehavior,
+      });
+    }
+  };
+
+  // Enhanced scrolling during streaming
+  const scrollToBottomDuringStreaming = () => {
+    if (messagesContainerRef.current) {
+      // Use requestAnimationFrame for smoother scrolling during streaming
+      requestAnimationFrame(() => {
+        if (messagesContainerRef.current) {
+          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
       });
     }
   };
@@ -116,6 +159,13 @@ export default function ChatInterface() {
       setTimeout(scrollToBottom, 100);
     }
   }, [messages]);
+
+  // Additional effect to handle scrolling during streaming content updates
+  useEffect(() => {
+    if (streamingMessage) {
+      scrollToBottomDuringStreaming();
+    }
+  }, [streamingMessage?.content]);
 
   const safeFormatTimestamp = (timestamp: string): string => {
     if (!timestamp || timestamp.includes('NaN') || timestamp === 'undefined') {
@@ -136,19 +186,29 @@ export default function ChatInterface() {
     // Get or create a conversation specific to this course
     getOrCreateConversationForCourse(course);
     setShowCourseSelector(false); // Hide selector after selection
+    setIsInitialLoad(false); // Mark that user has interacted
   };
 
   const handleSuggestionClick = async (
     suggestion: string,
     course: CourseType,
   ) => {
-    // Ensure we have the right conversation for this course
-    getOrCreateConversationForCourse(course);
-    setShowCourseSelector(false); // Hide selector after selection
-    setHasStartedChat(true); // Mark chat as started immediately
+    console.log('🚀 Starting conversation:', suggestion, '- Course:', course);
+    
+    try {
+      // Ensure we have the right conversation for this course (this updates selectedCourse)
+      const conversationId = getOrCreateConversationForCourse(course);
+      
+      // Update states immediately
+      setShowCourseSelector(false); // Hide selector after selection  
+      setIsInitialLoad(false); // Mark that user has interacted
+      setHasStartedChat(true); // Mark chat as started immediately
 
-    // Start the chat with the suggestion
-    await handleSubmit(suggestion);
+      // Start the chat immediately with the suggestion
+      await handleSubmit(suggestion);
+    } catch (error) {
+      console.error('❌ Error in handleSuggestionClick:', error);
+    }
   };
 
   const handleSubmit = async (inputText: string) => {
@@ -168,7 +228,7 @@ export default function ChatInterface() {
     addMessage(conversationId, userMessage);
     setInput(''); // Clear input box immediately after sending
     setIsLoading(true);
-    
+
     let accumulatedContent = ''; // Move to broader scope
     let assistantMessage: Message | null = null; // Declare in broader scope
 
@@ -181,11 +241,10 @@ export default function ChatInterface() {
             role: m.role,
             content: m.content,
           })),
-          course: selectedCourse || 'both',
+          course: selectedCourse || 'nodejs', // Default to nodejs since we removed 'both'
         }),
       });
 
-      
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       if (!response.body) throw new Error('No response body');
 
@@ -196,16 +255,16 @@ export default function ChatInterface() {
       if (sourcesHeader) {
         try {
           const parsedSources = JSON.parse(sourcesHeader);
-          sources = parsedSources.map((source: SourceTimestamp) => ({
-            ...source,
-            timestamp: safeFormatTimestamp(source.timestamp),
-          }));
+          sources = parsedSources; // Use exact timestamps from API
+          console.log(`🔍 Frontend received ${sources.length} sources:`, sources);
         } catch (error) {
           console.error('Error parsing sources:', error);
           // Continue without sources - deployment compatibility
         }
+      } else {
+        console.log('❌ No X-Sources header received from API');
       }
-      
+
       // For deployment: No sources available, but still show AI response
 
       const reader = response.body.getReader();
@@ -220,7 +279,7 @@ export default function ChatInterface() {
       };
 
       addMessage(conversationId, assistantMessage);
-      
+
       // Auto-show the right panel when streaming starts
       setStreamingMessage(assistantMessage);
       setSelectedMessage(assistantMessage);
@@ -234,12 +293,12 @@ export default function ChatInterface() {
       // Smooth streaming with slower, word-by-word display for better readability
       const updateStreamingContent = (newContent: string) => {
         contentQueue = newContent;
-        
+
         // Clear existing timeout
         if (streamingTimeoutRef.current) {
           clearTimeout(streamingTimeoutRef.current);
         }
-        
+
         // Process content gradually for smoother display
         const processNextChunk = () => {
           if (displayContent.length < contentQueue.length) {
@@ -247,22 +306,29 @@ export default function ChatInterface() {
             const remaining = contentQueue.slice(displayContent.length);
             const nextChunkSize = Math.min(3, remaining.length); // 3 characters at a time
             displayContent += remaining.slice(0, nextChunkSize);
-            
+
             if (assistantMessage) {
-              updateMessage(conversationId, assistantMessage.id, displayContent);
+              updateMessage(
+                conversationId,
+                assistantMessage.id,
+                displayContent,
+              );
               setStreamingMessage({
                 ...assistantMessage,
-                content: displayContent
+                content: displayContent,
               });
+
+              // Ensure scrolling stays at bottom during content updates
+              scrollToBottomDuringStreaming();
             }
-            
+
             // Continue processing if there's more content
             if (displayContent.length < contentQueue.length) {
               streamingTimeoutRef.current = setTimeout(processNextChunk, 80); // 80ms between chunks
             }
           }
         };
-        
+
         processNextChunk();
       };
 
@@ -274,26 +340,32 @@ export default function ChatInterface() {
           const chunk = decoder.decode(value, { stream: true });
           accumulatedContent += chunk;
           updateStreamingContent(accumulatedContent);
+          
+          // Additional scroll trigger for new stream chunks
+          scrollToBottomDuringStreaming();
         }
       }
-      
+
       // Ensure final content is set after streaming completes
       if (streamingTimeoutRef.current) {
         clearTimeout(streamingTimeoutRef.current);
       }
-      
+
       // Set final content and ensure display catches up
       if (assistantMessage) {
         displayContent = accumulatedContent;
         updateMessage(conversationId, assistantMessage.id, accumulatedContent);
-        
+
         // Create final message object for panel
         const finalMessage = {
           ...assistantMessage,
-          content: accumulatedContent
+          content: accumulatedContent,
         };
-        
+
         setStreamingMessage(finalMessage);
+        
+        // Final scroll to bottom after streaming completes
+        setTimeout(() => scrollToBottom('instant'), 100);
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -306,7 +378,7 @@ export default function ChatInterface() {
         sources: [],
       };
       addMessage(conversationId, errorMsg);
-      
+
       // If we were streaming and got an error, show the error in the panel
       if (streamingMessage) {
         setSelectedMessage(errorMsg);
@@ -319,21 +391,24 @@ export default function ChatInterface() {
         if (assistantMessage) {
           const finalMessage: Message = {
             ...assistantMessage,
-            content: accumulatedContent
+            content: accumulatedContent,
           };
-          
+
           // Clear streaming state but keep panel open
           setStreamingMessage(null);
           setSelectedMessage(finalMessage);
           setMessageDetailOpen(true); // Explicitly ensure panel stays open
+          
+          // Final scroll after streaming state is cleared
+          scrollToBottom('smooth');
         }
       }, 500);
     }
   };
 
   return (
-    <div className='h-screen flex flex-col overflow-hidden bg-gradient-to-br from-purple-200 via-violet-100 to-purple-300 relative'>
-      <div className='absolute inset-0 bg-gradient-to-tr from-purple-100/50 via-transparent to-purple-200/30 animate-pulse'></div>
+    <div className='h-screen flex flex-col overflow-hidden relative' style={{background: 'linear-gradient(to bottom right, #bde0ca, #dcefe2, #459071)'}}>
+      <div className='absolute inset-0 bg-gradient-to-tr from-green-100/50 via-transparent to-green-200/30 animate-pulse'></div>
 
       <ConversationSidebar
         isOpen={sidebarOpen}
@@ -368,8 +443,16 @@ export default function ChatInterface() {
                 isVisible={needsCourseSelection || showCourseSelector}
               />
             </div>
+          ) : shouldShowWelcome ? (
+            // Welcome screen after course selection
+            <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
+              <WelcomeScreen
+                onSubmit={handleSubmit}
+                selectedCourse={selectedCourse}
+              />
+            </div>
           ) : (
-            // Chat interface - no welcome screen
+            // Chat interface
             <div className='w-full max-w-4xl flex flex-col min-h-0 px-4'>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -382,6 +465,7 @@ export default function ChatInterface() {
                   onMessageClick={handleMessageClick}
                   isDetailPanelOpen={messageDetailOpen}
                   selectedMessageId={selectedMessage?.id || null}
+                  streamingMessage={streamingMessage}
                 />
 
                 <ChatInput
@@ -393,11 +477,7 @@ export default function ChatInterface() {
                   placeholder={
                     selectedCourse
                       ? `Ask me anything about ${
-                          selectedCourse === 'both'
-                            ? 'programming'
-                            : selectedCourse === 'nodejs'
-                            ? 'Node.js'
-                            : 'Python'
+                          selectedCourse === 'nodejs' ? 'Node.js' : 'Python'
                         }...`
                       : 'Please select a course first...'
                   }

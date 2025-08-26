@@ -11,10 +11,11 @@ interface MessagesContainerProps {
   onMessageClick?: (message: Message) => void;
   isDetailPanelOpen?: boolean;
   selectedMessageId?: string | null;
+  streamingMessage?: Message | null;
 }
 
 const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
-  ({ messages, isLoading, onMessageClick, isDetailPanelOpen, selectedMessageId }, ref) => {
+  ({ messages, isLoading, onMessageClick, isDetailPanelOpen, selectedMessageId, streamingMessage }, ref) => {
     return (
       <div
         ref={ref}
@@ -32,7 +33,7 @@ const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
               />
             ))}
           </AnimatePresence>
-          {isLoading && <TypingIndicator />}
+          {isLoading && !streamingMessage && <TypingIndicator />}
         </div>
       </div>
     );
