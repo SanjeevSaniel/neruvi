@@ -10,14 +10,40 @@ interface SourcePanelProps {
 }
 
 export default function SourcePanel({ sources }: SourcePanelProps) {
-  // Get dynamic title based on source count
+  // Filter sources to show the most relevant single reference
+  const filteredSources = sources
+    .filter(source => {
+      // Show sources with relevance percentage >= 40% or sources without percentage
+      const relevanceMatch = source.relevance.match(/(\d+)%?/);
+      if (relevanceMatch) {
+        const percentage = parseInt(relevanceMatch[1]);
+        return percentage >= 40;
+      }
+      // Keep sources without percentage (assume they're relevant)
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by relevance score, highest first
+      const aMatch = a.relevance.match(/(\d+)%?/);
+      const bMatch = b.relevance.match(/(\d+)%?/);
+      const aScore = aMatch ? parseInt(aMatch[1]) : 0;
+      const bScore = bMatch ? parseInt(bMatch[1]) : 0;
+      return bScore - aScore;
+    })
+    .slice(0, 1); // Take only the single best match
+
+  // If no high-quality sources, don't render the panel
+  if (filteredSources.length === 0) {
+    return null;
+  }
+
+  // Get dynamic title based on filtered source count - now always singular since we show max 1
   const getSourceTitle = (count: number): string => {
-    if (count === 1) return 'Source Reference:';
-    return 'Source References:';
+    return 'Source Reference:';
   };
 
-  // Group sources by course first, then sort by timestamp within each course
-  const groupedSources = sources.reduce((acc, source) => {
+  // Group filtered sources by course first, then sort by timestamp within each course
+  const groupedSources = filteredSources.reduce((acc, source) => {
     const courseKey = source.course.toLowerCase();
     if (!acc[courseKey]) {
       acc[courseKey] = [];
@@ -52,9 +78,9 @@ export default function SourcePanel({ sources }: SourcePanelProps) {
       transition={{ delay: 0.1, duration: 0.15 }}
       className='mt-2 bg-slate-100 border border-slate-300 rounded-lg p-3'>
       <div className='flex items-center space-x-2 mb-2'>
-        <Clock className='w-4 h-4 text-slate-600' />
-        <span className='text-sm font-medium text-slate-800'>
-          {getSourceTitle(sources.length)}
+        <Clock className='w-4 h-4' style={{color: '#459071'}} />
+        <span className='text-sm font-medium' style={{color: '#459071'}}>
+          {getSourceTitle(filteredSources.length)}
         </span>
       </div>
 
@@ -93,7 +119,7 @@ const CourseHeader = ({ course, count }: { course: string; count: number }) => {
         return {
           name: 'Node.js',
           icon: SiNodedotjs,
-          color: 'text-green-600',
+          color: '#4ea674',
           bg: 'bg-green-50',
           border: 'border-green-200',
         };
@@ -101,7 +127,7 @@ const CourseHeader = ({ course, count }: { course: string; count: number }) => {
         return {
           name: 'Python',
           icon: SiPython,
-          color: 'text-blue-600',
+          color: '#459071',
           bg: 'bg-blue-50',
           border: 'border-blue-200',
         };
@@ -109,7 +135,7 @@ const CourseHeader = ({ course, count }: { course: string; count: number }) => {
         return {
           name: courseKey.charAt(0).toUpperCase() + courseKey.slice(1),
           icon: Clock,
-          color: 'text-purple-600',
+          color: '#459071',
           bg: 'bg-purple-50',
           border: 'border-purple-200',
         };
@@ -122,11 +148,11 @@ const CourseHeader = ({ course, count }: { course: string; count: number }) => {
   return (
     <div
       className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${courseInfo.bg} ${courseInfo.border} border`}>
-      <Icon className={`w-4 h-4 ${courseInfo.color}`} />
-      <span className={`text-sm font-semibold ${courseInfo.color}`}>
+      <Icon className={`w-4 h-4`} style={{color: courseInfo.color}} />
+      <span className={`text-sm font-semibold`} style={{color: courseInfo.color}}>
         {courseInfo.name}
       </span>
-      <span className='text-xs text-slate-500'>
+      <span className='text-xs' style={{color: '#6b7280'}}>
         ({count} reference{count !== 1 ? 's' : ''})
       </span>
     </div>
@@ -146,11 +172,11 @@ const SourceItem = ({
   // Removed relevance text labels for cleaner display
 
   const getRelevanceColor = (relevance: string): string => {
-    if (!isPercentage) return 'text-slate-600';
+    if (!isPercentage) return '#459071';
     const percentage = parseFloat(relevance);
-    if (percentage >= 80) return 'text-green-600';
-    if (percentage >= 60) return 'text-blue-600';
-    if (percentage >= 40) return 'text-yellow-600';
+    if (percentage >= 80) return '#4ea674';
+    if (percentage >= 60) return '#459071';
+    if (percentage >= 40) return '#5fad81';
     if (percentage >= 20) return 'text-orange-600';
     return 'text-red-600';
   };
@@ -177,11 +203,11 @@ const SourceItem = ({
     switch (course.toLowerCase()) {
       case 'nodejs':
       case 'node.js':
-        return { icon: SiNodedotjs, color: 'text-green-600' };
+        return { icon: SiNodedotjs, color: '#4ea674' };
       case 'python':
-        return { icon: SiPython, color: 'text-blue-600' };
+        return { icon: SiPython, color: '#459071' };
       default:
-        return { icon: Clock, color: 'text-purple-600' };
+        return { icon: Clock, color: '#459071' };
     }
   };
 
@@ -196,16 +222,18 @@ const SourceItem = ({
         {showCourse && (
           <>
             {React.createElement(courseIcon.icon, {
-              className: `w-3 h-3 ${courseIcon.color}`,
+              className: `w-3 h-3`,
+              style: { color: courseIcon.color },
             })}
-            <span className='text-slate-400'>•</span>
+            <span style={{color: '#90c9a8'}}>•</span>
           </>
         )}
-        <span className='text-slate-700 font-medium'>{source.section}</span>
+        <span className='font-medium' style={{color: '#1f2937'}}>{source.section}</span>
         <span className='text-slate-400'>•</span>
         <button
           onClick={handleTimestampClick}
-          className='font-mono text-blue-600 bg-blue-100 px-2 py-1 rounded hover:bg-blue-200 hover:text-blue-700 transition-colors cursor-pointer'
+          className='font-mono px-2 py-1 rounded transition-colors cursor-pointer'
+          style={{color: '#459071', backgroundColor: '#f0f9f3'}}
           title={`Jump to ${source.timestamp} in ${source.course}`}>
           <Clock className='w-3 h-3 inline mr-1' />
           {source.timestamp}
