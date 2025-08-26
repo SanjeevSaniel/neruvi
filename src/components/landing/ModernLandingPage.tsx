@@ -238,7 +238,7 @@ export default function ModernLandingPage() {
             animated={false}
             className='w-8 h-8'
           />
-          <span className='text-lg font-bold text-slate-800'>FlowMind</span>
+          <span className='text-lg font-bold text-slate-800 font-comfortaa'>FlowMind</span>
         </div>
 
         <div className='flex items-center space-x-6'>
