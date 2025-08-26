@@ -1,11 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, ChevronRight, Code2, Sparkles } from 'lucide-react';
 import { useRef, useState } from 'react';
-import { FaCode } from 'react-icons/fa';
 import { SiNodedotjs, SiPython } from 'react-icons/si';
 import '../../styles/scrollbar.css';
 
-export type CourseType = 'nodejs' | 'python' | 'both';
+export type CourseType = 'nodejs' | 'python';
 
 interface CourseSelectorProps {
   selectedCourse: CourseType | null;
@@ -26,7 +25,7 @@ const courseOptions = [
     borderColor: 'border-green-200',
     hoverColor: 'hover:border-green-400',
     selectedColor: 'border-green-500 bg-green-100',
-    textColor: 'text-green-700',
+    textColor: '#459071',
     topics: [
       'Express.js',
       'REST APIs',
@@ -47,7 +46,7 @@ const courseOptions = [
     borderColor: 'border-blue-200',
     hoverColor: 'hover:border-blue-400',
     selectedColor: 'border-blue-500 bg-blue-100',
-    textColor: 'text-blue-700',
+    textColor: '#459071',
     topics: [
       'Functions',
       'Classes',
@@ -55,26 +54,6 @@ const courseOptions = [
       'Django/Flask',
       'NumPy',
       'Machine Learning',
-    ],
-  },
-  {
-    id: 'both' as CourseType,
-    name: 'Both Courses',
-    description: 'Search across both Node.js and Python content',
-    icon: FaCode,
-    iconColor: '#8B5CF6', // Purple for both
-    gradient: 'from-purple-500 via-violet-500 to-indigo-500',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
-    hoverColor: 'hover:border-purple-400',
-    selectedColor: 'border-purple-500 bg-purple-100',
-    textColor: 'text-purple-700',
-    topics: [
-      'Full Stack',
-      'Programming Concepts',
-      'Best Practices',
-      'Algorithms',
-      'Problem Solving',
     ],
   },
 ];
@@ -188,36 +167,9 @@ export default function CourseSelector({
         },
         { icon: '🤖', text: 'Machine learning intro', category: 'AI/ML' },
       ],
-      both: [
-        {
-          icon: '💻',
-          text: 'Full-stack development tips',
-          category: 'Development',
-        },
-        {
-          icon: '🏗️',
-          text: 'Software architecture patterns',
-          category: 'Architecture',
-        },
-        {
-          icon: '🔧',
-          text: 'Debugging techniques',
-          category: 'Problem Solving',
-        },
-        {
-          icon: '📚',
-          text: 'Best coding practices',
-          category: 'Best Practices',
-        },
-        {
-          icon: '⚡',
-          text: 'Performance optimization',
-          category: 'Optimization',
-        },
-      ],
     };
 
-    return suggestions[courseId || 'both'] || suggestions.both;
+    return suggestions[courseId || 'nodejs'] || suggestions.nodejs;
   };
 
   return (
@@ -245,10 +197,14 @@ export default function CourseSelector({
                   <Code2 className='w-6 h-6 text-white' />
                 </div>
               </div>
-              <h2 className='text-2xl font-bold text-slate-800 mb-2'>
+              <h2
+                className='text-2xl font-bold mb-2'
+                style={{ color: '#1f2937' }}>
                 Choose Your Learning Path
               </h2>
-              <p className='text-slate-600 max-w-md mx-auto'>
+              <p
+                className='max-w-md mx-auto'
+                style={{ color: '#4b5563' }}>
                 Select which course content you&apos;d like me to help you with
                 today
               </p>
@@ -256,7 +212,7 @@ export default function CourseSelector({
 
             {/* Course Options Grid */}
             <motion.div
-              className='grid md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-6'
+              className='grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-6'
               variants={containerVariants}>
               {courseOptions.map((course) => {
                 const isSelected = selectedCourse === course.id;
@@ -333,7 +289,8 @@ export default function CourseSelector({
                         </div>
                         <div>
                           <h3
-                            className={`text-lg font-bold ${course.textColor} relative z-10`}>
+                            className='text-lg font-bold relative z-10'
+                            style={{ color: course.textColor }}>
                             {course.name}
                           </h3>
                         </div>
@@ -341,22 +298,26 @@ export default function CourseSelector({
                       <ChevronRight
                         className={`
                       w-5 h-5 transition-all duration-200 relative z-10
-                      ${isSelected ? course.textColor : 'text-slate-400'}
                       ${isHovered ? 'translate-x-1' : ''}
                     `}
+                        style={{
+                          color: isSelected ? course.textColor : '#94a3b8',
+                        }}
                       />
                     </div>
 
                     {/* Description */}
                     <p
-                      className={`text-sm mb-4 ${course.textColor} opacity-80 relative z-20`}>
+                      className='text-sm mb-4 opacity-80 relative z-20'
+                      style={{ color: '#4b5563' }}>
                       {course.description}
                     </p>
 
                     {/* Topics */}
                     <div className='relative z-20 space-y-2'>
                       <h4
-                        className={`text-xs font-semibold uppercase tracking-wider ${course.textColor} opacity-60`}>
+                        className='text-xs font-semibold uppercase tracking-wider opacity-60'
+                        style={{ color: course.textColor }}>
                         Key Topics
                       </h4>
                       <div className='flex flex-wrap gap-1'>
@@ -371,12 +332,9 @@ export default function CourseSelector({
                               className={`
                               text-xs px-2 py-1 rounded-full relative z-10
                               ${
-                                isSelected
-                                  ? `bg-white/50 ${course.textColor}`
-                                  : `bg-white/80 ${course.textColor}`
-                              }
-                              font-medium transition-colors duration-200
-                            `}>
+                                isSelected ? 'bg-white/50' : 'bg-white/80'
+                              } font-medium transition-colors duration-200`}
+                              style={{ color: course.textColor }}>
                               {topic}
                             </motion.span>
                           ))}
@@ -403,11 +361,7 @@ export default function CourseSelector({
                       <Sparkles className='w-5 h-5 text-purple-500' />
                       <h3 className='text-xl font-bold'>
                         Popular{' '}
-                        {selectedCourse === 'both'
-                          ? 'Programming'
-                          : selectedCourse === 'nodejs'
-                          ? 'Node.js'
-                          : 'Python'}{' '}
+                        {selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}{' '}
                         Topics
                       </h3>
                       <Sparkles className='w-5 h-5 text-purple-500' />
@@ -445,6 +399,10 @@ export default function CourseSelector({
                             }}
                             onClick={() => {
                               if (onSuggestionClick && selectedCourse) {
+                                console.log(
+                                  '🚀 Starting conversation with:',
+                                  suggestion.text,
+                                );
                                 onSuggestionClick(
                                   suggestion.text,
                                   selectedCourse,
@@ -480,12 +438,16 @@ export default function CourseSelector({
                                   {suggestion.icon}
                                 </span>
                                 <span
-                                  className={`text-xs font-semibold uppercase tracking-wider ${selectedCourseOption?.textColor} opacity-60`}>
+                                  className='text-xs font-semibold uppercase tracking-wider opacity-60'
+                                  style={{
+                                    color: selectedCourseOption?.textColor,
+                                  }}>
                                   {suggestion.category}
                                 </span>
                               </div>
                               <p
-                                className={`text-sm font-medium ${selectedCourseOption?.textColor} leading-relaxed`}>
+                                className='text-sm font-medium leading-relaxed'
+                                style={{ color: '#1f2937' }}>
                                 {suggestion.text}
                               </p>
                             </div>
@@ -497,7 +459,10 @@ export default function CourseSelector({
                           transition-opacity duration-200
                         `}>
                               <ChevronRight
-                                className={`w-4 h-4 ${selectedCourseOption?.textColor}`}
+                                className='w-4 h-4'
+                                style={{
+                                  color: selectedCourseOption?.textColor,
+                                }}
                               />
                             </div>
                           </motion.button>
