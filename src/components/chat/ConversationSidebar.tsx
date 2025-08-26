@@ -116,6 +116,13 @@ export default function ConversationSidebar({
                             : 'hover:bg-slate-50'
                         }`}
                         onClick={() => {
+                          console.log('🔄 Switching to conversation:', {
+                            id: conversation.id,
+                            title: conversation.title,
+                            selectedCourse: conversation.selectedCourse,
+                            messageCount: conversation.messages.length,
+                            firstMessage: conversation.messages[0]?.content.substring(0, 50)
+                          });
                           setCurrentConversation(conversation.id);
                           onClose();
                         }}
