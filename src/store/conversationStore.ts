@@ -8,7 +8,7 @@ export interface Conversation {
   messages: Message[];
   createdAt: Date;
   updatedAt: Date;
-  selectedCourse?: 'nodejs' | 'python' | 'both';
+  selectedCourse?: 'nodejs' | 'python';
 }
 
 interface ConversationStore {
@@ -16,19 +16,19 @@ interface ConversationStore {
   currentConversationId: string | null;
   
   // Actions
-  createConversation: (title?: string, course?: 'nodejs' | 'python' | 'both') => string;
+  createConversation: (title?: string, course?: 'nodejs' | 'python') => string;
   deleteConversation: (id: string) => void;
   updateConversation: (id: string, updates: Partial<Conversation>) => void;
   addMessage: (conversationId: string, message: Message) => void;
   updateMessage: (conversationId: string, messageId: string, content: string) => void;
   setCurrentConversation: (id: string | null) => void;
   getCurrentConversation: () => Conversation | null;
-  setCourseForConversation: (conversationId: string, course: 'nodejs' | 'python' | 'both') => void;
+  setCourseForConversation: (conversationId: string, course: 'nodejs' | 'python') => void;
   clearConversations: () => void;
   
   // Course-specific methods
-  getOrCreateConversationForCourse: (course: 'nodejs' | 'python' | 'both') => string;
-  getCurrentConversationForCourse: (course: 'nodejs' | 'python' | 'both') => Conversation | null;
+  getOrCreateConversationForCourse: (course: 'nodejs' | 'python') => string;
+  getCurrentConversationForCourse: (course: 'nodejs' | 'python') => Conversation | null;
   
   // SessionStorage persistence
   loadFromStorage: () => void;
@@ -88,13 +88,12 @@ export const useConversationStore = create<ConversationStore>()(
       
       const courseNames = {
         nodejs: 'Node.js',
-        python: 'Python', 
-        both: 'Programming'
+        python: 'Python'
       };
       
       const conversation: Conversation = {
         id,
-        title: title || `${courseNames[course || 'both']} Chat ${new Date().toLocaleDateString()}`,
+        title: title || `${courseNames[course || 'nodejs']} Chat ${new Date().toLocaleDateString()}`,
         messages: [], // Start with empty messages to allow welcome screen to show
         createdAt: now,
         updatedAt: now,
