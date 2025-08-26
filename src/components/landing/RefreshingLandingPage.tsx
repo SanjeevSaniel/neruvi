@@ -553,7 +553,7 @@ export default function TranscriptLearningLanding() {
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2
-              className='text-4xl md:text-5xl font-semibold mb-6'
+              className='text-4xl md:text-5xl font-medium mb-6'
               style={{ color: '#459071' }}>
               How FlowMind Works
             </h2>
@@ -625,7 +625,7 @@ export default function TranscriptLearningLanding() {
                       className='w-6 h-6'
                       style={{ color: '#459071' }}
                     />
-                    <h3 className='text-lg font-semibold'>
+                    <h3 className='text-lg font-medium'>
                       Transcript Search Demo
                     </h3>
                   </div>
@@ -678,7 +678,7 @@ export default function TranscriptLearningLanding() {
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2
-              className='text-4xl md:text-5xl font-semibold mb-6'
+              className='text-4xl md:text-5xl font-medium mb-6'
               style={{ color: '#459071' }}>
               Why Choose FlowMind?
             </h2>
@@ -788,7 +788,7 @@ export default function TranscriptLearningLanding() {
         ref={ctaRef}
         className='py-24 bg-gradient-to-r from-primary-500 to-secondary-900'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8 text-center'>
-          <h2 className='text-4xl md:text-5xl text-[#459071] font-bold mb-6'>
+          <h2 className='text-4xl md:text-5xl text-[#459071] font-medium mb-6'>
             Ready to Transform Your Learning?
           </h2>
           <p className='text-xl text-[#394150] max-w-3xl mx-auto mb-12'>
