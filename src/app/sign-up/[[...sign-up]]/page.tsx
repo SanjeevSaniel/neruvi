@@ -17,7 +17,7 @@ export default function SignUpPage() {
           <div className="flex justify-center mb-6">
             <FlowMindLogo size={32} animated={true} className="w-16 h-16" />
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Join FlowMind</h1>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2 font-comfortaa">Join FlowMind</h1>
           <p className="text-slate-600">Start your AI-powered learning adventure</p>
         </div>
         

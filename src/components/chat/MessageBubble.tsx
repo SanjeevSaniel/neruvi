@@ -17,6 +17,31 @@ interface MessageBubbleProps {
 export default function MessageBubble({ message, index, onClick, isCompactMode, isSelected }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   
+  // Filter sources to show the most relevant single reference (same logic as SourcePanel)
+  const getFilteredSources = (sources: typeof message.sources) => {
+    if (!sources) return [];
+    return sources
+      .filter(source => {
+        const relevanceMatch = source.relevance.match(/(\d+)%?/);
+        if (relevanceMatch) {
+          const percentage = parseInt(relevanceMatch[1]);
+          return percentage >= 40; // Same threshold as SourcePanel
+        }
+        return true; // Keep sources without percentage
+      })
+      .sort((a, b) => {
+        // Sort by relevance score, highest first
+        const aMatch = a.relevance.match(/(\d+)%?/);
+        const bMatch = b.relevance.match(/(\d+)%?/);
+        const aScore = aMatch ? parseInt(aMatch[1]) : 0;
+        const bScore = bMatch ? parseInt(bMatch[1]) : 0;
+        return bScore - aScore;
+      })
+      .slice(0, 1); // Take only the single best match
+  };
+
+  const filteredSources = getFilteredSources(message.sources);
+  
   const formatTimestamp = (timestamp: Date) => {
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
@@ -79,11 +104,11 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
                   animate={{ scale: 1 }}
                   className='w-8 h-8 bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg'
                 >
-                  <Sparkles className='w-4 h-4 text-white' />
+                  <Sparkles className='w-4 h-4' style={{color: 'white'}} />
                 </motion.div>
               )}
               <span className={`text-sm font-semibold ${
-                message.role === 'user' ? 'order-1 text-purple-700' : 'text-purple-700'
+                message.role === 'user' ? 'order-1 text-purple-700' : 'text-purple-700 font-comfortaa'
               }`}>
                 {message.role === 'assistant' ? 'FlowMind' : 'You'}
               </span>
@@ -98,7 +123,7 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
                   animate={{ scale: 1 }}
                   className='w-8 h-8 bg-gradient-to-br from-pink-500 via-purple-500 to-violet-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white order-2'
                 >
-                  <User className='w-4 h-4 text-white' />
+                  <User className='w-4 h-4' style={{color: 'white'}} />
                 </motion.div>
               )}
             </div>
@@ -111,27 +136,33 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               onClick={() => onClick?.(message)}
               className={`relative px-4 py-3 rounded-2xl shadow-md cursor-pointer transition-all duration-200 hover:shadow-lg ${
                 message.role === 'user'
-                  ? `bg-gradient-to-br from-purple-500/90 via-violet-500/90 to-indigo-500/90 text-white shadow-purple-500/20 ml-6 ${
-                      isSelected ? 'ring-2 ring-purple-300 ring-offset-2' : ''
+                  ? `ml-6 ${
+                      isSelected ? 'ring-2 ring-green-300 ring-offset-2' : ''
                     }`
-                  : `bg-white text-slate-900 border shadow-lg ${
+                  : `bg-white border shadow-lg ${
                       isSelected 
-                        ? 'border-purple-400 ring-2 ring-purple-200 ring-offset-1 bg-purple-50' 
+                        ? 'border-green-400 ring-2 ring-green-200 ring-offset-1 bg-green-50' 
                         : 'border-slate-200'
                     }`
-              }`}>
+              }`}
+              style={message.role === 'user' ? {
+                background: 'linear-gradient(to bottom right, rgba(78, 166, 116, 0.9), rgba(69, 144, 113, 0.9))',
+                boxShadow: '0 4px 6px rgba(78, 166, 116, 0.2)'
+              } : {}}>
               <div className="flex items-start justify-between">
-                <div className={`flex-1 text-sm ${message.role === 'user' ? 'text-white' : 'text-slate-600'} leading-relaxed overflow-hidden pr-3`}
+                <div className={`flex-1 text-sm leading-relaxed overflow-hidden pr-3`}
                      style={{
+                       color: message.role === 'user' ? 'white' : '#64748b',
                        display: '-webkit-box',
                        WebkitLineClamp: 3,
                        WebkitBoxOrient: 'vertical'
                      }}>
                   {getPreviewText(message.content, 200)}
                   
-                  {message.sources && message.sources.length > 0 && (
-                    <div className={`mt-2 text-xs ${message.role === 'user' ? 'text-purple-200' : 'text-purple-600'} flex items-center space-x-1`}>
-                      <span>{message.sources.length} source{message.sources.length > 1 ? 's' : ''}</span>
+                  {filteredSources.length > 0 && (
+                    <div className={`mt-2 text-xs flex items-center space-x-1`}
+                         style={{color: message.role === 'user' ? '#dcefe2' : '#4ea674'}}>
+                      <span>1 source</span>
                       <span className="text-slate-400">• Click for details</span>
                     </div>
                   )}
@@ -162,9 +193,12 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               </div>
             </motion.div>
 
-            {/* Source Panel for Assistant Messages - Only on left side */}
-            {message.role === 'assistant' && message.sources && message.sources.length > 0 && (
-              <SourcePanel sources={message.sources} />
+            {/* Source Panel for Assistant Messages - Only show when filtered sources exist */}
+            {message.role === 'assistant' && filteredSources.length > 0 && (
+              <>
+                {console.log(`💬 Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
+                <SourcePanel sources={filteredSources} />
+              </>
             )}
           </div>
         </div>
@@ -198,7 +232,7 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               </motion.div>
             )}
             <span className={`text-sm font-semibold ${
-              message.role === 'user' ? 'order-1 text-purple-700' : 'text-purple-700'
+              message.role === 'user' ? 'order-1 text-purple-700' : 'text-purple-700 font-comfortaa'
             }`}>
               {message.role === 'assistant' ? 'FlowMind' : 'You'}
             </span>
@@ -223,13 +257,18 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            whileHover={{ scale: 1.01, boxShadow: '0 8px 25px rgba(139, 92, 246, 0.15)' }}
+            whileHover={{ scale: 1.01, boxShadow: message.role === 'user' ? '0 8px 25px rgba(78, 166, 116, 0.15)' : '0 8px 25px rgba(139, 92, 246, 0.15)' }}
             onClick={() => onClick?.(message)}
             className={`relative group px-5 py-4 rounded-2xl shadow-md cursor-pointer transition-all duration-200 ${
               message.role === 'user'
-                ? 'bg-gradient-to-br from-purple-500/90 via-violet-500/90 to-indigo-500/90 text-white shadow-purple-500/20 ml-6 hover:shadow-purple-500/30'
-                : 'bg-white text-slate-900 border border-slate-200 shadow-lg hover:border-purple-200 hover:shadow-xl'
-            }`}>
+                ? 'ml-6'
+                : 'bg-white border border-slate-200 shadow-lg hover:border-green-200 hover:shadow-xl'
+            }`}
+            style={message.role === 'user' ? {
+              background: 'linear-gradient(to bottom right, rgba(78, 166, 116, 0.9), rgba(69, 144, 113, 0.9))',
+              color: 'white',
+              boxShadow: '0 4px 6px rgba(78, 166, 116, 0.2)'
+            } : {}}>
             <EnhancedMessageRenderer content={message.content} role={message.role} />
             
             {/* Copy and Download Actions - Only for assistant messages */}

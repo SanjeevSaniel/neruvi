@@ -42,7 +42,7 @@ export default function TypingIndicator() {
               <Bot className='w-4 h-4 text-white' />
             </motion.div>
           </motion.div>
-          <span className='text-sm font-semibold text-purple-700'>
+          <span className='text-sm font-semibold text-purple-700 font-comfortaa'>
             FlowMind
           </span>
         </div>

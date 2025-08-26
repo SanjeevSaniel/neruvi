@@ -123,7 +123,7 @@ ${content}
                     )}
                     <div>
                       <div className="flex items-center space-x-2">
-                        <h2 className="text-lg font-semibold text-slate-800">
+                        <h2 className={`text-lg font-semibold text-slate-800 ${message.role === 'assistant' ? 'font-comfortaa' : ''}`}>
                           {message.role === 'assistant' ? 'FlowMind' : 'You'}
                         </h2>
                         {isStreaming && message.role === 'assistant' && (

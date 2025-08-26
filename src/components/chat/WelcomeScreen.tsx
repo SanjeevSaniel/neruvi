@@ -1,11 +1,14 @@
 // components/chat/WelcomeScreen.tsx
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Code2, FileText, Sparkles, Zap, Send } from 'lucide-react';
 import { Suggestion } from './types';
 import FlowMindLogo from '../FlowMindLogo';
+import SpeechRecognitionButton from '../ui/SpeechRecognitionButton';
+import WaveAnimation from '../ui/WaveAnimation';
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 
-type CourseType = 'nodejs' | 'python' | 'both';
+type CourseType = 'nodejs' | 'python';
 
 interface WelcomeScreenProps {
   onSubmit: (text: string) => Promise<void>;
@@ -15,6 +18,31 @@ interface WelcomeScreenProps {
 export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScreenProps) {
   const [input, setInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Speech recognition setup
+  const {
+    finalTranscript,
+    interimTranscript,
+    isListening,
+    hasRecognitionSupport,
+    startListening,
+    stopListening,
+    resetTranscript,
+    error: speechError
+  } = useSpeechRecognition({
+    continuous: false,
+    interimResults: true,
+    language: 'en-US'
+  });
+
+  // Handle final transcript - only add to input when speech recognition stops
+  useEffect(() => {
+    if (finalTranscript && finalTranscript.trim() && !isListening) {
+      const newText = input + (input ? ' ' : '') + finalTranscript.trim();
+      setInput(newText);
+      resetTranscript();
+    }
+  }, [finalTranscript, isListening, input, resetTranscript]);
 
   // Course-specific suggestions
   const getSuggestions = (course: CourseType | null | undefined): Suggestion[] => {
@@ -31,26 +59,22 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
         { icon: FileText, text: 'How do Python decorators work?' },
         { icon: Sparkles, text: 'Working with pandas for data analysis' },
       ],
-      both: [
-        { icon: Code2, text: 'Best practices for error handling' },
-        { icon: Zap, text: 'Debugging techniques for developers' },
-        { icon: FileText, text: 'Performance optimization strategies' },
-        { icon: Sparkles, text: 'Code review best practices' },
-      ],
     };
 
-    return suggestionsByCourse[course || 'both'] || suggestionsByCourse.both;
+    // Default to nodejs suggestions if no course is selected or course is null
+    return suggestionsByCourse[course || 'nodejs'] || suggestionsByCourse.nodejs;
   };
 
   const suggestions = getSuggestions(selectedCourse);
 
   const handleSuggestionClick = async (text: string) => {
     if (isSubmitting) return;
+    
     setIsSubmitting(true);
     try {
       await onSubmit(text);
     } catch (error) {
-      console.error('Error submitting suggestion:', error);
+      console.error('Error starting conversation:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -60,10 +84,28 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
     e.preventDefault();
     if (!input.trim() || isSubmitting) return;
 
+    // Stop any ongoing speech recognition
+    if (isListening) {
+      stopListening();
+    }
+
     setIsSubmitting(true);
     await onSubmit(input);
     setInput('');
     setIsSubmitting(false);
+  };
+
+  const handleMicClick = () => {
+    // Don't allow mic interaction when submitting
+    if (isSubmitting) {
+      return;
+    }
+
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
   };
 
   return (
@@ -79,10 +121,10 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
           <FlowMindLogo size={32} animated={true} className='w-12 h-12' />
         </div>
 
-        <h2 className='text-2xl font-bold text-purple-900 mb-3'>
+        <h2 className='text-2xl font-bold mb-3 font-comfortaa' style={{color: '#459071'}}>
           {selectedCourse ? `Ready to learn ${selectedCourse === 'nodejs' ? 'Node.js' : selectedCourse === 'python' ? 'Python' : 'Programming'}?` : 'Welcome to FlowMind'}
         </h2>
-        <p className='text-base text-purple-800 mb-6 leading-relaxed'>
+        <p className='text-base mb-6 leading-relaxed' style={{color: '#4ea674'}}>
           {selectedCourse 
             ? `Let's explore ${selectedCourse === 'nodejs' ? 'Node.js development' : selectedCourse === 'python' ? 'Python programming' : 'programming concepts'} together. Ask me anything!`
             : 'Your intelligent programming assistant for Node.js and Python'
@@ -108,76 +150,97 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
         transition={{ delay: 1.2, duration: 0.6 }}
         className='w-full max-w-2xl px-4'>
         <form onSubmit={handleSubmit}>
-          <div className='relative group'>
-            {/* Enhanced animated background */}
-            <motion.div
-              className='absolute -inset-1 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 rounded-3xl blur-sm opacity-75'
-              animate={{
-                opacity: [0.75, 0.9, 0.75],
-                scale: [1, 1.02, 1],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
+          <div className='relative'>
+            {/* Enhanced gradient background */}
+            <div className='absolute -inset-0.5 bg-gradient-to-r from-pink-400 via-purple-500 to-indigo-500 rounded-xl opacity-60 blur-sm animate-pulse transition-opacity duration-300'></div>
 
-            <motion.div
-              className='relative flex items-center bg-white/98 rounded-2xl px-4 py-2 shadow-xl backdrop-blur-sm'
-              whileHover={{
-                scale: 1.01,
-                boxShadow:
-                  '0 25px 50px rgba(139, 92, 246, 0.25), 0 0 0 1px rgba(139, 92, 246, 0.1)',
-              }}
-              whileFocus={{
-                scale: 1.02,
-                boxShadow:
-                  '0 30px 60px rgba(139, 92, 246, 0.3), 0 0 0 2px rgba(139, 92, 246, 0.2)',
-              }}>
+            <div className='relative flex items-center bg-white/98 rounded-xl px-3 py-2.5 shadow-lg transition-all duration-300'>
               <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
+                value={input + (isListening && interimTranscript ? (input ? ' ' : '') + interimTranscript : '')}
+                onChange={(e) => {
+                  // Only allow manual changes when not listening
+                  if (!isListening) {
+                    setInput(e.target.value);
+                  }
+                }}
                 placeholder={
-                  selectedCourse 
-                    ? `Ask me anything about ${selectedCourse === 'nodejs' ? 'Node.js development' : selectedCourse === 'python' ? 'Python programming' : 'programming'}...`
-                    : 'Ask me about Node.js or Python programming...'
+                  isListening
+                    ? `Listening... ${interimTranscript ? 'Processing speech...' : 'Speak now!'}`
+                    : selectedCourse 
+                      ? `Ask me anything about ${selectedCourse === 'nodejs' ? 'Node.js development' : selectedCourse === 'python' ? 'Python programming' : 'programming'}...`
+                      : 'Ask me about Node.js or Python programming...'
                 }
                 rows={1}
-                className='flex-1 bg-transparent text-purple-900 placeholder-purple-500/70 resize-none focus:outline-none text-base leading-relaxed transition-all duration-300 focus:placeholder-purple-600/80'
-                style={{ minHeight: '24px', maxHeight: '120px' }}
-                onFocus={(e) => {
-                  e.target.style.transform = 'scale(1.01)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.transform = 'scale(1)';
+                disabled={isSubmitting}
+                className={`flex-1 bg-transparent resize-none focus:outline-none text-base transition-all duration-300 ${
+                  isSubmitting
+                    ? 'cursor-not-allowed'
+                    : isListening
+                      ? 'cursor-default'
+                      : ''
+                }`}
+                style={{ 
+                  minHeight: '20px', 
+                  maxHeight: '100px',
+                  overflow: (input + (isListening && interimTranscript ? ' ' + interimTranscript : '')).split('\n').length > 3 ? 'auto' : 'hidden',
+                  color: isSubmitting ? '#9ca3af' : isListening ? '#7c3aed' : '#1f2937',
+                  caretColor: '#459071',
+                  backgroundColor: isListening ? 'rgba(139, 92, 246, 0.05)' : 'transparent',
                 }}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
+                  if (e.key === 'Enter' && !e.shiftKey && !isSubmitting && !isListening) {
                     e.preventDefault();
                     handleSubmit(e as unknown as React.FormEvent);
                   }
                 }}
               />
+              
+              {/* Speech Recognition with Wave Animation */}
+              <div className="flex items-center ml-2 space-x-2">
+                <SpeechRecognitionButton
+                  isListening={isListening}
+                  isDisabled={isSubmitting}
+                  hasSupport={hasRecognitionSupport}
+                  onClick={handleMicClick}
+                  size="md"
+                  variant="default"
+                  isProcessing={isSubmitting}
+                />
+                
+                {/* Animated Wave Visualization */}
+                {isListening && (
+                  <WaveAnimation 
+                    isActive={isListening} 
+                    size="sm" 
+                    color="rgb(147 51 234)" 
+                    className="opacity-90"
+                  />
+                )}
+              </div>
+
               <motion.button
                 type='submit'
                 disabled={isSubmitting || !input.trim()}
                 whileHover={{
-                  scale: isSubmitting || !input.trim() ? 1 : 1.05,
+                  scale: isSubmitting || !input.trim() ? 1 : 1.1,
                   boxShadow:
                     isSubmitting || !input.trim()
                       ? 'none'
-                      : '0 10px 25px rgba(139, 92, 246, 0.4)',
+                      : '0 10px 20px rgba(139, 92, 246, 0.4)',
                 }}
-                whileTap={{ scale: isSubmitting || !input.trim() ? 1 : 0.95 }}
-                className={`ml-4 p-2 rounded-xl transition-all duration-300 ${
+                whileTap={{ scale: isSubmitting || !input.trim() ? 1 : 0.9 }}
+                className={`ml-2 p-2 rounded-lg transition-all duration-300 ${
                   !isSubmitting && input.trim()
-                    ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/50 cursor-pointer transform hover:scale-105'
-                    : 'bg-purple-200 text-purple-400 cursor-not-allowed opacity-50'
-                }`}>
-                <Send className='w-5 h-5' />
+                    ? 'shadow-lg cursor-pointer'
+                    : 'cursor-not-allowed opacity-50'
+                }`}
+                style={!isSubmitting && input.trim()
+                  ? {backgroundColor: '#4ea674', color: 'white', boxShadow: '0 10px 25px rgba(78, 166, 116, 0.5)'}
+                  : {backgroundColor: '#bde0ca', color: '#5fad81'}
+                }>
+                <Send className='w-3.5 h-3.5' />
               </motion.button>
-            </motion.div>
+            </div>
           </div>
         </form>
       </motion.div>
@@ -195,21 +258,91 @@ const SuggestionCard = ({
   index: number;
   onClick: (text: string) => void;
   disabled: boolean;
-}) => (
-  <motion.button
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: index * 0.1 + 0.2 }}
-    whileHover={{ scale: disabled ? 1 : 1.02 }}
-    whileTap={{ scale: disabled ? 1 : 0.98 }}
-    onClick={() => !disabled && onClick(suggestion.text)}
-    disabled={disabled}
-    className='p-3 bg-white/95 backdrop-blur-sm border border-purple-200 rounded-lg text-left hover:border-purple-400 hover:shadow-md transition-all duration-300 disabled:opacity-50'>
-    <div className='flex items-center space-x-3'>
-      <div className='w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center'>
-        <suggestion.icon className='w-4 h-4 text-purple-600' />
+}) => {
+  // Define color variations for each suggestion type
+  const getCardColors = (index: number) => {
+    const colorSchemes = [
+      {
+        iconBg: '#f0f9f4', // green-50 equivalent
+        iconColor: '#16a34a', // green-600
+        borderColor: '#d1fae5', // green-200
+        borderHoverColor: '#4ade80', // green-400
+        shadowColor: 'rgba(34, 197, 94, 0.2)' // green-500 with opacity
+      },
+      {
+        iconBg: '#f0f4ff', // blue-50 equivalent
+        iconColor: '#2563eb', // blue-600
+        borderColor: '#bfdbfe', // blue-200
+        borderHoverColor: '#60a5fa', // blue-400
+        shadowColor: 'rgba(37, 99, 235, 0.2)' // blue-600 with opacity
+      },
+      {
+        iconBg: '#fef7f0', // orange-50 equivalent
+        iconColor: '#ea580c', // orange-600
+        borderColor: '#fed7aa', // orange-200
+        borderHoverColor: '#fb923c', // orange-400
+        shadowColor: 'rgba(234, 88, 12, 0.2)' // orange-600 with opacity
+      },
+      {
+        iconBg: '#f3f4f6', // purple-50 equivalent
+        iconColor: '#7c3aed', // purple-600
+        borderColor: '#e9d5ff', // purple-200
+        borderHoverColor: '#a855f7', // purple-500
+        shadowColor: 'rgba(124, 58, 237, 0.2)' // purple-600 with opacity
+      }
+    ];
+    return colorSchemes[index % colorSchemes.length];
+  };
+
+  const colors = getCardColors(index);
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 + 0.2 }}
+      whileHover={{ 
+        scale: disabled ? 1 : 1.02,
+        boxShadow: disabled ? 'none' : `0 8px 25px ${colors.shadowColor}`
+      }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      onClick={() => !disabled && onClick(suggestion.text)}
+      disabled={disabled}
+      className='p-4 bg-white/95 backdrop-blur-sm rounded-xl text-left transition-all duration-300 disabled:opacity-50'
+      style={{
+        border: `1.5px solid ${colors.borderColor}`,
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+      }}
+      onMouseEnter={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.borderColor = colors.borderHoverColor;
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = `0 12px 30px ${colors.shadowColor}`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.borderColor = colors.borderColor;
+          e.currentTarget.style.transform = 'translateY(0px)';
+          e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.05)';
+        }
+      }}>
+      <div className='flex items-center space-x-4'>
+        <div 
+          className='w-10 h-10 rounded-xl flex items-center justify-center shadow-sm'
+          style={{
+            backgroundColor: colors.iconBg,
+            border: `1px solid ${colors.borderColor}`
+          }}>
+          <suggestion.icon 
+            className='w-5 h-5' 
+            style={{ color: colors.iconColor }}
+          />
+        </div>
+        <p className='text-sm font-semibold leading-relaxed' style={{color: '#374151'}}>
+          {suggestion.text}
+        </p>
       </div>
-      <p className='text-sm font-medium text-purple-900'>{suggestion.text}</p>
-    </div>
-  </motion.button>
-);
+    </motion.button>
+  );
+};
