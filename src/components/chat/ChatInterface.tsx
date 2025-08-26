@@ -44,8 +44,8 @@ export default function ChatInterface() {
   const messages = useMemo(() => conversation?.messages || [], [conversation]);
   const selectedCourse = conversation?.selectedCourse || null;
 
-  // Check if we need course selection (no current conversation or no course selected)
-  const needsCourseSelection = !currentConversationId || !selectedCourse;
+  // Check if we need course selection (no current conversation or conversation has messages but no course)
+  const needsCourseSelection = !currentConversationId || (!selectedCourse && messages.length === 0);
 
   // Check if we should show welcome screen (course selected but no messages yet)
   const shouldShowWelcome =
@@ -53,6 +53,17 @@ export default function ChatInterface() {
     selectedCourse &&
     messages.length === 0 &&
     !showCourseSelector;
+
+  // Debug logging
+  console.log('🔍 ChatInterface state:', {
+    currentConversationId,
+    selectedCourse,
+    messagesLength: messages.length,
+    needsCourseSelection,
+    shouldShowWelcome,
+    showCourseSelector,
+    hasStartedChat
+  });
 
   // Handle header click to show course selector
   const handleHeaderClick = () => {
@@ -86,6 +97,7 @@ export default function ChatInterface() {
   useEffect(() => {
     const conversation = getCurrentConversation();
     if (conversation) {
+      console.log('🔄 Conversation changed:', conversation.id, 'Messages:', conversation.messages.length);
       setHasStartedChat(conversation.messages.length > 0);
       
       // Only hide course selector when actually switching conversations, not on initial load
@@ -93,8 +105,10 @@ export default function ChatInterface() {
         prevConversationIdRef.current !== null &&
         prevConversationIdRef.current !== currentConversationId;
       
-      if (conversationChanged && !isInitialLoad) {
-        setShowCourseSelector(false); // Hide course selector only when switching conversations
+      if (conversationChanged) {
+        console.log('👥 Conversation switched - hiding course selector');
+        setShowCourseSelector(false); // Hide course selector when switching conversations
+        setIsInitialLoad(false); // Mark as no longer initial load
         
         if (!streamingMessage && !keepPanelOpen) {
           setMessageDetailOpen(false);
@@ -110,7 +124,6 @@ export default function ChatInterface() {
     getCurrentConversation,
     streamingMessage,
     keepPanelOpen,
-    isInitialLoad,
   ]);
 
   // Close panel when navigating away from chat (when course selector is shown)
@@ -492,14 +505,14 @@ export default function ChatInterface() {
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
           className='flex justify-center'>
-          {needsCourseSelection || showCourseSelector ? (
+          {showCourseSelector || needsCourseSelection ? (
             // Full screen course selection
             <div className='w-full h-full flex flex-col'>
               <CourseSelector
                 selectedCourse={selectedCourse}
                 onCourseSelect={handleCourseSelect}
                 onSuggestionClick={handleSuggestionClick}
-                isVisible={needsCourseSelection || showCourseSelector}
+                isVisible={showCourseSelector || needsCourseSelection}
               />
             </div>
           ) : shouldShowWelcome ? (
