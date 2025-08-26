@@ -9,10 +9,13 @@ const AIStatusIndicator = () => {
   return (
     <motion.div
       whileHover={{ scale: 1.05 }}
-      className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg'>
+      className='flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md shadow-lg'>
       {/* AI Brain Icon with Animation */}
       <div className='relative'>
-        <Brain className='w-4 h-4 drop-shadow-sm' style={{color: 'white'}} />
+        <Brain
+          className='w-4 h-4 drop-shadow-sm'
+          style={{ color: 'white' }}
+        />
 
         {/* Status dot */}
         <div className='absolute -top-0.5 -right-0.5'>
@@ -36,10 +39,14 @@ const AIStatusIndicator = () => {
 
       {/* Status Text */}
       <div className='flex flex-col'>
-        <span className='text-xs font-semibold tracking-wide' style={{color: 'white'}}>
-          AI ACTIVE
+        <span
+          className='text-xs font-semibold tracking-wide'
+          style={{ color: 'white' }}>
+          AI
         </span>
-        <span className='text-primary-100 text-[10px] opacity-90'>GPT-4o-Mini</span>
+        {/* <span className='text-primary-100 text-[10px] opacity-90'>
+          GPT-4o
+        </span> */}
       </div>
     </motion.div>
   );
@@ -50,7 +57,10 @@ interface ChatHeaderProps {
   onHeaderClick?: () => void;
 }
 
-export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderProps) {
+export default function ChatHeader({
+  onOpenSidebar,
+  onHeaderClick,
+}: ChatHeaderProps) {
   return (
     <motion.div
       initial={{ y: -20, opacity: 0 }}
@@ -58,7 +68,12 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className='relative h-12 flex items-center justify-center flex-shrink-0 overflow-hidden'>
       {/* Clean gradient background */}
-      <div className='absolute inset-0 backdrop-blur-xl' style={{background: 'linear-gradient(to right, rgba(78, 166, 116, 0.95), rgba(69, 144, 113, 0.98), rgba(69, 144, 113, 0.95))'}}>
+      <div
+        className='absolute inset-0 backdrop-blur-xl'
+        style={{
+          background:
+            'linear-gradient(to right, rgba(78, 166, 116, 0.95), rgba(69, 144, 113, 0.98), rgba(69, 144, 113, 0.95))',
+        }}>
         {/* Subtle animated overlay */}
         <motion.div
           className='absolute inset-0 bg-gradient-to-r from-transparent via-white/3 to-transparent'
@@ -78,31 +93,34 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
             <motion.button
               onClick={onOpenSidebar}
               className='p-1.5 hover:bg-white/10 rounded-lg transition-all duration-300'
-              style={{color: 'white'}}
+              style={{ color: 'white' }}
               title='View conversation history'
-              whileHover={{ 
+              whileHover={{
                 scale: 1.05,
-                boxShadow: '0 4px 8px rgba(255, 255, 255, 0.1)'
+                boxShadow: '0 4px 8px rgba(255, 255, 255, 0.1)',
               }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ConversationHistoryIcon className='w-4 h-4' size={16} />
+              whileTap={{ scale: 0.95 }}>
+              <ConversationHistoryIcon
+                className='w-4 h-4'
+                size={16}
+              />
             </motion.button>
           )}
-          
+
           {/* Logo Section - Clickable */}
           <button
             onClick={onHeaderClick}
             className='flex justify-center items-center gap-2 p-1.5 rounded-lg cursor-pointer'
-            title='Show course selection'
-          >
-            <div className="scale-90">
+            title='Show course selection'>
+            <div className='scale-90'>
               <FlowMindLogo animated={true} />
             </div>
 
             {/* Brand Text */}
             <div className='text-left'>
-              <h1 className='text-lg font-semibold drop-shadow-lg tracking-tight lowercase font-comfortaa' style={{color: 'white'}}>
+              <h1
+                className='text-lg font-semibold drop-shadow-lg tracking-tight lowercase font-comfortaa'
+                style={{ color: 'white' }}>
                 FlowMind
               </h1>
               <p className='text-[10px] text-primary-100/90 font-medium -mt-0.5 drop-shadow-sm'>
@@ -112,9 +130,9 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
           </button>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className='flex items-center space-x-3'>
           {/* Compact AI Status Indicator */}
-          <div className='hidden md:block'>
+          {/* <div className='hidden md:block'>
             <motion.div
               whileHover={{ scale: 1.05 }}
               className='flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
@@ -128,27 +146,31 @@ export default function ChatHeader({ onOpenSidebar, onHeaderClick }: ChatHeaderP
               </div>
               <span className='text-xs font-medium' style={{color: 'white'}}>AI Ready</span>
             </motion.div>
-          </div>
+          </div> */}
+          <AIStatusIndicator />
 
           {/* Mobile version */}
           <div className='md:hidden'>
-            <motion.div
-              className='flex items-center space-x-1 px-2 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
+            <motion.div className='flex items-center space-x-1 px-2 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
               <div className='w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse' />
-              <span className='text-xs font-medium' style={{color: 'white'}}>AI</span>
+              <span
+                className='text-xs font-medium'
+                style={{ color: 'white' }}>
+                AI
+              </span>
             </motion.div>
           </div>
-
           {/* User Profile - Compact */}
-          <UserButton 
+          <UserButton
             appearance={{
               elements: {
-                avatarBox: "w-8 h-8 border-2 border-white/30 shadow-lg",
-                userButtonPopoverCard: "bg-white/95 backdrop-blur-sm border border-white/20 shadow-2xl",
-                userButtonPopoverActionButton: "hover:bg-primary-50",
+                avatarBox: 'w-8 h-8 border-2 border-white/30 shadow-lg',
+                userButtonPopoverCard:
+                  'bg-white/95 backdrop-blur-sm border border-white/20 shadow-2xl',
+                userButtonPopoverActionButton: 'hover:bg-primary-50',
               },
             }}
-            afterSignOutUrl="/"
+            afterSignOutUrl='/'
           />
         </div>
       </div>
