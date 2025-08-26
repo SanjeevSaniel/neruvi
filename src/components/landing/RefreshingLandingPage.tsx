@@ -24,6 +24,7 @@ import { useEffect, useRef, useState } from 'react';
 import FlowMindLogo from '../FlowMindLogo';
 import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
 import { PointerHighlight } from '@/components/ui/pointer-highlight';
+import { Button } from '../ui/button';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -297,7 +298,7 @@ export default function TranscriptLearningLanding() {
       ref={containerRef}
       className='min-h-screen bg-white'>
       {/* Navigation */}
-      <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100'>
+      <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
             <div className='flex items-center space-x-3'>
@@ -308,8 +309,8 @@ export default function TranscriptLearningLanding() {
               />
               <div>
                 <span
-                  className='text-xl font-bold lowercase tracking-wide font-comfortaa'
-                  style={{ color: '#459071' }}>
+                  className='text-xl font-extrabold lowercase tracking-wide font-comfortaa'
+                  style={{ color: '#121827' }}>
                   FlowMind
                 </span>
                 <div
@@ -331,12 +332,10 @@ export default function TranscriptLearningLanding() {
               <SignInButton
                 mode='modal'
                 appearance={clerkAppearance}>
-                <button
-                  className='relative overflow-hidden bg-gradient-to-r from-primary-500 to-secondary-900 hover:from-primary-600 hover:to-secondary-800 px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] cursor-pointer group'
-                  style={{ color: 'white' }}>
+                <Button className='relative overflow-hidden bg-[#4ea674] hover:bg-[#5cbb85] px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer group'>
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                   <span className='relative z-10 text-sm'>Sign In</span>
-                </button>
+                </Button>
               </SignInButton>
             </div>
           </div>
@@ -411,7 +410,7 @@ export default function TranscriptLearningLanding() {
                   <SignUpButton
                     mode='modal'
                     appearance={clerkAppearance}>
-                    <button
+                    <Button
                       className='group relative overflow-hidden text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:scale-[1.02] cursor-pointer transform'
                       style={{
                         background:
@@ -425,7 +424,7 @@ export default function TranscriptLearningLanding() {
                         style={{ color: 'white' }}
                       />
                       <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-primary-400/60 to-secondary-400/60 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
-                    </button>
+                    </Button>
                   </SignUpButton>
                 </div>
               </div>
@@ -468,7 +467,7 @@ export default function TranscriptLearningLanding() {
                   {/* AI Response */}
                   <div className='flex justify-start space-x-3'>
                     <div className='w-10 h-10 bg-gradient-to-r from-primary-100 to-secondary-100 rounded-full flex items-center justify-center flex-shrink-0 shadow-md'>
-                      <Brain className='w-5 h-5 text-primary-600' />
+                      <Brain className='w-5 h-5 text-[#1f2937]' />
                     </div>
                     <div className='bg-gradient-to-r from-gray-50 to-primary-50/30 px-5 py-4 rounded-2xl rounded-bl-md max-w-md text-sm border border-primary-100/50 shadow-sm'>
                       <p
@@ -554,7 +553,7 @@ export default function TranscriptLearningLanding() {
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2
-              className='text-4xl md:text-5xl font-bold mb-6'
+              className='text-4xl md:text-5xl font-semibold mb-6'
               style={{ color: '#459071' }}>
               How FlowMind Works
             </h2>
@@ -581,7 +580,7 @@ export default function TranscriptLearningLanding() {
                     className={`w-12 h-12 rounded-xl bg-gradient-to-r ${step.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
                     <step.icon
                       className='w-6 h-6'
-                      style={{ color: 'white' }}
+                      style={{ color: '#394150' }}
                     />
                   </div>
                   <div className='flex-1'>
@@ -620,7 +619,7 @@ export default function TranscriptLearningLanding() {
               <div className='bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden'>
                 <div
                   className='bg-gradient-to-r from-primary-500 to-secondary-900 p-6'
-                  style={{ color: 'white' }}>
+                  style={{ color: '#459071' }}>
                   <div className='flex items-center space-x-3 mb-4'>
                     <Search
                       className='w-6 h-6'
@@ -631,7 +630,7 @@ export default function TranscriptLearningLanding() {
                     </h3>
                   </div>
                   <div className='bg-white/20 rounded-lg p-3'>
-                    <p className='text-sm opacity-90'>
+                    <p className='text-sm text-[#4d5562] opacity-90'>
                       Searching through 50,000+ hours of programming tutorial
                       transcripts...
                     </p>
@@ -676,7 +675,7 @@ export default function TranscriptLearningLanding() {
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='text-center mb-16'>
             <h2
-              className='text-4xl md:text-5xl font-bold mb-6'
+              className='text-4xl md:text-5xl font-semibold mb-6'
               style={{ color: '#459071' }}>
               Why Choose FlowMind?
             </h2>
@@ -696,7 +695,7 @@ export default function TranscriptLearningLanding() {
                 <div className='w-12 h-12 bg-gradient-to-r from-primary-500 to-secondary-900 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300'>
                   <feature.icon
                     className='w-6 h-6'
-                    style={{ color: 'white' }}
+                    style={{ color: '#4b5563' }}
                   />
                 </div>
 
@@ -711,7 +710,7 @@ export default function TranscriptLearningLanding() {
                   {feature.description}
                 </p>
 
-                <div className='inline-flex items-center text-xs font-semibold text-primary-600 bg-primary-50 px-3 py-1 rounded-full'>
+                <div className='inline-flex items-center text-xs font-semibold text-[#4b5563] bg-primary-50 px-3 py-1 rounded-full'>
                   <CheckCircle2 className='w-3 h-3 mr-1' />
                   {feature.highlight}
                 </div>
@@ -786,12 +785,10 @@ export default function TranscriptLearningLanding() {
         ref={ctaRef}
         className='py-24 bg-gradient-to-r from-primary-500 to-secondary-900'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8 text-center'>
-          <h2
-            className='text-4xl md:text-5xl font-bold mb-6'
-            style={{ color: 'white' }}>
+          <h2 className='text-4xl md:text-5xl text-[#459071] font-bold mb-6'>
             Ready to Transform Your Learning?
           </h2>
-          <p className='text-xl text-primary-100 max-w-3xl mx-auto mb-12'>
+          <p className='text-xl text-[#394150] max-w-3xl mx-auto mb-12'>
             Stop wasting time searching through hours of content. Get instant,
             precise answers from detailed transcripts with exact timestamps.
           </p>
@@ -800,19 +797,22 @@ export default function TranscriptLearningLanding() {
             <SignUpButton
               mode='modal'
               appearance={clerkAppearance}>
-              <button className='bg-white text-primary-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center space-x-3'>
-                <span>Start Learning Free</span>
+              <Button
+                className='group relative overflow-hidden text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:scale-[1.02] cursor-pointer transform'
+                style={{
+                  background:
+                    'linear-gradient(to right, #4ea674, #459071, #4ea674)',
+                  boxShadow: '0 25px 50px rgba(78, 166, 116, 0.3)',
+                }}>
+                <div className='absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
+                <span className='relative z-10'>Start learning</span>
                 <ArrowRight
-                  className='w-5 h-5'
+                  className='relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300'
                   style={{ color: 'white' }}
                 />
-              </button>
+                <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-primary-400/60 to-secondary-400/60 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
+              </Button>
             </SignUpButton>
-
-            {/* <button className='border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 flex items-center space-x-3'>
-              <FileText className='w-5 h-5' style={{color: 'white'}} />
-              <span>View Sample Transcripts</span>
-            </button> */}
           </div>
         </div>
       </section>
@@ -834,27 +834,16 @@ export default function TranscriptLearningLanding() {
                   <span className='text-2xl font-bold lowercase tracking-wide font-comfortaa'>
                     FlowMind
                   </span>
-                  <div
-                    className='text-sm'
-                    style={{ color: '#459071' }}>
-                    © 2025 Transcript Learning AI
-                  </div>
+                  <div className='text-sm'>© 2025 Transcript Learning AI</div>
                 </div>
               </div>
 
               <div className='space-y-2'>
-                <p
-                  className='font-semibold'
-                  style={{ color: '#4ea674' }}>
+                <p className='font-semibold text-[#c1c2c5]'>
                   Crafted with ❤️ by Sanjeev Saniel
                 </p>
-                <p
-                  className='flex items-center space-x-2'
-                  style={{ color: '#459071' }}>
-                  <FileText
-                    className='w-4 h-4'
-                    style={{ color: '#459071' }}
-                  />
+                <p className='flex items-center space-x-2 text-[#c1c2c5]'>
+                  <FileText className='w-4 h-4 text-[#c1c2c5]' />
                   <span>
                     Revolutionizing transcript-based learning through AI
                   </span>
