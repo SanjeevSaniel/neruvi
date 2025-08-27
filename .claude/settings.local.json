@@ -32,7 +32,9 @@
       "WebFetch(domain:www.overleaf.com)",
       "Bash(git restore:*)",
       "Bash(find:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "ask": []
