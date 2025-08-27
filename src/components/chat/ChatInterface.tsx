@@ -44,7 +44,7 @@ export default function ChatInterface() {
   const messages = useMemo(() => conversation?.messages || [], [conversation]);
   const selectedCourse = conversation?.selectedCourse || null;
 
-  // Check if we need course selection (no current conversation or conversation has messages but no course)
+  // Check if we need course selection - only when no conversation exists, or conversation has no course AND no messages
   const needsCourseSelection = !currentConversationId || (!selectedCourse && messages.length === 0);
 
   // Check if we should show welcome screen (course selected but no messages yet)
@@ -100,13 +100,20 @@ export default function ChatInterface() {
       console.log('🔄 Conversation changed:', conversation.id, 'Messages:', conversation.messages.length);
       setHasStartedChat(conversation.messages.length > 0);
       
-      // Only hide course selector when actually switching conversations, not on initial load
+      // Hide course selector when switching to a conversation that has messages
       const conversationChanged =
         prevConversationIdRef.current !== null &&
         prevConversationIdRef.current !== currentConversationId;
       
-      if (conversationChanged) {
-        console.log('👥 Conversation switched - hiding course selector');
+      // Hide course selector if:
+      // 1. Conversation has messages (user wants to see the chat)
+      // 2. We're switching conversations and it's not the initial load
+      if (conversation.messages.length > 0 || (conversationChanged && !isInitialLoad)) {
+        console.log('👥 Conversation switched - hiding course selector', {
+          hasMessages: conversation.messages.length > 0,
+          conversationChanged,
+          isInitialLoad
+        });
         setShowCourseSelector(false); // Hide course selector when switching conversations
         setIsInitialLoad(false); // Mark as no longer initial load
         

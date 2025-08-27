@@ -187,19 +187,37 @@ export const useConversationStore = create<ConversationStore>()(
     getOrCreateConversationForCourse: (course) => {
       const state = get();
       
-      // Look for existing conversation with the selected course that has no messages (fresh start)
-      const existingConv = state.conversations.find(
-        conv => conv.selectedCourse === course && conv.messages.length === 0
+      // First, look for any existing conversation with the selected course (prioritize ones with messages)
+      const conversationsForCourse = state.conversations.filter(
+        conv => conv.selectedCourse === course
       );
       
-      if (existingConv) {
+      if (conversationsForCourse.length > 0) {
+        // Sort by: conversations with messages first, then by most recent
+        const sortedConversations = conversationsForCourse.sort((a, b) => {
+          // Prioritize conversations with messages
+          if (a.messages.length > 0 && b.messages.length === 0) return -1;
+          if (a.messages.length === 0 && b.messages.length > 0) return 1;
+          // Then sort by most recent
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        });
+        
+        const selectedConv = sortedConversations[0];
+        console.log('📋 Using existing conversation for course:', {
+          course,
+          conversationId: selectedConv.id,
+          hasMessages: selectedConv.messages.length > 0,
+          title: selectedConv.title
+        });
+        
         // Set as current and return the ID
-        set({ currentConversationId: existingConv.id });
+        set({ currentConversationId: selectedConv.id });
         get().saveToStorage();
-        return existingConv.id;
+        return selectedConv.id;
       }
       
-      // Create new conversation for this course
+      // Create new conversation for this course only if none exists
+      console.log('🆕 Creating new conversation for course:', course);
       return get().createConversation(undefined, course);
     },
 
