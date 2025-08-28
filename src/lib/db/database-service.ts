@@ -1,5 +1,5 @@
 import { getDatabase } from './connection';
-import { users, conversations, messages, messageChunks, userUsage, User, Conversation, Message, NewUser, NewConversation, NewMessage } from './schema';
+import { users, conversations, messages, messageChunks, userUsage, User, Conversation, Message, NewUser, NewConversation, NewMessage, UserRole } from './schema';
 import { eq, desc, and, count, inArray } from 'drizzle-orm';
 import { ContentStorageManager } from './content-storage';
 import type { Message as ChatMessage, SourceTimestamp } from '@/components/chat/types';
@@ -13,7 +13,7 @@ export class DatabaseService {
   /**
    * Create or update user from Clerk data
    */
-  async createOrUpdateUser(clerkId: string, email: string, displayName?: string): Promise<User> {
+  async createOrUpdateUser(clerkId: string, email: string, displayName?: string, role: UserRole = 'user'): Promise<User> {
     try {
       const [user] = await this.db
         .insert(users)
@@ -21,12 +21,15 @@ export class DatabaseService {
           clerkId,
           email,
           displayName,
+          role,
+          lastLoginAt: new Date(),
         })
         .onConflictDoUpdate({
           target: users.clerkId,
           set: {
             email,
             displayName,
+            lastLoginAt: new Date(),
             updatedAt: new Date(),
           },
         })

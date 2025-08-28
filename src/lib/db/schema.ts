@@ -1,5 +1,8 @@
-import { pgTable, uuid, varchar, text, integer, timestamp, jsonb, boolean, index } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, text, integer, timestamp, jsonb, boolean, index, pgEnum } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+
+// Define user role enum
+export const userRoleEnum = pgEnum('user_role', ['user', 'admin', 'moderator']);
 
 // Users table - synced with Clerk
 export const users = pgTable('users', {
@@ -7,11 +10,15 @@ export const users = pgTable('users', {
   clerkId: varchar('clerk_id', { length: 255 }).notNull().unique(),
   email: varchar('email', { length: 255 }).notNull(),
   displayName: varchar('display_name', { length: 255 }),
+  role: userRoleEnum('role').default('user').notNull(),
+  isActive: boolean('is_active').default(true).notNull(),
+  lastLoginAt: timestamp('last_login_at'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 }, (table) => ({
   clerkIdIdx: index('idx_users_clerk_id').on(table.clerkId),
   emailIdx: index('idx_users_email').on(table.email),
+  roleIdx: index('idx_users_role').on(table.role),
 }));
 
 // Conversations table
@@ -169,6 +176,8 @@ export const chatStatisticsRelations = relations(chatStatistics, ({ one }) => ({
 }));
 
 // Export types
+export type UserRole = 'user' | 'admin' | 'moderator';
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
