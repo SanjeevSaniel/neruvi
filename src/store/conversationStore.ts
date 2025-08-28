@@ -2,6 +2,37 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { Message } from '@/components/chat/types';
 
+// Type definitions for API responses
+interface ConversationData {
+  id: string;
+  title: string;
+  selectedCourse?: 'nodejs' | 'python';
+  createdAt: string;
+  updatedAt: string;
+  messages: MessageData[];
+}
+
+interface MessageData {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  sources?: unknown[];
+}
+
+interface ClerkWindow {
+  Clerk?: {
+    session?: {
+      getToken: () => Promise<string>;
+    };
+  };
+}
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  interface Window extends ClerkWindow {}
+}
+
 export interface Conversation {
   id: string;
   title: string;
@@ -34,6 +65,7 @@ interface ConversationStore {
   
   // Data management
   loadConversations: () => Promise<void>;
+  getAllConversations: () => Promise<void>;
   migrateFromSessionStorage: () => Promise<void>;
   
   // Utility methods
@@ -59,11 +91,11 @@ const loadFromSessionStorage = (): { conversations: Conversation[], currentId: s
     
     if (conversationsData) {
       const parsed = JSON.parse(conversationsData);
-      const conversations = parsed.map((conv: any) => ({
+      const conversations = parsed.map((conv: ConversationData) => ({
         ...conv,
         createdAt: new Date(conv.createdAt),
         updatedAt: new Date(conv.updatedAt),
-        messages: conv.messages.map((msg: any) => ({
+        messages: conv.messages.map((msg: MessageData) => ({
           ...msg,
           timestamp: new Date(msg.timestamp)
         }))
@@ -94,9 +126,9 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   try {
     // Get auth token from window.Clerk if available
     let authHeaders = {};
-    if (typeof window !== 'undefined' && (window as any).Clerk?.session) {
+    if (typeof window !== 'undefined' && window.Clerk?.session) {
       try {
-        const token = await (window as any).Clerk.session.getToken();
+        const token = await window.Clerk.session.getToken();
         if (token) {
           authHeaders = { Authorization: `Bearer ${token}` };
         }
@@ -115,12 +147,22 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      let errorDetails = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorBody = await response.text();
+        errorDetails += ` - ${errorBody}`;
+      } catch {
+        // Ignore error reading response body
+      }
+      throw new Error(errorDetails);
     }
 
     return await response.json();
   } catch (error) {
-    console.error(`API call failed: ${endpoint}`, error);
+    console.error(`❌ API call failed: ${endpoint}`, error);
+    if (error instanceof Error) {
+      console.error('📋 Error details:', error.message);
+    }
     throw error;
   }
 };
@@ -152,10 +194,10 @@ export const useConversationStore = create<ConversationStore>()(
           });
 
           const conversation: Conversation = {
-            ...response.conversation,
-            createdAt: new Date(response.conversation.createdAt),
-            updatedAt: new Date(response.conversation.updatedAt),
-            messages: response.conversation.messages || [],
+            ...response.data,
+            createdAt: new Date(response.data.createdAt),
+            updatedAt: new Date(response.data.updatedAt),
+            messages: response.data.messages || [],
           };
 
           set((state) => ({
@@ -197,9 +239,8 @@ export const useConversationStore = create<ConversationStore>()(
     },
 
     deleteConversation: async (id) => {
-      const state = get();
-      state.setLoading(true);
-      state.setError(null);
+      get().setLoading(true);
+      get().setError(null);
 
       try {
         if (isDatabaseEnabled()) {
@@ -220,15 +261,14 @@ export const useConversationStore = create<ConversationStore>()(
         }
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Failed to delete conversation';
-        state.setError(errorMsg);
+        get().setError(errorMsg);
         throw error;
       } finally {
-        state.setLoading(false);
+        get().setLoading(false);
       }
     },
 
     updateConversation: async (id, updates) => {
-      const state = get();
       
       // Update locally immediately for better UX
       set((state) => ({
@@ -254,7 +294,6 @@ export const useConversationStore = create<ConversationStore>()(
     },
 
     addMessage: async (conversationId, message) => {
-      const state = get();
       
       // Add message locally immediately for better UX
       set((state) => ({
@@ -276,20 +315,22 @@ export const useConversationStore = create<ConversationStore>()(
             method: 'POST',
             body: JSON.stringify({
               conversationId,
-              message: {
-                role: message.role,
-                content: message.content,
-                sources: message.sources,
-              },
+              role: message.role,
+              content: message.content,
+              sources: message.sources,
+              processingTimeMs: 0, // Default for user messages
             }),
           });
         } else {
           saveToSessionStorage(get().conversations, get().currentConversationId);
         }
       } catch (error) {
-        console.error('Failed to persist message:', error);
+        console.error('❌ Failed to persist message to database:', error);
+        if (error instanceof Error) {
+          console.error('Error details:', error.message);
+        }
         // Message is already added locally, so user sees it
-        // Consider showing a warning about sync failure
+        // TODO: Consider showing a warning about sync failure in UI
       }
     },
 
@@ -396,7 +437,7 @@ export const useConversationStore = create<ConversationStore>()(
           console.log('📡 Loading conversations from database');
           const response = await apiCall('/api/conversations');
           
-          const conversations: Conversation[] = response.conversations.map((conv: any) => ({
+          const conversations: Conversation[] = (response.data?.conversations || []).map((conv: ConversationData) => ({
             ...conv,
             createdAt: new Date(conv.createdAt),
             updatedAt: new Date(conv.updatedAt),
@@ -423,6 +464,11 @@ export const useConversationStore = create<ConversationStore>()(
       } finally {
         state.setLoading(false);
       }
+    },
+
+    getAllConversations: async () => {
+      // Alias for loadConversations - used by admin dashboard
+      return get().loadConversations();
     },
 
     migrateFromSessionStorage: async () => {
