@@ -242,11 +242,15 @@ export default function ChatInterface() {
     return '0:00';
   };
 
-  const handleCourseSelect = (course: CourseType) => {
-    // Get or create a conversation specific to this course
-    getOrCreateConversationForCourse(course);
-    setShowCourseSelector(false); // Hide selector after selection
-    setIsInitialLoad(false); // Mark that user has interacted
+  const handleCourseSelect = async (course: CourseType) => {
+    try {
+      // Get or create a conversation specific to this course
+      await getOrCreateConversationForCourse(course);
+      setShowCourseSelector(false); // Hide selector after selection
+      setIsInitialLoad(false); // Mark that user has interacted
+    } catch (error) {
+      console.error('Failed to select course:', error);
+    }
   };
 
   const handleSuggestionClick = async (
@@ -257,7 +261,7 @@ export default function ChatInterface() {
     
     try {
       // Ensure we have the right conversation for this course (this updates selectedCourse)
-      const conversationId = getOrCreateConversationForCourse(course);
+      const conversationId = await getOrCreateConversationForCourse(course);
       
       // Update states immediately
       setShowCourseSelector(false); // Hide selector after selection  
@@ -275,7 +279,7 @@ export default function ChatInterface() {
     if (!inputText.trim() || isLoading) return;
     if (!hasStartedChat) setHasStartedChat(true);
 
-    const conversationId = currentConversationId || createConversation();
+    const conversationId = currentConversationId || await createConversation();
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -285,7 +289,7 @@ export default function ChatInterface() {
       sources: [],
     };
 
-    addMessage(conversationId, userMessage);
+    await addMessage(conversationId, userMessage);
     setInput(''); // Clear input box immediately after sending
     setIsLoading(true);
 
@@ -338,7 +342,7 @@ export default function ChatInterface() {
         sources,
       };
 
-      addMessage(conversationId, assistantMessage);
+      await addMessage(conversationId, assistantMessage);
 
       // Auto-show the right panel when streaming starts
       setStreamingMessage(assistantMessage);
@@ -456,7 +460,7 @@ export default function ChatInterface() {
         timestamp: new Date(),
         sources: [],
       };
-      addMessage(conversationId, errorMsg);
+      await addMessage(conversationId, errorMsg);
 
       // If we were streaming and got an error, show the error in the panel
       if (streamingMessage) {
