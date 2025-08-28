@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { DatabaseService } from '@/lib/db/database-service';
 import { isDatabaseEnabled } from '@/lib/db/connection';
 
@@ -30,13 +30,27 @@ export async function GET(request: NextRequest) {
 
     const dbService = new DatabaseService();
     
-    // Ensure user exists in database
-    const user = await dbService.getUserByClerkId(userId);
+    // Get or create user in database
+    let user = await dbService.getUserByClerkId(userId);
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+      const clerkUser = await currentUser();
+      if (!clerkUser) {
+        return NextResponse.json(
+          { error: 'Unable to get user information' },
+          { status: 401 }
+        );
+      }
+      
+      // Create user from Clerk data
+      user = await dbService.createOrUpdateUser(
+        userId,
+        clerkUser.emailAddresses[0]?.emailAddress || '',
+        clerkUser.firstName && clerkUser.lastName 
+          ? `${clerkUser.firstName} ${clerkUser.lastName}` 
+          : clerkUser.username || ''
       );
+      
+      console.log(`👤 Auto-created user during conversation fetch: ${user.email}`);
     }
 
     const result = await dbService.getUserConversations(user.id, {
@@ -105,14 +119,27 @@ export async function POST(request: NextRequest) {
 
     const dbService = new DatabaseService();
     
-    // Get or create user
+    // Get or create user in database
     let user = await dbService.getUserByClerkId(userId);
     if (!user) {
-      // This shouldn't happen if user is authenticated, but let's handle it
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
+      const clerkUser = await currentUser();
+      if (!clerkUser) {
+        return NextResponse.json(
+          { error: 'Unable to get user information' },
+          { status: 401 }
+        );
+      }
+      
+      // Create user from Clerk data
+      user = await dbService.createOrUpdateUser(
+        userId,
+        clerkUser.emailAddresses[0]?.emailAddress || '',
+        clerkUser.firstName && clerkUser.lastName 
+          ? `${clerkUser.firstName} ${clerkUser.lastName}` 
+          : clerkUser.username || ''
       );
+      
+      console.log(`👤 Auto-created user during conversation creation: ${user.email}`);
     }
 
     const conversation = await dbService.createConversation(
