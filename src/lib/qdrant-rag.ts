@@ -4,12 +4,21 @@ import path from 'path';
 import { createHash } from 'crypto';
 import { qdrant, COLLECTIONS } from './qdrant';
 import { QdrantSetup } from './qdrant-setup';
-import { queryOptimizer } from './query-optimizer';
 import { getSectionInfo } from './content-mapping';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+// Lazy initialization of OpenAI client
+let openai: OpenAI | null = null;
+function getOpenAIClient() {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is required');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+    });
+  }
+  return openai;
+}
 
 export interface QdrantChunk {
   id: string;
@@ -339,7 +348,7 @@ export class QdrantRAGSystem {
       try {
         // Create embeddings for this batch
         const texts = batch.map(chunk => chunk.content);
-        const response = await openai.embeddings.create({
+        const response = await getOpenAIClient().embeddings.create({
           model: 'text-embedding-3-small',
           input: texts,
           dimensions: 1536,
@@ -396,12 +405,16 @@ export class QdrantRAGSystem {
     }
 
     try {
-      // console.log(`🔍 Optimized Qdrant search for: "${query}" (course: ${course})`);
+      console.log(`🔍 Direct Qdrant search for: "${query}" (course: ${course})`);
       const startTime = Date.now();
       
-      // Only create embeddings for user query - VTT files already indexed
-      const { queryOptimizer } = await import('./query-optimizer');
-      const queryEmbedding = await queryOptimizer.getOptimizedEmbedding(query);
+      // Create simple embedding directly using OpenAI
+      const openaiClient = getOpenAIClient();
+      const response = await openaiClient.embeddings.create({
+        model: "text-embedding-ada-002",
+        input: query,
+      });
+      const queryEmbedding = response.data[0].embedding;
       
       // Use HYDE enhancement for better query understanding (with fallback)
       let hydeResult = null;
@@ -413,7 +426,7 @@ export class QdrantRAGSystem {
         searchStrategy = await hydeEnhanced.createSearchStrategy(hydeResult);
         console.log('✅ HYDE enhancement successful');
       } catch (error) {
-        console.log('⚠️ HYDE enhancement failed, using standard search:', error?.message || 'Unknown error');
+        console.log('⚠️ HYDE enhancement failed, using standard search:', (error as Error).message);
         // Continue without HYDE - standard embedding search will still work
       }
       
