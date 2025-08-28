@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   GitBranch, 
   MessageSquare, 
-  MessageSquarePlus,
+  Route,
   Plus, 
   MoreVertical,
   Trash2,
@@ -256,7 +256,7 @@ export default function ThreadSidebar({
         {/* Empty State */}
         {visibleThreads.length === 0 && (
           <div className="p-8 text-center">
-            <MessageSquarePlus className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <Route className="w-12 h-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-sm font-medium text-slate-600 mb-2">
               {showArchived ? 'No archived threads' : 'No threads yet'}
             </h3>

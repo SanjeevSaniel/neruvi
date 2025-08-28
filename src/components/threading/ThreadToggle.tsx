@@ -11,7 +11,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageSquarePlus, Eye, EyeOff } from 'lucide-react';
+import { Route, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import { getThreadingPermissions, UserRole } from '@/lib/threading/permissions';
@@ -119,7 +119,7 @@ export default function ThreadToggle({
   return (
     <div className={`${styles.container} ${className}`}>
       <div className="flex items-center gap-2">
-        <MessageSquarePlus className={`${styles.icon} text-gray-400`} />
+        <Route className={`${styles.icon} text-gray-400`} />
         <span className={styles.text}>
           {getLabel()}
         </span>
