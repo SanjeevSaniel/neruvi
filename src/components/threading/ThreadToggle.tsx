@@ -1,17 +1,17 @@
 /**
- * ThreadToggle - Student-friendly toggle for threading view
+ * ThreadToggle - Simple icon toggle for threading view
  * 
  * Features:
- * - Hidden toggle in sidebar/panel for students
- * - Simple on/off switch for thread visualization
- * - Educational tooltips about threading benefits
+ * - Simple Route icon as toggle button
+ * - Clean header integration
+ * - Tooltip for user guidance
  * - Respects role-based permissions
  */
 
 'use client';
 
 import { useState } from 'react';
-import { Route, Eye, EyeOff } from 'lucide-react';
+import { Route } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useUser } from '@clerk/nextjs';
 import { getThreadingPermissions, UserRole } from '@/lib/threading/permissions';
@@ -27,7 +27,7 @@ export default function ThreadToggle({
   isVisible = false, 
   onToggle,
   className = '',
-  variant = 'sidebar' 
+  variant = 'compact' 
 }: ThreadToggleProps) {
   const { user } = useUser();
   const [showTooltip, setShowTooltip] = useState(false);
@@ -46,115 +46,61 @@ export default function ThreadToggle({
     onToggle?.(newVisibility);
   };
 
-  const getVariantStyles = () => {
+  const getIconSize = () => {
     switch (variant) {
-      case 'sidebar':
-        return {
-          container: 'flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors',
-          button: 'p-2 rounded-lg transition-all duration-200',
-          text: 'text-sm font-medium text-gray-700',
-          icon: 'w-4 h-4',
-        };
-      case 'panel':
-        return {
-          container: 'flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm',
-          button: 'p-2 rounded-lg transition-all duration-200',
-          text: 'text-sm font-medium text-gray-700',
-          icon: 'w-4 h-4',
-        };
       case 'compact':
-        return {
-          container: 'flex items-center gap-2',
-          button: 'p-1.5 rounded-md transition-all duration-200',
-          text: 'text-xs font-medium text-gray-600',
-          icon: 'w-3.5 h-3.5',
-        };
+        return 'w-4 h-4';
+      case 'sidebar':
+      case 'panel':
       default:
-        return {
-          container: 'flex items-center gap-2',
-          button: 'p-2 rounded-lg transition-all duration-200',
-          text: 'text-sm font-medium text-gray-700',
-          icon: 'w-4 h-4',
-        };
+        return 'w-5 h-5';
     }
   };
-
-  const styles = getVariantStyles();
   
   const getTooltipContent = () => {
     if (userRole === 'user') {
       return isVisible 
-        ? "Hide conversation threads - return to simple chat view"
-        : "Show threading features - visualize conversation flow";
+        ? "Hide threading view"
+        : "Show threading view";
     } else {
       return isVisible 
         ? "Hide threading panel"
-        : "Show threading management";
-    }
-  };
-
-  const getButtonColor = () => {
-    if (isVisible) {
-      return userRole === 'user' 
-        ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-        : 'bg-green-100 text-green-600 hover:bg-green-200';
-    } else {
-      return 'bg-gray-100 text-gray-500 hover:bg-gray-200';
-    }
-  };
-
-  const getLabel = () => {
-    switch (userRole) {
-      case 'user':
-        return 'Thread View';
-      case 'moderator':
-        return 'Thread Management';
-      case 'admin':
-        return 'Threading Controls';
-      default:
-        return 'Threads';
+        : "Show threading panel";
     }
   };
 
   return (
-    <div className={`${styles.container} ${className}`}>
-      <div className="flex items-center gap-2">
-        <Route className={`${styles.icon} text-gray-400`} />
-        <span className={styles.text}>
-          {getLabel()}
-        </span>
-      </div>
-      
-      <div className="relative">
-        <motion.button
-          onClick={handleToggle}
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-          className={`${styles.button} ${getButtonColor()}`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          aria-label={getTooltipContent()}
-        >
-          {isVisible ? (
-            <Eye className={styles.icon} />
-          ) : (
-            <EyeOff className={styles.icon} />
-          )}
-        </motion.button>
+    <div className={`relative ${className}`}>
+      <motion.button
+        onClick={handleToggle}
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        className={`
+          p-2 rounded-full transition-all duration-200
+          ${isVisible 
+            ? 'text-white/90 hover:text-white bg-white/10 hover:bg-white/20' 
+            : 'text-white/60 hover:text-white/80 hover:bg-white/10'
+          }
+        `}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        aria-label={getTooltipContent()}
+      >
+        <Route className={getIconSize()} />
+      </motion.button>
 
-        {/* Educational tooltip for students */}
-        {showTooltip && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute bottom-full right-0 mb-2 p-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-50 max-w-xs"
-          >
-            {getTooltipContent()}
-            <div className="absolute top-full right-4 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-          </motion.div>
-        )}
-      </div>
+      {/* Tooltip */}
+      {showTooltip && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-black text-white text-xs rounded-lg shadow-lg whitespace-nowrap z-50"
+        >
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+          {getTooltipContent()}
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -164,14 +110,22 @@ export default function ThreadToggle({
  */
 export function StudentThreadBenefits() {
   return (
-    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-      <h4 className="font-semibold text-blue-800 mb-2">💡 Thread View Benefits:</h4>
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0 }}
+      className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm"
+    >
+      <h4 className="font-semibold text-blue-800 mb-2 flex items-center">
+        <Route className="w-4 h-4 mr-2" />
+        Threading Benefits for Students
+      </h4>
       <ul className="text-blue-700 space-y-1 text-xs">
-        <li>• See how your conversation flows and develops</li>
-        <li>• Navigate between different topics easily</li>
-        <li>• Track your learning progress visually</li>
-        <li>• Return to earlier discussion points</li>
+        <li>• See how conversations branch and evolve</li>
+        <li>• Track different solution approaches</li>
+        <li>• Understand decision-making patterns</li>
+        <li>• Learn from alternative explanations</li>
       </ul>
-    </div>
+    </motion.div>
   );
 }

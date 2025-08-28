@@ -166,34 +166,17 @@ export default function ChatHeader({
 
           {/* Threading Toggle - Only show when there's an active conversation */}
           {canToggleThreadView && onToggleThreadSidebar && hasActiveConversation && (
-            <div className='flex items-center'>
-              {userRole === 'user' ? (
-                // Student-friendly compact toggle
-                <motion.div 
-                  whileHover={{ scale: 1.05 }}
-                  className='px-2.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
-                  <ThreadToggle
-                    isVisible={showThreadSidebar || false}
-                    onToggle={onToggleThreadSidebar}
-                    variant='compact'
-                  />
-                </motion.div>
-              ) : (
-                // Admin/Moderator full toggle with counter
-                <motion.div 
-                  whileHover={{ scale: 1.05 }}
-                  className='flex items-center space-x-2 px-2.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
-                  <ThreadToggle
-                    isVisible={showThreadSidebar || false}
-                    onToggle={onToggleThreadSidebar}
-                    variant='compact'
-                  />
-                  {threadsCount !== undefined && (
-                    <span className='text-xs font-medium text-white/80'>
-                      {threadsCount === 0 ? '(New)' : `(${threadsCount})`}
-                    </span>
-                  )}
-                </motion.div>
+            <div className='flex items-center space-x-2'>
+              <ThreadToggle
+                isVisible={showThreadSidebar || false}
+                onToggle={onToggleThreadSidebar}
+                variant='compact'
+              />
+              {/* Thread counter for admin/moderators */}
+              {userRole !== 'user' && threadsCount !== undefined && (
+                <span className='text-xs font-medium text-white/70'>
+                  {threadsCount === 0 ? '(New)' : `(${threadsCount})`}
+                </span>
               )}
             </div>
           )}
