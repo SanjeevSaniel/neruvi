@@ -2,6 +2,8 @@
 'use client';
 
 import { useConversationStore } from '@/store/conversationStore';
+import { useThreadingStore } from '@/store/threadingStore';
+import { useUser } from '@clerk/nextjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ChatHeader from './ChatHeader';
@@ -12,8 +14,13 @@ import MessageDetailPanel from './MessageDetailPanel';
 import MessagesContainer from './MessagesContainer';
 import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
+import ThreadSidebar from '@/components/threading/ThreadSidebar';
+import ThreadVisualization from '@/components/threading/ThreadVisualization';
+import { getThreadingPermissions, hasThreadingPermission, UserRole } from '@/lib/threading/permissions';
+import { GitBranch, BarChart3 } from 'lucide-react';
 
 export default function ChatInterface() {
+  const { user } = useUser();
   const {
     getCurrentConversation,
     createConversation,
@@ -22,6 +29,26 @@ export default function ChatInterface() {
     currentConversationId,
     getOrCreateConversationForCourse,
   } = useConversationStore();
+  
+  const {
+    currentThreadId,
+    threads,
+    traces,
+    showThreadSidebar,
+    showThreadVisualization,
+    selectedThreadId,
+    initializeConversationThreading,
+    createBranch,
+    switchThread,
+    deleteThread,
+    renameThread,
+    toggleThreadVisibility,
+    addMessageTrace,
+    setShowThreadSidebar,
+    setShowThreadVisualization,
+    setSelectedThread,
+    loadConversationThreads,
+  } = useThreadingStore();
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,14 +65,22 @@ export default function ChatInterface() {
   const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingContentRef = useRef<string>('');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Threading permissions based on user role
+  const userRole: UserRole = user?.publicMetadata?.role === 'admin' ? 'admin' 
+    : user?.publicMetadata?.role === 'moderator' ? 'moderator' : 'user';
+  const threadingPermissions = getThreadingPermissions(userRole);
+  const canViewThreads = hasThreadingPermission(userRole, 'canViewThreads');
+  const canViewVisualization = hasThreadingPermission(userRole, 'canViewVisualization');
 
   // Get current conversation or create one if none exists
   const conversation = getCurrentConversation();
   const messages = useMemo(() => conversation?.messages || [], [conversation]);
   const selectedCourse = conversation?.selectedCourse || null;
 
-  // Check if we need course selection - only when no conversation exists, or conversation has no course AND no messages
-  const needsCourseSelection = !currentConversationId || (!selectedCourse && messages.length === 0);
+  // Check if we need course selection - only when no conversation exists
+  // If a conversation exists, we should show it regardless of course selection state
+  const needsCourseSelection = !currentConversationId;
 
   // Check if we should show welcome screen (course selected but no messages yet)
   const shouldShowWelcome =
@@ -91,7 +126,26 @@ export default function ChatInterface() {
   // }, [currentConversationId, createConversation]);
 
   // Track previous conversation ID to detect actual conversation changes
-  const prevConversationIdRef = useRef<string | null>(null);
+  const prevConversationIdRef = useRef<string | null>(currentConversationId);
+
+  // Initialize threading when conversation changes
+  useEffect(() => {
+    const conversation = getCurrentConversation();
+    if (conversation && conversation.id !== prevConversationIdRef.current) {
+      // Initialize threading for this conversation
+      if (canViewThreads) {
+        loadConversationThreads(conversation.id);
+        
+        // If this is a new conversation with messages, initialize threading
+        if (conversation.messages.length > 0 && !currentThreadId) {
+          const firstMessageId = conversation.messages[0]?.id;
+          if (firstMessageId) {
+            initializeConversationThreading(conversation.id, firstMessageId);
+          }
+        }
+      }
+    }
+  }, [currentConversationId, getCurrentConversation, canViewThreads, loadConversationThreads, initializeConversationThreading, currentThreadId]);
 
   // Reset chat state when conversation changes
   useEffect(() => {
@@ -100,21 +154,12 @@ export default function ChatInterface() {
       console.log('🔄 Conversation changed:', conversation.id, 'Messages:', conversation.messages.length);
       setHasStartedChat(conversation.messages.length > 0);
       
-      // Hide course selector when switching to a conversation that has messages
-      const conversationChanged =
-        prevConversationIdRef.current !== null &&
-        prevConversationIdRef.current !== currentConversationId;
+      // When switching to an existing conversation (from history), always hide course selector
+      const conversationChanged = prevConversationIdRef.current !== currentConversationId;
       
-      // Hide course selector if:
-      // 1. Conversation has messages (user wants to see the chat)
-      // 2. We're switching conversations and it's not the initial load
-      if (conversation.messages.length > 0 || (conversationChanged && !isInitialLoad)) {
-        console.log('👥 Conversation switched - hiding course selector', {
-          hasMessages: conversation.messages.length > 0,
-          conversationChanged,
-          isInitialLoad
-        });
-        setShowCourseSelector(false); // Hide course selector when switching conversations
+      if (conversationChanged && prevConversationIdRef.current !== null) {
+        console.log('👥 Conversation switched from history - hiding course selector');
+        setShowCourseSelector(false); // Always hide course selector when switching from history
         setIsInitialLoad(false); // Mark as no longer initial load
         
         if (!streamingMessage && !keepPanelOpen) {
@@ -141,17 +186,20 @@ export default function ChatInterface() {
     }
   }, [needsCourseSelection, showCourseSelector]);
 
-  // Ensure course selector is shown on initial load, regardless of stored state
+  // Handle initial load state
   useEffect(() => {
     if (isInitialLoad) {
-      setShowCourseSelector(true);
+      // Only show course selector if there's no current conversation
+      if (!currentConversationId) {
+        setShowCourseSelector(true);
+      }
       // Mark initial load as complete after a short delay to allow store to load
       const timer = setTimeout(() => {
         setIsInitialLoad(false);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isInitialLoad]);
+  }, [isInitialLoad, currentConversationId]);
 
   const scrollToBottom = (forceBehavior: 'smooth' | 'instant' = 'smooth') => {
     if (messagesContainerRef.current) {
@@ -290,6 +338,13 @@ export default function ChatInterface() {
     };
 
     await addMessage(conversationId, userMessage);
+    
+    // Add message trace if threading is enabled
+    if (canViewThreads && currentThreadId) {
+      const parentMessageId = messages.length > 0 ? messages[messages.length - 1].id : null;
+      await addMessageTrace(userMessage.id, currentThreadId, parentMessageId);
+    }
+    
     setInput(''); // Clear input box immediately after sending
     setIsLoading(true);
 
@@ -343,6 +398,11 @@ export default function ChatInterface() {
       };
 
       await addMessage(conversationId, assistantMessage);
+
+      // Add message trace for assistant message if threading is enabled
+      if (canViewThreads && currentThreadId) {
+        await addMessageTrace(assistantMessage.id, currentThreadId, userMessage.id);
+      }
 
       // Auto-show the right panel when streaming starts
       setStreamingMessage(assistantMessage);
@@ -506,17 +566,61 @@ export default function ChatInterface() {
       </div>
 
       <div className='flex-1 flex min-h-0 relative z-10'>
+        {/* Thread Sidebar - Only for admin/moderator */}
+        <AnimatePresence>
+          {showThreadSidebar && canViewThreads && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: '300px', opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className='overflow-hidden border-r border-slate-200'
+            >
+              <ThreadSidebar
+                threads={threads}
+                currentThreadId={currentThreadId || ''}
+                onThreadSwitch={switchThread}
+                onCreateBranch={createBranch}
+                onDeleteThread={deleteThread}
+                onRenameThread={renameThread}
+                onToggleThreadVisibility={toggleThreadVisibility}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Main Content Area */}
         <motion.div
           animate={{
-            width: messageDetailOpen ? '50%' : '100%',
+            width: showThreadVisualization && canViewVisualization 
+              ? '100%' 
+              : messageDetailOpen 
+              ? showThreadSidebar && canViewThreads ? '50%' : '50%'
+              : showThreadSidebar && canViewThreads ? 'calc(100% - 300px)' : '100%',
           }}
           transition={{
             duration: 0.4,
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
           className='flex justify-center'>
-          {showCourseSelector || needsCourseSelection ? (
+          {showThreadVisualization && canViewVisualization ? (
+            // Thread Visualization - Only for admin/moderator
+            <div className='w-full h-full'>
+              <ThreadVisualization
+                threads={threads}
+                traces={traces}
+                currentThreadId={currentThreadId || ''}
+                onThreadSwitch={switchThread}
+                onCreateBranch={createBranch}
+                onRegenerateMessage={async (messageId: string) => {
+                  // Handle message regeneration
+                  console.log('Regenerate message:', messageId);
+                }}
+                onDeleteThread={deleteThread}
+                messages={messages}
+              />
+            </div>
+          ) : showCourseSelector || needsCourseSelection ? (
             // Full screen course selection
             <div className='w-full h-full flex flex-col'>
               <CourseSelector
@@ -541,6 +645,49 @@ export default function ChatInterface() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className='flex-1 flex flex-col min-h-0'>
+                {/* Threading controls for admin/moderator */}
+                {canViewThreads && (
+                  <div className='flex items-center justify-between mb-4 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-slate-200'>
+                    <div className='flex items-center space-x-2'>
+                      <button
+                        onClick={() => setShowThreadSidebar(!showThreadSidebar)}
+                        className={`
+                          flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                          ${showThreadSidebar 
+                            ? 'bg-purple-100 text-purple-700' 
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }
+                        `}
+                      >
+                        <GitBranch className='w-4 h-4' />
+                        <span>Threads ({threads.length})</span>
+                      </button>
+                      
+                      {canViewVisualization && (
+                        <button
+                          onClick={() => setShowThreadVisualization(!showThreadVisualization)}
+                          className={`
+                            flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+                            ${showThreadVisualization 
+                              ? 'bg-blue-100 text-blue-700' 
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            }
+                          `}
+                        >
+                          <BarChart3 className='w-4 h-4' />
+                          <span>Visualization</span>
+                        </button>
+                      )}
+                    </div>
+                    
+                    {currentThreadId && (
+                      <div className='text-sm text-slate-600'>
+                        Current: {threads.find(t => t.id === currentThreadId)?.name || 'Main Thread'}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <MessagesContainer
                   ref={messagesContainerRef}
                   messages={messages}
@@ -570,11 +717,12 @@ export default function ChatInterface() {
           )}
         </motion.div>
 
-        {/* Message Detail Panel - Side by side - Only show in chat interface */}
+        {/* Message Detail Panel - Side by side - Only show in chat interface when not in visualization mode */}
         <AnimatePresence>
           {messageDetailOpen &&
             !needsCourseSelection &&
-            !showCourseSelector && (
+            !showCourseSelector &&
+            !showThreadVisualization && (
               <motion.div
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ width: '50%', opacity: 1 }}
