@@ -12,13 +12,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  GitBranch, 
-  MessageSquare, 
+import {
+  GitBranch,
+  MessageSquare,
   Clock,
   ArrowRight,
-  BookOpen,
-  Navigation
+  Navigation,
 } from 'lucide-react';
 import { ConversationThread } from '@/lib/threading/types';
 
@@ -27,15 +26,18 @@ interface StudentThreadViewProps {
   currentThreadId: string;
   onThreadSwitch: (threadId: string) => void;
   className?: string;
+  hasActiveConversation?: boolean;
+  messageCount?: number;
 }
 
-export default function StudentThreadView({ 
-  threads, 
-  currentThreadId, 
+export default function StudentThreadView({
+  threads,
+  currentThreadId,
   onThreadSwitch,
-  className = '' 
+  className = '',
+  hasActiveConversation = false,
+  messageCount = 0,
 }: StudentThreadViewProps) {
-  
   const formatTimestamp = (date: Date | string) => {
     const now = new Date();
     const dateObj = date instanceof Date ? date : new Date(date);
@@ -65,9 +67,18 @@ export default function StudentThreadView({
   if (threads.length === 0) {
     return (
       <div className={`p-6 ${className}`}>
-        <div className="text-center text-gray-500">
-          <BookOpen className="w-8 h-8 mx-auto mb-3 opacity-50" />
-          <p className="text-sm">Start chatting to see your conversation flow!</p>
+        <div className='text-center text-gray-500'>
+          <Navigation className='w-8 h-8 mx-auto mb-3 opacity-50' />
+          <h3 className='text-sm font-medium text-gray-600 mb-1'>
+            {hasActiveConversation && messageCount > 0
+              ? 'Threading Not Available Yet'
+              : 'No Conversation Started'}
+          </h3>
+          <p className='text-xs text-gray-500'>
+            {hasActiveConversation && messageCount > 0
+              ? 'Threading features will appear as your conversation develops branches and alternative paths.'
+              : 'Start chatting to see your conversation flow!'}
+          </p>
         </div>
       </div>
     );
@@ -76,25 +87,25 @@ export default function StudentThreadView({
   return (
     <div className={`p-4 bg-gradient-to-b from-blue-50 to-white ${className}`}>
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 mb-2">
-          <Navigation className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold text-gray-800">Your Learning Journey</h3>
+      <div className='mb-6'>
+        <div className='flex items-center gap-2 mb-2'>
+          <Navigation className='w-5 h-5 text-blue-600' />
+          <h3 className='font-semibold text-gray-800'>Your Learning Journey</h3>
         </div>
-        <p className="text-sm text-gray-600">
-          Navigate through your conversation topics and see how your learning has progressed.
+        <p className='text-sm text-gray-600'>
+          Navigate through your conversation topics and see how your learning
+          has progressed.
         </p>
       </div>
 
       {/* Thread List */}
-      <div className="space-y-3">
+      <div className='space-y-3'>
         {sortedThreads.map((thread, index) => (
           <motion.div
             key={thread.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
+            transition={{ delay: index * 0.1 }}>
             <ThreadCard
               thread={thread}
               isActive={thread.id === currentThreadId}
@@ -107,13 +118,16 @@ export default function StudentThreadView({
       </div>
 
       {/* Educational Footer */}
-      <div className="mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200">
-        <div className="flex items-start gap-2">
-          <GitBranch className="w-4 h-4 text-blue-600 mt-0.5" />
-          <div className="text-xs text-blue-700">
-            <p className="font-medium mb-1">💡 Did you know?</p>
-            <p>Each thread represents a different topic or direction in your conversation. 
-               You can switch between them to explore different learning paths!</p>
+      <div className='mt-6 p-3 bg-blue-50 rounded-lg border border-blue-200'>
+        <div className='flex items-start gap-2'>
+          <GitBranch className='w-4 h-4 text-blue-600 mt-0.5' />
+          <div className='text-xs text-blue-700'>
+            <p className='font-medium mb-1'>💡 Did you know?</p>
+            <p>
+              Each thread represents a different topic or direction in your
+              conversation. You can switch between them to explore different
+              learning paths!
+            </p>
           </div>
         </div>
       </div>

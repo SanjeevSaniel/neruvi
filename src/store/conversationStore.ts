@@ -546,7 +546,10 @@ export const useConversationStore = create<ConversationStore>()(
             ...conv,
             createdAt: new Date(conv.createdAt),
             updatedAt: new Date(conv.updatedAt),
-            messages: conv.messages || [],
+            messages: (conv.messages || []).map((msg: MessageData) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp)
+            })),
           }));
 
           // Set the most recent conversation as current if none is selected

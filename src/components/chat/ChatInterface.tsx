@@ -1,6 +1,10 @@
 // components/chat/ChatInterface.tsx
 'use client';
 
+import StudentThreadView from '@/components/threading/StudentThreadView';
+import ThreadSidebar from '@/components/threading/ThreadSidebar';
+import ThreadVisualization from '@/components/threading/ThreadVisualization';
+import { hasThreadingPermission, UserRole } from '@/lib/threading/permissions';
 import { useConversationStore } from '@/store/conversationStore';
 import { useThreadingStore } from '@/store/threadingStore';
 import { useUser } from '@clerk/nextjs';
@@ -14,12 +18,6 @@ import MessageDetailPanel from './MessageDetailPanel';
 import MessagesContainer from './MessagesContainer';
 import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
-import ThreadSidebar from '@/components/threading/ThreadSidebar';
-import ThreadVisualization from '@/components/threading/ThreadVisualization';
-import ThreadToggle, { StudentThreadBenefits } from '@/components/threading/ThreadToggle';
-import StudentThreadView from '@/components/threading/StudentThreadView';
-import { getThreadingPermissions, hasThreadingPermission, UserRole } from '@/lib/threading/permissions';
-import { GitBranch, BarChart3 } from 'lucide-react';
 
 export default function ChatInterface() {
   const { user } = useUser();
@@ -29,16 +27,15 @@ export default function ChatInterface() {
     addMessage,
     updateMessage,
     currentConversationId,
-    getOrCreateConversationForCourse,
+    setCurrentConversation,
   } = useConversationStore();
-  
+
   const {
     currentThreadId,
     threads,
     traces,
     showThreadSidebar,
     showThreadVisualization,
-    selectedThreadId,
     initializeConversationThreading,
     createBranch,
     switchThread,
@@ -47,8 +44,6 @@ export default function ChatInterface() {
     toggleThreadVisibility,
     addMessageTrace,
     setShowThreadSidebar,
-    setShowThreadVisualization,
-    setSelectedThread,
     loadConversationThreads,
   } = useThreadingStore();
 
@@ -65,18 +60,34 @@ export default function ChatInterface() {
   );
   const [keepPanelOpen, setKeepPanelOpen] = useState(false);
   const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingContentRef = useRef<string>('');
+  // const pendingContentRef = useRef<string>('');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // Threading permissions based on user role
-  const userRole: UserRole = user?.publicMetadata?.role === 'admin' ? 'admin' 
-    : user?.publicMetadata?.role === 'moderator' ? 'moderator' : 'user';
-  const threadingPermissions = getThreadingPermissions(userRole);
+  const userRole: UserRole =
+    user?.publicMetadata?.role === 'admin'
+      ? 'admin'
+      : user?.publicMetadata?.role === 'moderator'
+      ? 'moderator'
+      : 'user';
+  // const threadingPermissions = getThreadingPermissions(userRole);
   const canViewThreads = hasThreadingPermission(userRole, 'canViewThreads');
-  const canViewVisualization = hasThreadingPermission(userRole, 'canViewVisualization');
-  const canCreateBranches = hasThreadingPermission(userRole, 'canCreateBranches');
-  const canNavigateThreads = hasThreadingPermission(userRole, 'canNavigateThreads');
-  const canToggleThreadView = hasThreadingPermission(userRole, 'canToggleThreadView');
+  const canViewVisualization = hasThreadingPermission(
+    userRole,
+    'canViewVisualization',
+  );
+  // const canCreateBranches = hasThreadingPermission(
+  //   userRole,
+  //   'canCreateBranches',
+  // );
+  // const canNavigateThreads = hasThreadingPermission(
+  //   userRole,
+  //   'canNavigateThreads',
+  // );
+  const canToggleThreadView = hasThreadingPermission(
+    userRole,
+    'canToggleThreadView',
+  );
 
   // Get current conversation or create one if none exists
   const conversation = getCurrentConversation();
@@ -85,7 +96,10 @@ export default function ChatInterface() {
     console.log('🔍 Messages updated:', {
       conversationId: conversation?.id,
       messageCount: msgs.length,
-      messages: msgs.map(m => ({ role: m.role, content: m.content.substring(0, 50) }))
+      messages: msgs.map((m) => ({
+        role: m.role,
+        content: m.content.substring(0, 50),
+      })),
     });
     return msgs;
   }, [conversation]);
@@ -103,7 +117,12 @@ export default function ChatInterface() {
     !showCourseSelector;
 
   // Calculate if we should show thread button
-  const shouldShowThreadButton = !!currentConversationId && !!conversation && !showCourseSelector && !needsCourseSelection && !shouldShowWelcome;
+  const shouldShowThreadButton =
+    !!currentConversationId &&
+    !!conversation &&
+    !showCourseSelector &&
+    !needsCourseSelection &&
+    !shouldShowWelcome;
 
   // Debug logging
   console.log('🔍 ChatInterface state:', {
@@ -114,7 +133,7 @@ export default function ChatInterface() {
     shouldShowWelcome,
     showCourseSelector,
     hasStartedChat,
-    shouldShowThreadButton
+    shouldShowThreadButton,
   });
 
   // Handle header click to show course selector
@@ -122,6 +141,11 @@ export default function ChatInterface() {
     setShowCourseSelector(true);
     setMessageDetailOpen(false); // Close message detail panel
     setSelectedMessage(null);
+    setCurrentConversation(null); // Reset active chat when going to course selection
+
+    // Also close sidebars for cleaner navigation
+    setShowThreadSidebar(false);
+    setSidebarOpen(false); // Close conversation sidebar
   };
 
   const handleMessageClick = (message: Message) => {
@@ -147,38 +171,79 @@ export default function ChatInterface() {
 
   // Initialize threading when conversation changes
   useEffect(() => {
-    const conversation = getCurrentConversation();
-    if (conversation && conversation.id !== prevConversationIdRef.current) {
-      // Initialize threading for this conversation
-      if (canViewThreads) {
-        loadConversationThreads(conversation.id);
-        
-        // If this is a new conversation with messages, initialize threading
-        if (conversation.messages.length > 0 && !currentThreadId) {
-          const firstMessageId = conversation.messages[0]?.id;
-          if (firstMessageId) {
-            initializeConversationThreading(conversation.id, firstMessageId);
+    const initializeThreading = async () => {
+      const conversation = getCurrentConversation();
+      if (conversation && conversation.id !== prevConversationIdRef.current) {
+        // Initialize threading for this conversation
+        if (canViewThreads) {
+          loadConversationThreads(conversation.id);
+
+          // If this is a new conversation with messages, initialize threading
+          if (conversation.messages.length > 0 && !currentThreadId) {
+            const firstMessageId = conversation.messages[0]?.id;
+            if (firstMessageId && conversation.id) {
+              console.log(
+                '🔗 Initializing threading for conversation:',
+                conversation.id,
+                'with first message:',
+                firstMessageId,
+              );
+              try {
+                await initializeConversationThreading(
+                  conversation.id,
+                  firstMessageId,
+                );
+              } catch (error) {
+                console.error(
+                  '❌ Error initializing conversation threading:',
+                  error,
+                );
+              }
+            } else {
+              console.warn('⚠️ Cannot initialize threading - missing data:', {
+                conversationId: conversation.id,
+                firstMessageId,
+                messageCount: conversation.messages.length,
+              });
+            }
           }
         }
       }
-    }
-  }, [currentConversationId, getCurrentConversation, canViewThreads, loadConversationThreads, initializeConversationThreading, currentThreadId]);
+    };
+
+    initializeThreading();
+  }, [
+    currentConversationId,
+    getCurrentConversation,
+    canViewThreads,
+    loadConversationThreads,
+    initializeConversationThreading,
+    currentThreadId,
+  ]);
 
   // Reset chat state when conversation changes
   useEffect(() => {
     const conversation = getCurrentConversation();
     if (conversation) {
-      console.log('🔄 Conversation changed:', conversation.id, 'Messages:', conversation.messages.length);
+      console.log(
+        '🔄 Conversation changed:',
+        conversation.id,
+        'Messages:',
+        conversation.messages.length,
+      );
       setHasStartedChat(conversation.messages.length > 0);
-      
+
       // When switching to an existing conversation (from history), always hide course selector
-      const conversationChanged = prevConversationIdRef.current !== currentConversationId;
-      
+      const conversationChanged =
+        prevConversationIdRef.current !== currentConversationId;
+
       if (conversationChanged && prevConversationIdRef.current !== null) {
-        console.log('👥 Conversation switched from history - hiding course selector');
+        console.log(
+          '👥 Conversation switched from history - hiding course selector',
+        );
         setShowCourseSelector(false); // Always hide course selector when switching from history
         setIsInitialLoad(false); // Mark as no longer initial load
-        
+
         if (!streamingMessage && !keepPanelOpen) {
           setMessageDetailOpen(false);
           setSelectedMessage(null);
@@ -232,19 +297,21 @@ export default function ChatInterface() {
     if (messagesContainerRef.current) {
       const attemptScroll = (retries = 3) => {
         if (!messagesContainerRef.current || retries <= 0) return;
-        
+
         const container = messagesContainerRef.current;
-        const targetScrollTop = container.scrollHeight - container.clientHeight;
-        
+        // const targetScrollTop = container.scrollHeight - container.clientHeight;
+
         // Scroll to bottom
         container.scrollTop = container.scrollHeight;
-        
+
         // Verify we actually reached the bottom and retry if not
         setTimeout(() => {
           if (messagesContainerRef.current) {
             const currentScrollTop = messagesContainerRef.current.scrollTop;
-            const actualTarget = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.clientHeight;
-            
+            const actualTarget =
+              messagesContainerRef.current.scrollHeight -
+              messagesContainerRef.current.clientHeight;
+
             // If we're not within 10px of the bottom, try again
             if (Math.abs(currentScrollTop - actualTarget) > 10) {
               attemptScroll(retries - 1);
@@ -252,7 +319,7 @@ export default function ChatInterface() {
           }
         }, 20);
       };
-      
+
       // Use RAF to ensure DOM updates, then attempt scroll with retries
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -273,14 +340,14 @@ export default function ChatInterface() {
     if (streamingMessage) {
       scrollToBottomDuringStreaming();
     }
-  }, [streamingMessage?.content]);
+  }, [streamingMessage?.content, streamingMessage]);
 
   // More aggressive scroll effect specifically for streaming content changes
   useEffect(() => {
     if (streamingMessage?.content) {
       // Use multiple timing strategies to ensure scroll reaches bottom
       const scrollAttempts = [0, 50, 100, 200]; // Multiple attempts with different delays
-      
+
       scrollAttempts.forEach((delay) => {
         setTimeout(() => {
           if (messagesContainerRef.current) {
@@ -292,20 +359,20 @@ export default function ChatInterface() {
     }
   }, [streamingMessage?.content]);
 
-  const safeFormatTimestamp = (timestamp: string): string => {
-    if (!timestamp || timestamp.includes('NaN') || timestamp === 'undefined') {
-      return '0:00';
-    }
-    const parts = timestamp.split(':');
-    if (parts.length === 2 && !parts.some((part) => isNaN(Number(part)))) {
-      const minutes = parseInt(parts[0]);
-      const seconds = parseInt(parts[1]);
-      if (minutes >= 0 && seconds >= 0) {
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      }
-    }
-    return '0:00';
-  };
+  // const safeFormatTimestamp = (timestamp: string): string => {
+  //   if (!timestamp || timestamp.includes('NaN') || timestamp === 'undefined') {
+  //     return '0:00';
+  //   }
+  //   const parts = timestamp.split(':');
+  //   if (parts.length === 2 && !parts.some((part) => isNaN(Number(part)))) {
+  //     const minutes = parseInt(parts[0]);
+  //     const seconds = parseInt(parts[1]);
+  //     if (minutes >= 0 && seconds >= 0) {
+  //       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  //     }
+  //   }
+  //   return '0:00';
+  // };
 
   const handleCourseSelect = async (course: CourseType) => {
     try {
@@ -330,7 +397,7 @@ export default function ChatInterface() {
       suggestionLength: suggestion?.length,
       suggestionTrimmed: suggestion?.trim(),
     });
-    
+
     try {
       // Validate suggestion text
       if (!suggestion || !suggestion.trim()) {
@@ -340,8 +407,11 @@ export default function ChatInterface() {
 
       // Create a NEW conversation for this suggestion and course
       const conversationId = await createConversation(undefined, course);
-      console.log('🆕 Created new conversation for suggestion:', conversationId);
-      
+      console.log(
+        '🆕 Created new conversation for suggestion:',
+        conversationId,
+      );
+
       // Ensure conversation is set before proceeding
       if (!conversationId) {
         console.error('❌ Failed to create conversation');
@@ -349,7 +419,7 @@ export default function ChatInterface() {
       }
 
       // Update states immediately
-      setShowCourseSelector(false); // Hide selector after selection  
+      setShowCourseSelector(false); // Hide selector after selection
       setIsInitialLoad(false); // Mark that user has interacted
       setHasStartedChat(true); // Mark chat as started immediately
 
@@ -416,13 +486,14 @@ export default function ChatInterface() {
       console.error('❌ Failed to add message:', messageError);
       return;
     }
-    
+
     // Add message trace if threading is enabled
     if (canViewThreads && currentThreadId) {
-      const parentMessageId = messages.length > 0 ? messages[messages.length - 1].id : null;
+      const parentMessageId =
+        messages.length > 0 ? messages[messages.length - 1].id : null;
       await addMessageTrace(userMessage.id, currentThreadId, parentMessageId);
     }
-    
+
     setInput(''); // Clear input box immediately after sending
     setIsLoading(true);
 
@@ -453,7 +524,10 @@ export default function ChatInterface() {
         try {
           const parsedSources = JSON.parse(sourcesHeader);
           sources = parsedSources; // Use exact timestamps from API
-          console.log(`🔍 Frontend received ${sources.length} sources:`, sources);
+          console.log(
+            `🔍 Frontend received ${sources.length} sources:`,
+            sources,
+          );
         } catch (error) {
           console.error('Error parsing sources:', error);
           // Continue without sources - deployment compatibility
@@ -479,7 +553,11 @@ export default function ChatInterface() {
 
       // Add message trace for assistant message if threading is enabled
       if (canViewThreads && currentThreadId) {
-        await addMessageTrace(assistantMessage.id, currentThreadId, userMessage.id);
+        await addMessageTrace(
+          assistantMessage.id,
+          currentThreadId,
+          userMessage.id,
+        );
       }
 
       // Auto-show the right panel when streaming starts
@@ -522,11 +600,12 @@ export default function ChatInterface() {
 
               // Ensure scrolling stays at bottom during content updates
               scrollToBottomDuringStreaming();
-              
+
               // Additional immediate scroll with setTimeout to catch any DOM delays
               setTimeout(() => {
                 if (messagesContainerRef.current) {
-                  messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                  messagesContainerRef.current.scrollTop =
+                    messagesContainerRef.current.scrollHeight;
                 }
               }, 20);
             }
@@ -549,19 +628,21 @@ export default function ChatInterface() {
           const chunk = decoder.decode(value, { stream: true });
           accumulatedContent += chunk;
           updateStreamingContent(accumulatedContent);
-          
+
           // Multiple scroll triggers for new stream chunks to ensure we reach bottom
           scrollToBottomDuringStreaming();
-          
+
           // Immediate scroll
           if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+            messagesContainerRef.current.scrollTop =
+              messagesContainerRef.current.scrollHeight;
           }
-          
+
           // Delayed scroll to catch any rendering delays
           setTimeout(() => {
             if (messagesContainerRef.current) {
-              messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+              messagesContainerRef.current.scrollTop =
+                messagesContainerRef.current.scrollHeight;
             }
           }, 30);
         }
@@ -584,7 +665,7 @@ export default function ChatInterface() {
         };
 
         setStreamingMessage(finalMessage);
-        
+
         // Final scroll to bottom after streaming completes
         setTimeout(() => scrollToBottom('instant'), 100);
       }
@@ -619,7 +700,7 @@ export default function ChatInterface() {
           setStreamingMessage(null);
           setSelectedMessage(finalMessage);
           setMessageDetailOpen(true); // Explicitly ensure panel stays open
-          
+
           // Final scroll after streaming state is cleared
           scrollToBottom('smooth');
         }
@@ -628,7 +709,12 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className='h-screen flex flex-col overflow-hidden relative' style={{background: 'linear-gradient(to bottom right, #bde0ca, #dcefe2, #459071)'}}>
+    <div
+      className='h-screen flex flex-col overflow-hidden relative'
+      style={{
+        background:
+          'linear-gradient(to bottom right, #bde0ca, #dcefe2, #459071)',
+      }}>
       <div className='absolute inset-0 bg-gradient-to-tr from-green-100/50 via-transparent to-green-200/30 animate-pulse'></div>
 
       <ConversationSidebar
@@ -651,21 +737,24 @@ export default function ChatInterface() {
 
       <div className='flex-1 flex min-h-0 relative z-10'>
         {/* Thread Sidebar - Only for admin/moderator */}
-        <AnimatePresence>
+        <AnimatePresence mode='wait'>
           {showThreadSidebar && canViewThreads && (
             <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: '300px', opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className='overflow-hidden border-r border-slate-200'
-            >
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className='w-[300px] border-r border-slate-200 bg-white'>
               {userRole === 'user' ? (
                 // Student-friendly read-only thread view
                 <StudentThreadView
                   threads={threads}
                   currentThreadId={currentThreadId || ''}
                   onThreadSwitch={switchThread}
+                  hasActiveConversation={
+                    !!currentConversationId && !!conversation
+                  }
+                  messageCount={messages.length}
                 />
               ) : (
                 // Admin/Moderator full management view
@@ -684,19 +773,7 @@ export default function ChatInterface() {
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <motion.div
-          animate={{
-            width: showThreadVisualization && canViewVisualization 
-              ? '100%' 
-              : messageDetailOpen 
-              ? showThreadSidebar && canViewThreads ? '50%' : '50%'
-              : showThreadSidebar && canViewThreads ? 'calc(100% - 300px)' : '100%',
-          }}
-          transition={{
-            duration: 0.4,
-            ease: [0.25, 0.46, 0.45, 0.94],
-          }}
-          className='flex justify-center'>
+        <div className='flex-1 flex justify-center min-w-0'>
           {showThreadVisualization && canViewVisualization ? (
             // Thread Visualization - Only for admin/moderator
             <div className='w-full h-full'>
@@ -739,7 +816,6 @@ export default function ChatInterface() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className='flex-1 flex flex-col min-h-0'>
-
                 <MessagesContainer
                   ref={messagesContainerRef}
                   messages={messages}
@@ -767,7 +843,7 @@ export default function ChatInterface() {
               </motion.div>
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* Message Detail Panel - Side by side - Only show in chat interface when not in visualization mode */}
         <AnimatePresence>
@@ -776,15 +852,14 @@ export default function ChatInterface() {
             !showCourseSelector &&
             !showThreadVisualization && (
               <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: '50%', opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
+                initial={{ x: '100%', opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: '100%', opacity: 0 }}
                 transition={{
-                  duration: 0.4,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                  opacity: { duration: 0.3 },
+                  duration: 0.3,
+                  ease: 'easeInOut',
                 }}
-                className='overflow-hidden'>
+                className='w-1/2 bg-white border-l border-slate-200'>
                 <MessageDetailPanel
                   message={streamingMessage || selectedMessage}
                   isOpen={messageDetailOpen}

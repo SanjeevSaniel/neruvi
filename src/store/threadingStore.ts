@@ -124,8 +124,15 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Initialize threading for a conversation
     initializeConversationThreading: async (conversationId: string, firstMessageId?: string) => {
+      if (!conversationId) {
+        console.error('❌ Cannot initialize threading: conversationId is required');
+        throw new Error('conversationId is required for threading initialization');
+      }
+      
       const { engine } = get();
       const databaseService = get().getDatabaseService();
+      
+      console.log('🔗 Starting threading initialization:', { conversationId, firstMessageId });
       
       try {
         // Initialize engine
@@ -133,7 +140,14 @@ export const useThreadingStore = create<ThreadingState>()(
         
         // Save to database
         if (firstMessageId) {
-          const mainThread = engine.getConversationThreads(conversationId)[0];
+          const threads = engine.getConversationThreads(conversationId);
+          const mainThread = threads?.[0];
+          
+          if (!mainThread) {
+            console.error('❌ No main thread found after initialization:', { conversationId, threads });
+            throw new Error('Failed to initialize main thread');
+          }
+          
           const dbThreadId = await databaseService.createThread({
             conversationId: mainThread.conversationId,
             name: mainThread.name,
