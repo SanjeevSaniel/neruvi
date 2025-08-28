@@ -294,6 +294,15 @@ export const useConversationStore = create<ConversationStore>()(
     },
 
     addMessage: async (conversationId, message) => {
+      console.log('🔍 Store Debug - addMessage called with:', {
+        conversationId,
+        messageRole: message.role,
+        messageContent: message.content?.substring(0, 100),
+        hasConversationId: !!conversationId,
+        hasMessage: !!message,
+        hasRole: !!message.role,
+        hasContent: !!message.content,
+      });
       
       // Add message locally immediately for better UX
       set((state) => ({
@@ -311,15 +320,19 @@ export const useConversationStore = create<ConversationStore>()(
       try {
         if (isDatabaseEnabled()) {
           console.log('📡 Adding message via database API');
+          const payload = {
+            conversationId,
+            role: message.role,
+            content: message.content,
+            sources: message.sources,
+            processingTimeMs: 0, // Default for user messages
+          };
+          
+          console.log('🔍 API Payload:', payload);
+          
           await apiCall('/api/messages', {
             method: 'POST',
-            body: JSON.stringify({
-              conversationId,
-              role: message.role,
-              content: message.content,
-              sources: message.sources,
-              processingTimeMs: 0, // Default for user messages
-            }),
+            body: JSON.stringify(payload),
           });
         } else {
           saveToSessionStorage(get().conversations, get().currentConversationId);

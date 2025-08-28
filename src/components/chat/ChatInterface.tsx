@@ -327,7 +327,11 @@ export default function ChatInterface() {
     if (!inputText.trim() || isLoading) return;
     if (!hasStartedChat) setHasStartedChat(true);
 
-    const conversationId = currentConversationId || await createConversation();
+    let conversationId = currentConversationId;
+    if (!conversationId) {
+      const course = selectedCourse || 'nodejs'; // Default to nodejs
+      conversationId = await createConversation(undefined, course);
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -336,6 +340,13 @@ export default function ChatInterface() {
       timestamp: new Date(),
       sources: [],
     };
+
+    console.log('🔍 Debug - Adding message:', {
+      conversationId,
+      messageRole: userMessage.role,
+      messageContent: userMessage.content,
+      hasConversationId: !!conversationId,
+    });
 
     await addMessage(conversationId, userMessage);
     
