@@ -21,7 +21,7 @@ interface ThreadingState {
   
   // Services
   engine: ThreadingEngine;
-  databaseService: ThreadingDatabaseService;
+  databaseService: ThreadingDatabaseService | null;
   
   // Actions
   initializeConversationThreading: (conversationId: string, firstMessageId?: string) => Promise<void>;
@@ -44,6 +44,9 @@ interface ThreadingState {
   // Data loading
   loadConversationThreads: (conversationId: string) => Promise<void>;
   refreshThreadData: () => Promise<void>;
+  
+  // Internal helpers
+  getDatabaseService: () => ThreadingDatabaseService;
 }
 
 export const useThreadingStore = create<ThreadingState>()(
@@ -60,11 +63,69 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Services
     engine: new ThreadingEngine(),
-    databaseService: new ThreadingDatabaseService(),
+    databaseService: null,
+    
+    // Helper to get database service with lazy initialization
+    getDatabaseService: () => {
+      let { databaseService } = get();
+      if (!databaseService) {
+        // Check if we're on the client side - if so, return a mock service
+        if (typeof window !== 'undefined') {
+          console.info('🔒 Client-side detected - using mock threading database service');
+          databaseService = {
+            createThread: async () => {
+              console.log('🔷 Mock: createThread called');
+              return 'mock-thread-id';
+            },
+            getConversationThreads: async () => {
+              console.log('🔷 Mock: getConversationThreads called');
+              return [];
+            },
+            updateThread: async () => {
+              console.log('🔷 Mock: updateThread called');
+            },
+            createMessageTrace: async () => {
+              console.log('🔷 Mock: createMessageTrace called');
+            },
+            logThreadAction: async () => {
+              console.log('🔷 Mock: logThreadAction called');
+            },
+            getMessageTrace: async () => {
+              console.log('🔷 Mock: getMessageTrace called');
+              return null;
+            },
+            getThreadTraces: async () => {
+              console.log('🔷 Mock: getThreadTraces called');
+              return [];
+            },
+            getThreadStatistics: async () => {
+              console.log('🔷 Mock: getThreadStatistics called');
+              return { messageCount: 0, branchCount: 0, alternativeCount: 0 };
+            },
+            archiveInactiveThreads: async () => {
+              console.log('🔷 Mock: archiveInactiveThreads called');
+              return 0;
+            },
+          } as ThreadingDatabaseService;
+          set({ databaseService });
+        } else {
+          // Server-side: create real database service
+          try {
+            databaseService = new ThreadingDatabaseService();
+            set({ databaseService });
+          } catch (error) {
+            console.error('❌ Failed to initialize ThreadingDatabaseService on server:', error);
+            throw error;
+          }
+        }
+      }
+      return databaseService;
+    },
     
     // Initialize threading for a conversation
     initializeConversationThreading: async (conversationId: string, firstMessageId?: string) => {
-      const { engine, databaseService } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         // Initialize engine
@@ -102,7 +163,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Create branch from message
     createBranch: async (fromMessageId: string, branchName: string) => {
-      const { engine, databaseService, currentThreadId } = get();
+      const { engine, currentThreadId } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         const newThreadId = await engine.createBranch(fromMessageId, branchName);
@@ -150,7 +212,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Switch to different thread
     switchThread: async (threadId: string) => {
-      const { engine, databaseService } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         await engine.switchThread(threadId);
@@ -183,7 +246,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Delete thread
     deleteThread: async (threadId: string) => {
-      const { engine, databaseService } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         const thread = engine.exportState().availableThreads.find(t => t.id === threadId);
@@ -229,7 +293,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Rename thread
     renameThread: async (threadId: string, newName: string) => {
-      const { engine, databaseService } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         await databaseService.updateThread(threadId, {
@@ -266,7 +331,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Toggle thread visibility
     toggleThreadVisibility: async (threadId: string) => {
-      const { engine, databaseService } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         const state = engine.exportState();
@@ -303,7 +369,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Regenerate message
     regenerateMessage: async (messageId: string) => {
-      const { engine, databaseService } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         const newMessageId = await engine.regenerateMessage(messageId);
@@ -338,7 +405,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Add message trace
     addMessageTrace: async (messageId: string, threadId: string, parentMessageId: string | null) => {
-      const { engine, databaseService } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         const trace = await engine.createMessageTrace(messageId, threadId, parentMessageId);
@@ -382,7 +450,8 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Load conversation threads from database
     loadConversationThreads: async (conversationId: string) => {
-      const { databaseService, engine } = get();
+      const { engine } = get();
+      const databaseService = get().getDatabaseService();
       
       try {
         const threads = await databaseService.getConversationThreads(conversationId);

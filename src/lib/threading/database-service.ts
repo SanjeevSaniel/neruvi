@@ -13,7 +13,12 @@ import { messages, conversations } from '@/lib/db/schema';
 import { ConversationThread, MessageTrace, ThreadAction } from './types';
 
 export class ThreadingDatabaseService {
-  private db = getDatabase();
+  private db: ReturnType<typeof getDatabase>;
+  
+  constructor() {
+    // Lazy initialize database connection to avoid client-side issues
+    this.db = getDatabase();
+  }
 
   /**
    * Create a new conversation thread

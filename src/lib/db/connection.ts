@@ -7,6 +7,11 @@ let db: ReturnType<typeof drizzle> | null = null;
 
 export function getDatabase() {
   if (!db) {
+    // Check if we're on the client side
+    if (typeof window !== 'undefined') {
+      throw new Error('Database connections can only be created on the server side');
+    }
+    
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL environment variable is required');
     }
