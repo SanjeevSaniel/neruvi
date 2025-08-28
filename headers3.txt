@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+x-clerk-auth-reason: dev-browser-missing
+x-clerk-auth-status: signed-out
+x-middleware-rewrite: /api/chat
+vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+content-type: text/plain; charset=utf-8
+x-rag-metrics: {"processingTime":7193,"confidence":0,"technique":"basic_rag_simple","corrections":[],"useAdvancedRAG":false,"sourceCount":3}
+x-sources: [{"course":"nodejs","section":"Node.js Fundamentals","videoId":"24-node-express-middleware-2","timestamp":"4:25","relevance":"69%"},{"course":"nodejs","section":"Node.js Fundamentals","videoId":"23-node-express-middlewares","timestamp":"3:30","relevance":"68%"},{"course":"nodejs","section":"Node.js Fundamentals","videoId":"23-node-express-middlewares","timestamp":"20:45","relevance":"66%"}]
+Date: Thu, 28 Aug 2025 07:31:47 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+

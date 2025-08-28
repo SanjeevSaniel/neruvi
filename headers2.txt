@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+x-clerk-auth-reason: dev-browser-missing
+x-clerk-auth-status: signed-out
+x-middleware-rewrite: /api/chat
+vary: RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch
+content-type: text/plain; charset=utf-8
+x-rag-metrics: {"processingTime":8009,"confidence":0,"technique":"timeout_simple","corrections":[],"useAdvancedRAG":false,"sourceCount":0}
+Date: Thu, 28 Aug 2025 07:30:44 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
