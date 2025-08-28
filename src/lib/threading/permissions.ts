@@ -6,16 +6,26 @@
 export type UserRole = 'user' | 'admin' | 'moderator';
 
 export interface ThreadingPermissions {
+  // Student-level permissions (read-only)
   canViewThreads: boolean;
+  canNavigateThreads: boolean;
+  canViewConversationFlow: boolean;
+  canToggleThreadView: boolean; // Hidden toggle in sidebar
+  
+  // Moderator-level permissions
   canCreateBranches: boolean;
+  canOrganizeConversations: boolean;
   canDeleteThreads: boolean;
   canRenameThreads: boolean;
+  canModerateThreads: boolean;
+  
+  // Admin-level permissions
   canViewVisualization: boolean;
   canAccessAdvancedFeatures: boolean;
-  canViewAllConversations: boolean; // Admin feature
-  canModerateThreads: boolean; // Moderator feature
+  canViewAllConversations: boolean;
   canExportThreadData: boolean;
   canViewAnalytics: boolean;
+  canManageSystemControls: boolean;
 }
 
 /**
@@ -23,54 +33,85 @@ export interface ThreadingPermissions {
  */
 export function getThreadingPermissions(role: UserRole): ThreadingPermissions {
   const basePermissions: ThreadingPermissions = {
+    // Student-level permissions
     canViewThreads: false,
+    canNavigateThreads: false,
+    canViewConversationFlow: false,
+    canToggleThreadView: false,
+    
+    // Moderator-level permissions
     canCreateBranches: false,
+    canOrganizeConversations: false,
     canDeleteThreads: false,
     canRenameThreads: false,
+    canModerateThreads: false,
+    
+    // Admin-level permissions
     canViewVisualization: false,
     canAccessAdvancedFeatures: false,
     canViewAllConversations: false,
-    canModerateThreads: false,
     canExportThreadData: false,
     canViewAnalytics: false,
+    canManageSystemControls: false,
   };
 
   switch (role) {
     case 'user':
-      return {
-        ...basePermissions,
-        canViewThreads: true, // Basic thread viewing for all users
-        canCreateBranches: false, // Restrict branching to prevent confusion
-        canDeleteThreads: false,
-        canRenameThreads: false,
-      };
-
-    case 'moderator':
+      // Students: Read-only access with hidden toggle
       return {
         ...basePermissions,
         canViewThreads: true,
+        canNavigateThreads: true,
+        canViewConversationFlow: true,
+        canToggleThreadView: true, // Hidden toggle in sidebar/panel
+      };
+
+    case 'moderator':
+      // Moderators: Create branches, organize conversations
+      return {
+        ...basePermissions,
+        // Student-level permissions
+        canViewThreads: true,
+        canNavigateThreads: true,
+        canViewConversationFlow: true,
+        canToggleThreadView: true,
+        
+        // Moderator-level permissions
         canCreateBranches: true,
+        canOrganizeConversations: true,
         canDeleteThreads: true,
         canRenameThreads: true,
-        canViewVisualization: true, // Moderators can see visualizations
-        canAccessAdvancedFeatures: true,
         canModerateThreads: true,
+        
+        // Limited admin features for moderators
+        canViewVisualization: true,
         canViewAnalytics: true,
       };
 
     case 'admin':
+      // Admins: Full thread management, analytics, system controls
       return {
         ...basePermissions,
+        // All student permissions
         canViewThreads: true,
+        canNavigateThreads: true,
+        canViewConversationFlow: true,
+        canToggleThreadView: true,
+        
+        // All moderator permissions
         canCreateBranches: true,
+        canOrganizeConversations: true,
         canDeleteThreads: true,
         canRenameThreads: true,
-        canViewVisualization: true, // Admins get full access
-        canAccessAdvancedFeatures: true,
-        canViewAllConversations: true, // Admin can see all user conversations
         canModerateThreads: true,
+        
+        // Full admin permissions
+        canViewVisualization: true,
+        canAccessAdvancedFeatures: true,
+        canViewAllConversations: true,
         canExportThreadData: true,
         canViewAnalytics: true,
+        canManageSystemControls: true,
       };
 
     default:

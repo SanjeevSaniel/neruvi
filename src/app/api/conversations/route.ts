@@ -161,3 +161,73 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// PUT /api/conversations - Update conversation (e.g., title)
+export async function PUT(request: NextRequest) {
+  try {
+    // Check if database is enabled
+    if (!isDatabaseEnabled()) {
+      return NextResponse.json(
+        { error: 'Database not enabled. Using SessionStorage.' },
+        { status: 503 }
+      );
+    }
+
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { conversationId, title } = body;
+
+    // Validate input
+    if (!conversationId) {
+      return NextResponse.json(
+        { error: 'conversationId is required' },
+        { status: 400 }
+      );
+    }
+
+    const dbService = new DatabaseService();
+    
+    // Get user
+    const user = await dbService.getUserByClerkId(userId);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify conversation ownership
+    const conversation = await dbService.getConversationById(conversationId, user.id);
+    if (!conversation) {
+      return NextResponse.json(
+        { error: 'Conversation not found' },
+        { status: 404 }
+      );
+    }
+
+    // Update the conversation
+    const updatedConversation = await dbService.updateConversation(conversationId, {
+      title: title || conversation.title
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: updatedConversation
+    });
+
+  } catch (error) {
+    console.error('Error updating conversation:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

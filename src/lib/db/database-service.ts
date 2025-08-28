@@ -130,6 +130,17 @@ export class DatabaseService {
         .limit(limit)
         .offset(offset);
       
+      // Load messages for each conversation
+      const conversationsWithMessages = await Promise.all(
+        conversationsList.map(async (conversation) => {
+          const messages = await this.getConversationMessages(conversation.id);
+          return {
+            ...conversation,
+            messages: messages || []
+          };
+        })
+      );
+      
       // Get total count
       let countQuery = this.db
         .select({ count: count() })
@@ -147,8 +158,17 @@ export class DatabaseService {
       
       const [{ count: total }] = await countQuery;
       
+      console.log('📊 Database service returning conversations:', {
+        count: conversationsWithMessages.length,
+        withMessages: conversationsWithMessages.map(c => ({ 
+          id: c.id, 
+          title: c.title, 
+          messageCount: c.messages?.length || 0 
+        }))
+      });
+
       return {
-        conversations: conversationsList,
+        conversations: conversationsWithMessages,
         total,
         hasMore: offset + limit < total
       };
@@ -181,6 +201,31 @@ export class DatabaseService {
     }
   }
   
+  /**
+   * Update conversation details (e.g., title)
+   */
+  async updateConversation(
+    conversationId: string, 
+    updates: { title?: string; selectedCourse?: 'nodejs' | 'python' }
+  ): Promise<Conversation> {
+    try {
+      const [updatedConversation] = await this.db
+        .update(conversations)
+        .set({
+          ...updates,
+          updatedAt: new Date()
+        })
+        .where(eq(conversations.id, conversationId))
+        .returning();
+      
+      console.log(`📝 Updated conversation ${conversationId}:`, updates);
+      return updatedConversation;
+    } catch (error) {
+      console.error('❌ Error updating conversation:', error);
+      throw error;
+    }
+  }
+  
   // ====== MESSAGE MANAGEMENT ======
   
   /**
@@ -193,6 +238,23 @@ export class DatabaseService {
   ): Promise<string> {
     try {
       console.log(`💾 Storing message: ${message.role} - ${message.content.length} characters`);
+      
+      // Enforce 5-message limit per conversation
+      const existingMessages = await this.db
+        .select({ id: messages.id, createdAt: messages.createdAt })
+        .from(messages)
+        .where(eq(messages.conversationId, conversationId))
+        .orderBy(messages.createdAt);
+      
+      // If we already have 5 messages, remove the oldest one
+      if (existingMessages.length >= 5) {
+        const oldestMessageId = existingMessages[0].id;
+        console.log(`🗑️ Removing oldest message (${oldestMessageId}) to maintain 5-message limit`);
+        
+        // Delete the oldest message and its chunks
+        await this.db.delete(messageChunks).where(eq(messageChunks.messageId, oldestMessageId));
+        await this.db.delete(messages).where(eq(messages.id, oldestMessageId));
+      }
       
       // Store content using tiered strategy
       const contentResult = await this.contentStorage.storeContent(message.content);
@@ -323,7 +385,7 @@ export class DatabaseService {
             role: msgData.role as 'user' | 'assistant',
             content: fullContent,
             sources,
-            timestamp: msgData.createdAt || new Date(),
+            timestamp: msgData.createdAt ? new Date(msgData.createdAt) : new Date(),
           };
         })
       );

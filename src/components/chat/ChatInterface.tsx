@@ -16,6 +16,8 @@ import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
 import ThreadSidebar from '@/components/threading/ThreadSidebar';
 import ThreadVisualization from '@/components/threading/ThreadVisualization';
+import ThreadToggle, { StudentThreadBenefits } from '@/components/threading/ThreadToggle';
+import StudentThreadView from '@/components/threading/StudentThreadView';
 import { getThreadingPermissions, hasThreadingPermission, UserRole } from '@/lib/threading/permissions';
 import { GitBranch, BarChart3 } from 'lucide-react';
 
@@ -72,10 +74,21 @@ export default function ChatInterface() {
   const threadingPermissions = getThreadingPermissions(userRole);
   const canViewThreads = hasThreadingPermission(userRole, 'canViewThreads');
   const canViewVisualization = hasThreadingPermission(userRole, 'canViewVisualization');
+  const canCreateBranches = hasThreadingPermission(userRole, 'canCreateBranches');
+  const canNavigateThreads = hasThreadingPermission(userRole, 'canNavigateThreads');
+  const canToggleThreadView = hasThreadingPermission(userRole, 'canToggleThreadView');
 
   // Get current conversation or create one if none exists
   const conversation = getCurrentConversation();
-  const messages = useMemo(() => conversation?.messages || [], [conversation]);
+  const messages = useMemo(() => {
+    const msgs = conversation?.messages || [];
+    console.log('🔍 Messages updated:', {
+      conversationId: conversation?.id,
+      messageCount: msgs.length,
+      messages: msgs.map(m => ({ role: m.role, content: m.content.substring(0, 50) }))
+    });
+    return msgs;
+  }, [conversation]);
   const selectedCourse = conversation?.selectedCourse || null;
 
   // Check if we need course selection - only when no conversation exists
@@ -89,6 +102,9 @@ export default function ChatInterface() {
     messages.length === 0 &&
     !showCourseSelector;
 
+  // Calculate if we should show thread button
+  const shouldShowThreadButton = !!currentConversationId && !!conversation && !showCourseSelector && !needsCourseSelection && !shouldShowWelcome;
+
   // Debug logging
   console.log('🔍 ChatInterface state:', {
     currentConversationId,
@@ -97,7 +113,8 @@ export default function ChatInterface() {
     needsCourseSelection,
     shouldShowWelcome,
     showCourseSelector,
-    hasStartedChat
+    hasStartedChat,
+    shouldShowThreadButton
   });
 
   // Handle header click to show course selector
@@ -292,8 +309,9 @@ export default function ChatInterface() {
 
   const handleCourseSelect = async (course: CourseType) => {
     try {
-      // Get or create a conversation specific to this course
-      await getOrCreateConversationForCourse(course);
+      // Always create a NEW conversation for the selected course
+      console.log('🆕 Creating new conversation for course:', course);
+      await createConversation(undefined, course);
       setShowCourseSelector(false); // Hide selector after selection
       setIsInitialLoad(false); // Mark that user has interacted
     } catch (error) {
@@ -306,37 +324,78 @@ export default function ChatInterface() {
     course: CourseType,
   ) => {
     console.log('🚀 Starting conversation:', suggestion, '- Course:', course);
+    console.log('🔍 Debug - Suggestion text:', {
+      suggestion,
+      suggestionType: typeof suggestion,
+      suggestionLength: suggestion?.length,
+      suggestionTrimmed: suggestion?.trim(),
+    });
     
     try {
-      // Ensure we have the right conversation for this course (this updates selectedCourse)
-      const conversationId = await getOrCreateConversationForCourse(course);
+      // Validate suggestion text
+      if (!suggestion || !suggestion.trim()) {
+        console.error('❌ Invalid suggestion text:', suggestion);
+        return;
+      }
+
+      // Create a NEW conversation for this suggestion and course
+      const conversationId = await createConversation(undefined, course);
+      console.log('🆕 Created new conversation for suggestion:', conversationId);
       
+      // Ensure conversation is set before proceeding
+      if (!conversationId) {
+        console.error('❌ Failed to create conversation');
+        return;
+      }
+
       // Update states immediately
       setShowCourseSelector(false); // Hide selector after selection  
       setIsInitialLoad(false); // Mark that user has interacted
       setHasStartedChat(true); // Mark chat as started immediately
 
       // Start the chat immediately with the suggestion
-      await handleSubmit(suggestion);
+      await handleSubmit(suggestion.trim());
     } catch (error) {
       console.error('❌ Error in handleSuggestionClick:', error);
     }
   };
 
   const handleSubmit = async (inputText: string) => {
+    console.log('🔍 handleSubmit called with:', {
+      inputText,
+      inputType: typeof inputText,
+      inputLength: inputText?.length,
+      trimmed: inputText?.trim(),
+      isLoading,
+      currentConversationId,
+    });
+
     if (!inputText.trim() || isLoading) return;
     if (!hasStartedChat) setHasStartedChat(true);
 
     let conversationId = currentConversationId;
+    console.log('🔍 Current conversation state:', {
+      currentConversationId,
+      hasConversation: !!conversation,
+      conversationIdInDb: conversation?.id,
+    });
+
     if (!conversationId) {
       const course = selectedCourse || 'nodejs'; // Default to nodejs
       conversationId = await createConversation(undefined, course);
+      console.log('🔍 Created new conversation:', conversationId);
+    }
+
+    // Ensure conversationId is valid
+    if (!conversationId) {
+      console.error('❌ No valid conversationId available');
+      return;
     }
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputText,
+      content: inputText.trim(), // Ensure we trim the content
       timestamp: new Date(),
       sources: [],
     };
@@ -345,10 +404,18 @@ export default function ChatInterface() {
       conversationId,
       messageRole: userMessage.role,
       messageContent: userMessage.content,
+      messageContentType: typeof userMessage.content,
       hasConversationId: !!conversationId,
+      fullMessage: userMessage,
     });
 
-    await addMessage(conversationId, userMessage);
+    try {
+      await addMessage(conversationId, userMessage);
+      console.log('✅ Message added successfully');
+    } catch (messageError) {
+      console.error('❌ Failed to add message:', messageError);
+      return;
+    }
     
     // Add message trace if threading is enabled
     if (canViewThreads && currentThreadId) {
@@ -573,6 +640,12 @@ export default function ChatInterface() {
         <ChatHeader
           onOpenSidebar={() => setSidebarOpen(true)}
           onHeaderClick={handleHeaderClick}
+          canToggleThreadView={canToggleThreadView}
+          userRole={userRole}
+          showThreadSidebar={showThreadSidebar}
+          onToggleThreadSidebar={setShowThreadSidebar}
+          threadsCount={threads.length}
+          hasActiveConversation={shouldShowThreadButton}
         />
       </div>
 
@@ -587,15 +660,25 @@ export default function ChatInterface() {
               transition={{ duration: 0.3 }}
               className='overflow-hidden border-r border-slate-200'
             >
-              <ThreadSidebar
-                threads={threads}
-                currentThreadId={currentThreadId || ''}
-                onThreadSwitch={switchThread}
-                onCreateBranch={createBranch}
-                onDeleteThread={deleteThread}
-                onRenameThread={renameThread}
-                onToggleThreadVisibility={toggleThreadVisibility}
-              />
+              {userRole === 'user' ? (
+                // Student-friendly read-only thread view
+                <StudentThreadView
+                  threads={threads}
+                  currentThreadId={currentThreadId || ''}
+                  onThreadSwitch={switchThread}
+                />
+              ) : (
+                // Admin/Moderator full management view
+                <ThreadSidebar
+                  threads={threads}
+                  currentThreadId={currentThreadId || ''}
+                  onThreadSwitch={switchThread}
+                  onCreateBranch={createBranch}
+                  onDeleteThread={deleteThread}
+                  onRenameThread={renameThread}
+                  onToggleThreadVisibility={toggleThreadVisibility}
+                />
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -656,48 +739,6 @@ export default function ChatInterface() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className='flex-1 flex flex-col min-h-0'>
-                {/* Threading controls for admin/moderator */}
-                {canViewThreads && (
-                  <div className='flex items-center justify-between mb-4 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-slate-200'>
-                    <div className='flex items-center space-x-2'>
-                      <button
-                        onClick={() => setShowThreadSidebar(!showThreadSidebar)}
-                        className={`
-                          flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-                          ${showThreadSidebar 
-                            ? 'bg-purple-100 text-purple-700' 
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                          }
-                        `}
-                      >
-                        <GitBranch className='w-4 h-4' />
-                        <span>Threads ({threads.length})</span>
-                      </button>
-                      
-                      {canViewVisualization && (
-                        <button
-                          onClick={() => setShowThreadVisualization(!showThreadVisualization)}
-                          className={`
-                            flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-                            ${showThreadVisualization 
-                              ? 'bg-blue-100 text-blue-700' 
-                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }
-                          `}
-                        >
-                          <BarChart3 className='w-4 h-4' />
-                          <span>Visualization</span>
-                        </button>
-                      )}
-                    </div>
-                    
-                    {currentThreadId && (
-                      <div className='text-sm text-slate-600'>
-                        Current: {threads.find(t => t.id === currentThreadId)?.name || 'Main Thread'}
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 <MessagesContainer
                   ref={messagesContainerRef}

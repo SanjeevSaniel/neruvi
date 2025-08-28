@@ -36,7 +36,8 @@
       "Bash(npx drizzle-kit:*)",
       "Bash(git log:*)",
       "Bash(echo:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

@@ -17,6 +17,14 @@ interface MessageBubbleProps {
 export default function MessageBubble({ message, index, onClick, isCompactMode, isSelected }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   
+  // Debug sources
+  console.log(`🔍 MessageBubble - Message sources:`, {
+    messageId: message.id,
+    messageRole: message.role,
+    sources: message.sources,
+    sourcesLength: message.sources?.length || 0
+  });
+  
   // Filter sources to show the most relevant single reference (same logic as SourcePanel)
   const getFilteredSources = (sources: typeof message.sources) => {
     if (!sources) return [];
@@ -41,15 +49,41 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
   };
 
   const filteredSources = getFilteredSources(message.sources);
+  console.log(`🔍 MessageBubble - Filtered sources:`, {
+    messageId: message.id,
+    filteredSources,
+    filteredLength: filteredSources.length
+  });
   
-  const formatTimestamp = (timestamp: Date) => {
+  const formatTimestamp = (timestamp: Date | string | undefined) => {
+    console.log('🔍 MessageBubble formatTimestamp called:', {
+      timestamp,
+      timestampType: typeof timestamp,
+      messageId: message.id,
+      messageRole: message.role,
+      fullMessage: message
+    });
+
+    if (!timestamp) {
+      console.log('❌ No timestamp provided, using fallback');
+      return 'Just now';
+    }
+
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
+    const timestampDate = timestamp instanceof Date ? timestamp : new Date(timestamp);
+    
+    // Check if timestampDate is valid
+    if (isNaN(timestampDate.getTime())) {
+      console.log('❌ Invalid timestamp date:', timestamp);
+      return 'Just now';
+    }
+
+    const diffInMinutes = Math.floor((now.getTime() - timestampDate.getTime()) / (1000 * 60));
     
     if (diffInMinutes <= 0) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     
-    return timestamp.toLocaleTimeString('en-US', {
+    return timestampDate.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
@@ -300,7 +334,13 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             )}
           </motion.div>
 
-          {/* Source Panel removed from compact cards - only shown in detail panel */}
+          {/* Source Panel for Assistant Messages - Only show when filtered sources exist */}
+          {message.role === 'assistant' && filteredSources.length > 0 && (
+            <>
+              {console.log(`💬 Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
+              <SourcePanel sources={filteredSources} />
+            </>
+          )}
         </div>
       </div>
     </motion.div>

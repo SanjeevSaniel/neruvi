@@ -185,13 +185,19 @@ export const useConversationStore = create<ConversationStore>()(
       try {
         if (isDatabaseEnabled()) {
           console.log('📡 Creating conversation via database API');
+          const requestPayload = {
+            title: title || `${course === 'nodejs' ? 'Node.js' : 'Python'} Chat ${new Date().toLocaleDateString()}`,
+            selectedCourse: course || 'nodejs',
+          };
+          
+          console.log('🔍 Conversation creation payload:', requestPayload);
+          
           const response = await apiCall('/api/conversations', {
             method: 'POST',
-            body: JSON.stringify({
-              title: title || `${course === 'nodejs' ? 'Node.js' : 'Python'} Chat ${new Date().toLocaleDateString()}`,
-              selectedCourse: course || 'nodejs',
-            }),
+            body: JSON.stringify(requestPayload),
           });
+
+          console.log('🔍 Conversation creation response:', response);
 
           const conversation: Conversation = {
             ...response.data,
@@ -200,11 +206,19 @@ export const useConversationStore = create<ConversationStore>()(
             messages: response.data.messages || [],
           };
 
+          console.log('🔍 Created conversation object:', {
+            id: conversation.id,
+            title: conversation.title,
+            selectedCourse: conversation.selectedCourse,
+            hasId: !!conversation.id,
+          });
+
           set((state) => ({
             conversations: [...state.conversations, conversation],
             currentConversationId: conversation.id,
           }));
 
+          console.log('✅ Conversation created successfully with ID:', conversation.id);
           return conversation.id;
         } else {
           // Fallback to SessionStorage
@@ -304,13 +318,33 @@ export const useConversationStore = create<ConversationStore>()(
         hasContent: !!message.content,
       });
       
-      // Add message locally immediately for better UX
+      // Add message locally immediately for better UX with 5-message limit
       set((state) => ({
         conversations: state.conversations.map((conv) =>
           conv.id === conversationId
             ? {
                 ...conv,
-                messages: [...conv.messages, message],
+                messages: (() => {
+                  const newMessages = [...conv.messages, message];
+                  // Keep only the most recent 5 messages
+                  if (newMessages.length > 5) {
+                    console.log(`📝 Limiting conversation to 5 messages (was ${newMessages.length})`);
+                    return newMessages.slice(-5); // Keep last 5 messages
+                  }
+                  return newMessages;
+                })(),
+                // Update title to first user message (like Claude app)
+                title: (() => {
+                  // Only update title if this is the first user message
+                  if (message.role === 'user' && conv.messages.length === 0) {
+                    const truncatedMessage = message.content.length > 50 
+                      ? message.content.substring(0, 50) + '...'
+                      : message.content;
+                    console.log(`📝 Setting conversation title to first message: "${truncatedMessage}"`);
+                    return truncatedMessage;
+                  }
+                  return conv.title; // Keep existing title
+                })(),
                 updatedAt: new Date(),
               }
             : conv
@@ -320,6 +354,25 @@ export const useConversationStore = create<ConversationStore>()(
       try {
         if (isDatabaseEnabled()) {
           console.log('📡 Adding message via database API');
+          
+          // Validate before creating payload
+          if (!conversationId) {
+            throw new Error('❌ conversationId is required but not provided');
+          }
+          if (!message.role) {
+            throw new Error('❌ message.role is required but not provided');
+          }
+          if (!message.content || !message.content.trim()) {
+            console.error('❌ message.content validation failed:', {
+              content: message.content,
+              contentType: typeof message.content,
+              contentValue: JSON.stringify(message.content),
+              trimmedContent: message.content?.trim(),
+              entireMessage: JSON.stringify(message),
+            });
+            throw new Error('❌ message.content is required but not provided');
+          }
+          
           const payload = {
             conversationId,
             role: message.role,
@@ -329,11 +382,43 @@ export const useConversationStore = create<ConversationStore>()(
           };
           
           console.log('🔍 API Payload:', payload);
+          console.log('🔍 Payload validation:', {
+            hasConversationId: !!payload.conversationId,
+            hasRole: !!payload.role,
+            hasContent: !!payload.content,
+            conversationIdType: typeof payload.conversationId,
+            roleType: typeof payload.role,
+            contentType: typeof payload.content,
+          });
           
           await apiCall('/api/messages', {
             method: 'POST',
             body: JSON.stringify(payload),
           });
+          
+          // Update conversation title if this is the first user message
+          if (message.role === 'user') {
+            const currentConversation = get().conversations.find(c => c.id === conversationId);
+            if (currentConversation && currentConversation.messages.length === 1) { // Only this message exists
+              const newTitle = message.content.length > 50 
+                ? message.content.substring(0, 50) + '...'
+                : message.content;
+              
+              console.log('📝 Updating conversation title in database:', newTitle);
+              try {
+                await apiCall('/api/conversations', {
+                  method: 'PUT',
+                  body: JSON.stringify({ 
+                    conversationId,
+                    title: newTitle
+                  }),
+                });
+              } catch (titleError) {
+                console.error('❌ Failed to update conversation title:', titleError);
+                // Non-critical error, don't throw
+              }
+            }
+          }
         } else {
           saveToSessionStorage(get().conversations, get().currentConversationId);
         }
@@ -450,6 +535,13 @@ export const useConversationStore = create<ConversationStore>()(
           console.log('📡 Loading conversations from database');
           const response = await apiCall('/api/conversations');
           
+          console.log('📡 Database API response:', {
+            success: response.success,
+            dataKeys: Object.keys(response.data || {}),
+            conversationsLength: response.data?.conversations?.length || 0,
+            rawData: response.data
+          });
+          
           const conversations: Conversation[] = (response.data?.conversations || []).map((conv: ConversationData) => ({
             ...conv,
             createdAt: new Date(conv.createdAt),
@@ -457,7 +549,32 @@ export const useConversationStore = create<ConversationStore>()(
             messages: conv.messages || [],
           }));
 
-          set({ conversations });
+          // Set the most recent conversation as current if none is selected
+          const currentState = get();
+          const currentId = currentState.currentConversationId || 
+            (conversations.length > 0 ? conversations[0].id : null);
+
+          console.log('📡 Database loaded conversations:', {
+            count: conversations.length,
+            settingCurrentId: currentId,
+            conversationTitles: conversations.map(c => c.title),
+            messagesCounts: conversations.map(c => ({ title: c.title, messages: c.messages?.length || 0 }))
+          });
+
+          set({ 
+            conversations,
+            currentConversationId: currentId
+          });
+          
+          console.log('✅ Conversations set in store:', {
+            storeConversationCount: get().conversations.length,
+            currentConversationId: get().currentConversationId,
+            firstConversation: get().conversations[0] ? {
+              id: get().conversations[0].id,
+              title: get().conversations[0].title,
+              messageCount: get().conversations[0].messages?.length || 0
+            } : null
+          });
         } else {
           console.log('💾 Loading conversations from SessionStorage');
           const { conversations, currentId } = loadFromSessionStorage();

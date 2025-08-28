@@ -4,6 +4,8 @@ import { Brain } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import FlowMindLogo from '../FlowMindLogo';
 import ConversationHistoryIcon from '../ui/ConversationHistoryIcon';
+import ThreadToggle, { StudentThreadBenefits } from '@/components/threading/ThreadToggle';
+import { UserRole } from '@/lib/threading/permissions';
 
 const AIStatusIndicator = () => {
   return (
@@ -55,11 +57,24 @@ const AIStatusIndicator = () => {
 interface ChatHeaderProps {
   onOpenSidebar?: () => void;
   onHeaderClick?: () => void;
+  // Threading props
+  canToggleThreadView?: boolean;
+  userRole?: UserRole;
+  showThreadSidebar?: boolean;
+  onToggleThreadSidebar?: (show: boolean) => void;
+  threadsCount?: number;
+  hasActiveConversation?: boolean;
 }
 
 export default function ChatHeader({
   onOpenSidebar,
   onHeaderClick,
+  canToggleThreadView,
+  userRole,
+  showThreadSidebar,
+  onToggleThreadSidebar,
+  threadsCount,
+  hasActiveConversation,
 }: ChatHeaderProps) {
   return (
     <motion.div
@@ -148,6 +163,40 @@ export default function ChatHeader({
             </motion.div>
           </div> */}
           <AIStatusIndicator />
+
+          {/* Threading Toggle - Only show when there's an active conversation */}
+          {canToggleThreadView && onToggleThreadSidebar && hasActiveConversation && (
+            <div className='flex items-center'>
+              {userRole === 'user' ? (
+                // Student-friendly compact toggle
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  className='px-2.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
+                  <ThreadToggle
+                    isVisible={showThreadSidebar || false}
+                    onToggle={onToggleThreadSidebar}
+                    variant='compact'
+                  />
+                </motion.div>
+              ) : (
+                // Admin/Moderator full toggle with counter
+                <motion.div 
+                  whileHover={{ scale: 1.05 }}
+                  className='flex items-center space-x-2 px-2.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
+                  <ThreadToggle
+                    isVisible={showThreadSidebar || false}
+                    onToggle={onToggleThreadSidebar}
+                    variant='compact'
+                  />
+                  {threadsCount !== undefined && (
+                    <span className='text-xs font-medium text-white/80'>
+                      {threadsCount === 0 ? '(New)' : `(${threadsCount})`}
+                    </span>
+                  )}
+                </motion.div>
+              )}
+            </div>
+          )}
 
           {/* Mobile version */}
           <div className='md:hidden'>

@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   GitBranch, 
   MessageSquare, 
+  MessageSquarePlus,
   Plus, 
   MoreVertical,
   Trash2,
@@ -75,9 +76,10 @@ export default function ThreadSidebar({
     return 'bg-green-500';
   };
 
-  const formatTimestamp = (date: Date) => {
+  const formatTimestamp = (date: Date | string) => {
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const dateObj = date instanceof Date ? date : new Date(date);
+    const diff = now.getTime() - dateObj.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
     
     if (minutes < 1) return 'Just now';
@@ -96,7 +98,9 @@ export default function ThreadSidebar({
       // Main thread first, then by last update
       if (a.isMainThread && !b.isMainThread) return -1;
       if (!a.isMainThread && b.isMainThread) return 1;
-      return b.updatedAt.getTime() - a.updatedAt.getTime();
+      const bDate = b.updatedAt instanceof Date ? b.updatedAt : new Date(b.updatedAt);
+      const aDate = a.updatedAt instanceof Date ? a.updatedAt : new Date(a.updatedAt);
+      return bDate.getTime() - aDate.getTime();
     });
 
   return (
@@ -252,14 +256,14 @@ export default function ThreadSidebar({
         {/* Empty State */}
         {visibleThreads.length === 0 && (
           <div className="p-8 text-center">
-            <GitBranch className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+            <MessageSquarePlus className="w-12 h-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-sm font-medium text-slate-600 mb-2">
-              {showArchived ? 'No archived threads' : 'No active threads'}
+              {showArchived ? 'No archived threads' : 'No threads yet'}
             </h3>
             <p className="text-xs text-slate-500">
               {showArchived 
                 ? 'All threads are currently active' 
-                : 'Start a conversation to create threads'
+                : 'Continue the conversation to enable threading features'
               }
             </p>
           </div>
