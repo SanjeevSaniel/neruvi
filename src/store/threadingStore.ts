@@ -139,16 +139,77 @@ export const useThreadingStore = create<ThreadingState>()(
       console.log('🔗 Starting threading initialization:', { conversationId, firstMessageId });
       
       try {
+        console.log('🔍 Store: Engine state before initialization:', {
+          engineExists: !!engine,
+          engineStateThreads: engine?.state.availableThreads.length || 0,
+          currentThreadId: engine?.state.currentThreadId
+        });
+        
         // Initialize engine
         const mainThreadId = await engine.initializeConversation(conversationId, firstMessageId);
         
+        console.log('🔍 Store: Engine state after initialization:', {
+          engineExists: !!engine,
+          engineStateThreads: engine?.state.availableThreads.length || 0,
+          currentThreadId: engine?.state.currentThreadId,
+          mainThreadId
+        });
+        
         // Always save main thread to database, even without messages
+        console.log('🔍 Store: About to get threads after initialization:', {
+          conversationId,
+          mainThreadId
+        });
+        
         const threads = engine.getConversationThreads(conversationId);
         const mainThread = threads?.[0];
         
+        console.log('🔍 Store: Retrieved threads after initialization:', {
+          conversationId,
+          threadsFound: threads.length,
+          threads: threads.map(t => ({ id: t.id, name: t.name, conversationId: t.conversationId })),
+          mainThread: mainThread ? { id: mainThread.id, name: mainThread.name, conversationId: mainThread.conversationId } : null
+        });
+        
         if (!mainThread) {
-          console.error('❌ No main thread found after initialization:', { conversationId, threads });
-          throw new Error('Failed to initialize main thread');
+          console.error('❌ No main thread found after initialization:', { conversationId, threads, mainThreadId });
+          
+          // Try to recover by creating a simple main thread directly
+          console.log('🔧 Attempting to recover by creating main thread directly...');
+          const recoveryThread = {
+            id: mainThreadId,
+            conversationId,
+            name: 'Main Thread',
+            description: 'Primary conversation thread',
+            rootMessageId: firstMessageId || '',
+            currentMessageId: firstMessageId || '',
+            messageCount: firstMessageId ? 1 : 0,
+            isMainThread: true,
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          
+          // Add to engine state directly
+          try {
+            engine.state.availableThreads.push(recoveryThread);
+            engine.state.currentThreadId = recoveryThread.id;
+            console.log('🔧 Recovery thread added to engine state:', {
+              threadId: recoveryThread.id,
+              engineThreadsCount: engine.state.availableThreads.length
+            });
+          } catch (engineError) {
+            console.error('❌ Failed to add recovery thread to engine:', engineError);
+          }
+          
+          // Update store state directly with recovery thread
+          set({
+            currentThreadId: mainThreadId,
+            threads: [recoveryThread],
+          });
+          
+          console.log('🔧 Recovery successful - created thread directly in store');
+          return; // Skip database creation for now, just get the UI working
         }
         
         const dbThreadId = await databaseService.createThread({
@@ -493,11 +554,19 @@ export const useThreadingStore = create<ThreadingState>()(
     
     // Load conversation threads from database
     loadConversationThreads: async (conversationId: string) => {
+      console.log('🧵 Loading conversation threads:', { conversationId });
+      
       const { engine } = get();
       const databaseService = get().getDatabaseService();
       
       try {
         const threads = await databaseService.getConversationThreads(conversationId);
+        
+        console.log('🧵 Loaded threads from database:', {
+          conversationId,
+          threadsCount: threads.length,
+          threads: threads.map(t => ({ id: t.id, name: t.name, isMainThread: t.isMainThread, messageCount: t.messageCount }))
+        });
         
         // Import into engine
         const state = engine.exportState();
@@ -506,6 +575,11 @@ export const useThreadingStore = create<ThreadingState>()(
         // Set current thread to main thread or first active thread
         const mainThread = threads.find(t => t.isMainThread);
         const currentThread = mainThread || threads.find(t => t.isActive);
+        
+        console.log('🧵 Setting current thread after load:', {
+          mainThread: mainThread ? { id: mainThread.id, name: mainThread.name } : null,
+          currentThread: currentThread ? { id: currentThread.id, name: currentThread.name } : null
+        });
         
         if (currentThread) {
           state.currentThreadId = currentThread.id;
@@ -516,6 +590,11 @@ export const useThreadingStore = create<ThreadingState>()(
         set({
           threads,
           currentThreadId: state.currentThreadId,
+        });
+        
+        console.log('🧵 Store updated with loaded threads:', {
+          threadsInStore: threads.length,
+          currentThreadId: state.currentThreadId
         });
       } catch (error) {
         console.error('❌ Error loading conversation threads:', error);

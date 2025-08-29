@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useConversationStore } from '@/store/conversationStore';
 
 interface ConversationSidebarProps {
@@ -19,9 +19,38 @@ export default function ConversationSidebar({
     deleteConversation,
     setCurrentConversation,
     clearConversations,
+    loadConversations,
   } = useConversationStore();
+  
+  // Debug logging for sidebar
+  console.log('📋 ConversationSidebar render:', {
+    isOpen,
+    conversationsCount: conversations.length,
+    currentConversationId,
+    conversations: conversations.map(c => ({
+      id: c.id,
+      title: c.title,
+      messageCount: c.messages?.length || 0,
+      updatedAt: c.updatedAt
+    }))
+  });
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  // Load conversations on component mount
+  useEffect(() => {
+    const initializeConversations = async () => {
+      try {
+        console.log('📋 ConversationSidebar: Loading conversations on mount');
+        await loadConversations();
+        console.log('✅ ConversationSidebar: Conversations loaded successfully');
+      } catch (error) {
+        console.error('❌ ConversationSidebar: Failed to load conversations:', error);
+      }
+    };
+
+    initializeConversations();
+  }, []); // Only run on mount
 
   // const handleNewConversation = () => {
   //   const newId = createConversation();

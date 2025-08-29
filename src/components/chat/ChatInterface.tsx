@@ -20,6 +20,7 @@ import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
 
 export default function ChatInterface() {
+  console.log('🚀 ChatInterface component loaded - debugging is working!');
   const { user } = useUser();
   const {
     getCurrentConversation,
@@ -139,6 +140,15 @@ export default function ChatInterface() {
     showCourseSelector,
     hasStartedChat,
     shouldShowThreadButton,
+    // Threading state
+    canViewThreads,
+    currentThreadId,
+    threadsCount: threads.length,
+    showThreadSidebar,
+    threadingState: {
+      currentThreadId,
+      availableThreads: threads.map(t => ({ id: t.id, name: t.name, messageCount: t.messageCount }))
+    }
   });
 
   // Handle header click to show course selector
@@ -176,14 +186,45 @@ export default function ChatInterface() {
 
   // Initialize threading when conversation changes
   useEffect(() => {
+    console.log('🧵 Threading useEffect triggered:', {
+      currentConversationId,
+      previousConversationId: prevConversationIdRef.current,
+      canViewThreads,
+      currentThreadId,
+      threadsCount: threads.length
+    });
+    
     const initializeThreading = async () => {
       const conversation = getCurrentConversation();
+      console.log('🧵 Threading initialization check:', {
+        hasConversation: !!conversation,
+        conversationId: conversation?.id,
+        previousId: prevConversationIdRef.current,
+        isNewConversation: conversation && conversation.id !== prevConversationIdRef.current,
+        canViewThreads,
+        currentThreadId
+      });
+      
       if (conversation && conversation.id !== prevConversationIdRef.current) {
+        console.log('🧵 New conversation detected, initializing threading:', {
+          conversationId: conversation.id,
+          previousId: prevConversationIdRef.current,
+          canViewThreads,
+          currentThreadId,
+          messageCount: conversation.messages?.length || 0
+        });
+        
         // Initialize threading for this conversation
         if (canViewThreads) {
           loadConversationThreads(conversation.id);
 
           // Initialize threading for any conversation, with or without messages
+          // Always initialize for new conversations, regardless of currentThreadId
+          console.log('🧵 Checking if threading needs initialization:', {
+            currentThreadId,
+            shouldInitialize: !currentThreadId || currentThreadId !== conversation.id
+          });
+          
           if (!currentThreadId) {
             const firstMessageId = conversation.messages.length > 0 ? conversation.messages[0]?.id : undefined;
             if (conversation.id) {
@@ -208,6 +249,9 @@ export default function ChatInterface() {
             }
           }
         }
+        
+        // Update the ref to prevent re-initialization
+        prevConversationIdRef.current = conversation.id;
       }
     };
 
@@ -567,7 +611,7 @@ export default function ChatInterface() {
         sources,
       };
 
-      await addMessage(conversationId, assistantMessage);
+      // Note: Assistant message will be saved after streaming completes with final content
 
       // Add message trace for assistant message if threading is enabled
       if (canViewThreads && currentThreadId) {
@@ -677,6 +721,11 @@ export default function ChatInterface() {
       // Set final content and ensure display catches up
       if (assistantMessage) {
         displayContent = accumulatedContent;
+        console.log('🔄 Updating assistant message with final content:', {
+          messageId: assistantMessage.id,
+          finalContentLength: accumulatedContent.length,
+          conversationId
+        });
         updateMessage(conversationId, assistantMessage.id, accumulatedContent);
 
         // Create final message object for panel
@@ -709,13 +758,31 @@ export default function ChatInterface() {
     } finally {
       setIsLoading(false);
       // Clear streaming state when done but keep panel open with final message
-      setTimeout(() => {
+      setTimeout(async () => {
         // Create final message from the accumulated content if assistantMessage exists
         if (assistantMessage) {
           const finalMessage: Message = {
             ...assistantMessage,
             content: accumulatedContent,
           };
+
+          // CRITICAL: Persist the final assistant message to database
+          console.log('🤖 About to save final assistant message:', {
+            conversationId,
+            messageId: assistantMessage.id,
+            role: assistantMessage.role,
+            contentLength: accumulatedContent.length,
+            sources: assistantMessage.sources?.length || 0,
+            timestamp: assistantMessage.timestamp
+          });
+
+          try {
+            await addMessage(conversationId, finalMessage);
+            console.log('✅ Final assistant message saved successfully:', assistantMessage.id);
+          } catch (assistantSaveError) {
+            console.error('❌ Failed to save final assistant message:', assistantSaveError);
+            console.error('💥 Final assistant message data:', finalMessage);
+          }
 
           // Clear streaming state but keep panel open
           setStreamingMessage(null);
@@ -752,7 +819,7 @@ export default function ChatInterface() {
           showThreadSidebar={showThreadSidebar}
           onToggleThreadSidebar={setShowThreadSidebar}
           threadsCount={threads.length}
-          hasActiveConversation={shouldShowThreadButton}
+          hasActiveConversation={!!currentConversationId && !!conversation}
         />
       </div>
 

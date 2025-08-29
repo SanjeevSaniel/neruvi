@@ -16,6 +16,19 @@ interface MessagesContainerProps {
 
 const MessagesContainer = forwardRef<HTMLDivElement, MessagesContainerProps>(
   ({ messages, isLoading, onMessageClick, isDetailPanelOpen, selectedMessageId, streamingMessage }, ref) => {
+    // Debug what messages are being rendered
+    console.log('💬 MessagesContainer rendering:', {
+      totalMessages: messages.length,
+      userMessages: messages.filter(m => m.role === 'user').length,
+      assistantMessages: messages.filter(m => m.role === 'assistant').length,
+      messageDetails: messages.map(m => ({ 
+        id: m.id, 
+        role: m.role, 
+        content: m.content?.substring(0, 30),
+        timestamp: m.timestamp 
+      }))
+    });
+    
     return (
       <div
         ref={ref}

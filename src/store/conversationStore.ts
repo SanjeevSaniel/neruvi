@@ -79,8 +79,14 @@ const MIGRATION_KEY = 'flowmind-database-migrated';
 
 // Check if database is enabled
 const isDatabaseEnabled = () => {
-  return typeof window !== 'undefined' && 
-         process.env.NEXT_PUBLIC_USE_DATABASE === 'true';
+  const enabled = typeof window !== 'undefined' && 
+                  process.env.NEXT_PUBLIC_USE_DATABASE === 'true';
+  console.log('🔍 Database enabled check:', {
+    isClient: typeof window !== 'undefined',
+    envValue: process.env.NEXT_PUBLIC_USE_DATABASE,
+    isDatabaseEnabled: enabled
+  });
+  return enabled;
 };
 
 // Helper functions for sessionStorage (fallback)
@@ -456,6 +462,13 @@ export const useConversationStore = create<ConversationStore>()(
     },
 
     setCurrentConversation: (id) => {
+      console.log('🔄 Setting current conversation:', {
+        newId: id,
+        previousId: get().currentConversationId,
+        conversationExists: !!get().conversations.find(c => c.id === id),
+        totalConversations: get().conversations.length
+      });
+      
       set({ currentConversationId: id });
       if (!isDatabaseEnabled()) {
         sessionStorage.setItem(CURRENT_CONVERSATION_KEY, id || '');
@@ -464,7 +477,21 @@ export const useConversationStore = create<ConversationStore>()(
 
     getCurrentConversation: () => {
       const state = get();
-      return state.conversations.find((conv) => conv.id === state.currentConversationId) || null;
+      const found = state.conversations.find((conv) => conv.id === state.currentConversationId);
+      
+      console.log('🔍 Getting current conversation:', {
+        currentConversationId: state.currentConversationId,
+        foundConversation: !!found,
+        conversationDetails: found ? {
+          id: found.id,
+          title: found.title,
+          messageCount: found.messages?.length || 0,
+          selectedCourse: found.selectedCourse
+        } : null,
+        allConversationIds: state.conversations.map(c => c.id)
+      });
+      
+      return found || null;
     },
 
     setCourseForConversation: (conversationId, course) => {

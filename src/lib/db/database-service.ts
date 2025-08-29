@@ -342,7 +342,14 @@ export class DatabaseService {
       console.log('📨 Database getConversationMessages:', {
         conversationId,
         messagesFound: messagesData.length,
-        messageRoles: messagesData.map(m => ({ role: m.role, id: m.id, content: m.content?.substring(0, 30) }))
+        userMessages: messagesData.filter(m => m.role === 'user').length,
+        assistantMessages: messagesData.filter(m => m.role === 'assistant').length,
+        messageRoles: messagesData.map(m => ({ 
+          role: m.role, 
+          id: m.id, 
+          content: m.content?.substring(0, 30),
+          createdAt: m.createdAt 
+        }))
       });
       
       if (messagesData.length === 0) {
