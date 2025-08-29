@@ -310,9 +310,9 @@ Answer based on your ${selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} exper
 
     // Dynamic model and parameters based on query complexity
     const modelConfig = {
-      simple: { maxTokens: 300, temperature: 0.2 },
-      medium: { maxTokens: 600, temperature: 0.3 },
-      complex: { maxTokens: 1000, temperature: 0.4 }
+      simple: { maxTokens: 600, temperature: 0.2 },
+      medium: { maxTokens: 1200, temperature: 0.3 },
+      complex: { maxTokens: 2000, temperature: 0.4 }
     }[queryComplexity];
 
     const result = streamText({

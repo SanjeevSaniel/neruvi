@@ -339,6 +339,12 @@ export class DatabaseService {
         .limit(limit)
         .offset(offset);
       
+      console.log('📨 Database getConversationMessages:', {
+        conversationId,
+        messagesFound: messagesData.length,
+        messageRoles: messagesData.map(m => ({ role: m.role, id: m.id, content: m.content?.substring(0, 30) }))
+      });
+      
       if (messagesData.length === 0) {
         return [];
       }

@@ -53,6 +53,13 @@ export class ThreadingEngine {
 
     this.state.availableThreads.push(mainThread);
     this.state.currentThreadId = mainThread.id;
+    
+    console.log('🔍 ThreadingEngine.initializeConversation - Added thread:', {
+      mainThreadId: mainThread.id,
+      conversationId: mainThread.conversationId,
+      totalThreadsAfter: this.state.availableThreads.length,
+      availableThreads: this.state.availableThreads.map(t => ({ id: t.id, name: t.name, convId: t.conversationId }))
+    });
 
     // Create initial trace if we have a first message
     if (firstMessageId) {
@@ -245,14 +252,23 @@ export class ThreadingEngine {
    * Get conversation threads with their current state
    */
   getConversationThreads(conversationId: string): ConversationThread[] {
-    return this.state.availableThreads
-      .filter(thread => thread.conversationId === conversationId)
-      .sort((a, b) => {
-        // Main thread first, then by update time
-        if (a.isMainThread) return -1;
-        if (b.isMainThread) return 1;
-        return b.updatedAt.getTime() - a.updatedAt.getTime();
-      });
+    const filtered = this.state.availableThreads
+      .filter(thread => thread.conversationId === conversationId);
+    
+    console.log('🔍 ThreadingEngine.getConversationThreads:', {
+      conversationId,
+      totalThreads: this.state.availableThreads.length,
+      allThreads: this.state.availableThreads.map(t => ({ id: t.id, convId: t.conversationId, name: t.name })),
+      filteredThreads: filtered.length,
+      filteredThreadsData: filtered.map(t => ({ id: t.id, name: t.name, isMainThread: t.isMainThread }))
+    });
+    
+    return filtered.sort((a, b) => {
+      // Main thread first, then by update time
+      if (a.isMainThread) return -1;
+      if (b.isMainThread) return 1;
+      return b.updatedAt.getTime() - a.updatedAt.getTime();
+    });
   }
 
   /**

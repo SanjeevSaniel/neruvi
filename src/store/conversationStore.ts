@@ -561,7 +561,11 @@ export const useConversationStore = create<ConversationStore>()(
             count: conversations.length,
             settingCurrentId: currentId,
             conversationTitles: conversations.map(c => c.title),
-            messagesCounts: conversations.map(c => ({ title: c.title, messages: c.messages?.length || 0 }))
+            messagesCounts: conversations.map(c => ({ title: c.title, messages: c.messages?.length || 0 })),
+            detailedMessages: conversations.map(c => ({
+              title: c.title,
+              messages: c.messages?.map(m => ({ role: m.role, content: m.content.substring(0, 50), id: m.id })) || []
+            }))
           });
 
           set({ 

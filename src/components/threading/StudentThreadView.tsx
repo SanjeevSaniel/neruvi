@@ -38,6 +38,15 @@ export default function StudentThreadView({
   hasActiveConversation = false,
   messageCount = 0,
 }: StudentThreadViewProps) {
+  
+  // Debug logging
+  console.log('🧵 StudentThreadView Debug:', {
+    threadsCount: threads.length,
+    threads: threads.map(t => ({ id: t.id, name: t.name, isMainThread: t.isMainThread, messageCount: t.messageCount })),
+    currentThreadId,
+    hasActiveConversation,
+    messageCount
+  });
   const formatTimestamp = (date: Date | string) => {
     const now = new Date();
     const dateObj = date instanceof Date ? date : new Date(date);
@@ -71,12 +80,12 @@ export default function StudentThreadView({
           <Navigation className='w-8 h-8 mx-auto mb-3 opacity-50' />
           <h3 className='text-sm font-medium text-gray-600 mb-1'>
             {hasActiveConversation && messageCount > 0
-              ? 'Threading Not Available Yet'
+              ? 'Initializing Threading...'
               : 'No Conversation Started'}
           </h3>
           <p className='text-xs text-gray-500'>
             {hasActiveConversation && messageCount > 0
-              ? 'Threading features will appear as your conversation develops branches and alternative paths.'
+              ? 'Threading system is setting up your conversation flow.'
               : 'Start chatting to see your conversation flow!'}
           </p>
         </div>

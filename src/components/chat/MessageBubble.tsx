@@ -167,8 +167,10 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              onClick={() => onClick?.(message)}
-              className={`relative px-4 py-3 rounded-2xl shadow-md cursor-pointer transition-all duration-200 hover:shadow-lg ${
+              onClick={() => message.role === 'assistant' && onClick?.(message)}
+              className={`relative px-4 py-3 rounded-2xl shadow-md transition-all duration-200 hover:shadow-lg ${
+                message.role === 'assistant' ? 'cursor-pointer' : 'cursor-default'
+              } ${
                 message.role === 'user'
                   ? `ml-6 ${
                       isSelected ? 'ring-2 ring-green-300 ring-offset-2' : ''
@@ -292,8 +294,10 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
             whileHover={{ scale: 1.01, boxShadow: message.role === 'user' ? '0 8px 25px rgba(78, 166, 116, 0.15)' : '0 8px 25px rgba(139, 92, 246, 0.15)' }}
-            onClick={() => onClick?.(message)}
-            className={`relative group px-5 py-4 rounded-2xl shadow-md cursor-pointer transition-all duration-200 ${
+            onClick={() => message.role === 'assistant' && onClick?.(message)}
+            className={`relative group px-5 py-4 rounded-2xl shadow-md transition-all duration-200 ${
+              message.role === 'assistant' ? 'cursor-pointer' : 'cursor-default'
+            } ${
               message.role === 'user'
                 ? 'ml-6'
                 : 'bg-white border border-slate-200 shadow-lg hover:border-green-200 hover:shadow-xl'

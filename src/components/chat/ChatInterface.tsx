@@ -45,6 +45,7 @@ export default function ChatInterface() {
     addMessageTrace,
     setShowThreadSidebar,
     loadConversationThreads,
+    updateThreadMessageCount,
   } = useThreadingStore();
 
   const [input, setInput] = useState('');
@@ -96,9 +97,13 @@ export default function ChatInterface() {
     console.log('🔍 Messages updated:', {
       conversationId: conversation?.id,
       messageCount: msgs.length,
+      userMessages: msgs.filter(m => m.role === 'user').length,
+      assistantMessages: msgs.filter(m => m.role === 'assistant').length,
       messages: msgs.map((m) => ({
         role: m.role,
         content: m.content.substring(0, 50),
+        id: m.id,
+        timestamp: m.timestamp
       })),
     });
     return msgs;
@@ -178,15 +183,14 @@ export default function ChatInterface() {
         if (canViewThreads) {
           loadConversationThreads(conversation.id);
 
-          // If this is a new conversation with messages, initialize threading
-          if (conversation.messages.length > 0 && !currentThreadId) {
-            const firstMessageId = conversation.messages[0]?.id;
-            if (firstMessageId && conversation.id) {
+          // Initialize threading for any conversation, with or without messages
+          if (!currentThreadId) {
+            const firstMessageId = conversation.messages.length > 0 ? conversation.messages[0]?.id : undefined;
+            if (conversation.id) {
               console.log(
                 '🔗 Initializing threading for conversation:',
                 conversation.id,
-                'with first message:',
-                firstMessageId,
+                firstMessageId ? `with first message: ${firstMessageId}` : 'without messages (new conversation)',
               );
               try {
                 await initializeConversationThreading(
@@ -200,11 +204,7 @@ export default function ChatInterface() {
                 );
               }
             } else {
-              console.warn('⚠️ Cannot initialize threading - missing data:', {
-                conversationId: conversation.id,
-                firstMessageId,
-                messageCount: conversation.messages.length,
-              });
+              console.warn('⚠️ Cannot initialize threading - missing conversation ID');
             }
           }
         }
@@ -440,7 +440,16 @@ export default function ChatInterface() {
       currentConversationId,
     });
 
-    if (!inputText.trim() || isLoading) return;
+    // Enhanced validation
+    if (!inputText || typeof inputText !== 'string') {
+      console.error('❌ handleSubmit received invalid input:', { inputText, type: typeof inputText });
+      return;
+    }
+    
+    if (!inputText.trim() || isLoading) {
+      console.log('🔍 handleSubmit early return:', { trimmed: inputText.trim(), isLoading });
+      return;
+    }
     if (!hasStartedChat) setHasStartedChat(true);
 
     let conversationId = currentConversationId;
@@ -462,10 +471,16 @@ export default function ChatInterface() {
       return;
     }
 
+    const trimmedContent = inputText.trim();
+    if (!trimmedContent) {
+      console.error('❌ Content is empty after trimming:', { original: inputText, trimmed: trimmedContent });
+      return;
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputText.trim(), // Ensure we trim the content
+      content: trimmedContent,
       timestamp: new Date(),
       sources: [],
     };
@@ -487,11 +502,14 @@ export default function ChatInterface() {
       return;
     }
 
-    // Add message trace if threading is enabled
+    // Add message trace and update thread if threading is enabled
     if (canViewThreads && currentThreadId) {
       const parentMessageId =
         messages.length > 0 ? messages[messages.length - 1].id : null;
       await addMessageTrace(userMessage.id, currentThreadId, parentMessageId);
+      
+      // Update thread message count and current message
+      updateThreadMessageCount(currentThreadId, userMessage.id);
     }
 
     setInput(''); // Clear input box immediately after sending
@@ -558,6 +576,9 @@ export default function ChatInterface() {
           currentThreadId,
           userMessage.id,
         );
+        
+        // Update thread message count and current message
+        updateThreadMessageCount(currentThreadId, assistantMessage.id);
       }
 
       // Auto-show the right panel when streaming starts
@@ -747,15 +768,24 @@ export default function ChatInterface() {
               className='w-[300px] border-r border-slate-200 bg-white'>
               {userRole === 'user' ? (
                 // Student-friendly read-only thread view
-                <StudentThreadView
-                  threads={threads}
-                  currentThreadId={currentThreadId || ''}
-                  onThreadSwitch={switchThread}
-                  hasActiveConversation={
-                    !!currentConversationId && !!conversation
-                  }
-                  messageCount={messages.length}
-                />
+                <>
+                  {console.log('🔍 ChatInterface Debug - Passing threads to StudentThreadView:', {
+                    threadsCount: threads.length,
+                    threads: threads.map(t => ({ id: t.id, name: t.name, isMainThread: t.isMainThread })),
+                    currentThreadId,
+                    hasActiveConversation: !!currentConversationId && !!conversation,
+                    messageCount: messages.length
+                  })}
+                  <StudentThreadView
+                    threads={threads}
+                    currentThreadId={currentThreadId || ''}
+                    onThreadSwitch={switchThread}
+                    hasActiveConversation={
+                      !!currentConversationId && !!conversation
+                    }
+                    messageCount={messages.length}
+                  />
+                </>
               ) : (
                 // Admin/Moderator full management view
                 <ThreadSidebar

@@ -45,6 +45,9 @@ interface ThreadingState {
   loadConversationThreads: (conversationId: string) => Promise<void>;
   refreshThreadData: () => Promise<void>;
   
+  // Thread updates
+  updateThreadMessageCount: (threadId: string, messageId: string) => void;
+  
   // Internal helpers
   getDatabaseService: () => ThreadingDatabaseService;
 }
@@ -73,9 +76,10 @@ export const useThreadingStore = create<ThreadingState>()(
         if (typeof window !== 'undefined') {
           console.info('🔒 Client-side detected - using mock threading database service');
           databaseService = {
-            createThread: async () => {
-              console.log('🔷 Mock: createThread called');
-              return 'mock-thread-id';
+            createThread: async (threadData: any) => {
+              const mockId = `thread-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+              console.log('🔷 Mock: createThread called', { threadData, generatedId: mockId });
+              return mockId;
             },
             getConversationThreads: async () => {
               console.log('🔷 Mock: getConversationThreads called');
@@ -138,38 +142,46 @@ export const useThreadingStore = create<ThreadingState>()(
         // Initialize engine
         const mainThreadId = await engine.initializeConversation(conversationId, firstMessageId);
         
-        // Save to database
-        if (firstMessageId) {
-          const threads = engine.getConversationThreads(conversationId);
-          const mainThread = threads?.[0];
-          
-          if (!mainThread) {
-            console.error('❌ No main thread found after initialization:', { conversationId, threads });
-            throw new Error('Failed to initialize main thread');
-          }
-          
-          const dbThreadId = await databaseService.createThread({
-            conversationId: mainThread.conversationId,
-            name: mainThread.name,
-            description: mainThread.description,
-            rootMessageId: mainThread.rootMessageId,
-            currentMessageId: mainThread.currentMessageId,
-            messageCount: mainThread.messageCount,
-            isMainThread: mainThread.isMainThread,
-            isActive: mainThread.isActive,
-          });
-          
-          // Update engine with database ID
-          mainThread.id = dbThreadId;
+        // Always save main thread to database, even without messages
+        const threads = engine.getConversationThreads(conversationId);
+        const mainThread = threads?.[0];
+        
+        if (!mainThread) {
+          console.error('❌ No main thread found after initialization:', { conversationId, threads });
+          throw new Error('Failed to initialize main thread');
         }
         
-        // Update state
-        set({
-          currentThreadId: mainThreadId,
-          threads: engine.getConversationThreads(conversationId),
+        const dbThreadId = await databaseService.createThread({
+          conversationId: mainThread.conversationId,
+          name: mainThread.name,
+          description: mainThread.description,
+          rootMessageId: mainThread.rootMessageId,
+          currentMessageId: mainThread.currentMessageId,
+          messageCount: mainThread.messageCount,
+          isMainThread: mainThread.isMainThread,
+          isActive: mainThread.isActive,
         });
         
-        console.log('🧵 Threading initialized for conversation:', conversationId);
+        // Update engine with database ID
+        mainThread.id = dbThreadId;
+        
+        // Update state
+        const conversationThreads = engine.getConversationThreads(conversationId);
+        set({
+          currentThreadId: mainThreadId,
+          threads: conversationThreads,
+        });
+        
+        console.log('🧵 Threading initialized for conversation:', conversationId, {
+          mainThreadId,
+          threadsCount: conversationThreads.length,
+          threads: conversationThreads.map(t => ({
+            id: t.id,
+            name: t.name,
+            isMainThread: t.isMainThread,
+            messageCount: t.messageCount
+          }))
+        });
       } catch (error) {
         console.error('❌ Error initializing threading:', error);
       }
@@ -461,6 +473,23 @@ export const useThreadingStore = create<ThreadingState>()(
     setShowThreadSidebar: (show: boolean) => set({ showThreadSidebar: show }),
     setShowThreadVisualization: (show: boolean) => set({ showThreadVisualization: show }),
     setSelectedThread: (threadId: string | null) => set({ selectedThreadId: threadId }),
+    
+    // Thread updates
+    updateThreadMessageCount: (threadId: string, messageId: string) => {
+      set((state) => ({
+        threads: state.threads.map(thread => 
+          thread.id === threadId
+            ? {
+                ...thread,
+                messageCount: (thread.messageCount || 0) + 1,
+                currentMessageId: messageId,
+                updatedAt: new Date()
+              }
+            : thread
+        )
+      }));
+      console.log('🧵 Thread state updated via store:', { threadId, messageId });
+    },
     
     // Load conversation threads from database
     loadConversationThreads: async (conversationId: string) => {
