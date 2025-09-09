@@ -65,6 +65,7 @@ interface ConversationStore {
   
   // Data management
   loadConversations: () => Promise<void>;
+  loadConversation: (conversationId: string) => Promise<void>;
   getAllConversations: () => Promise<void>;
   migrateFromSessionStorage: () => Promise<void>;
   
@@ -322,6 +323,21 @@ export const useConversationStore = create<ConversationStore>()(
         hasMessage: !!message,
         hasRole: !!message.role,
         hasContent: !!message.content,
+        timestamp: message.timestamp,
+        timestampType: typeof message.timestamp,
+        timestampString: message.timestamp?.toString(),
+      });
+
+      // Ensure message has timestamp
+      const messageWithTimestamp = {
+        ...message,
+        timestamp: message.timestamp || new Date(),
+      };
+
+      console.log('🔍 Message with timestamp:', {
+        hasTimestamp: !!messageWithTimestamp.timestamp,
+        timestamp: messageWithTimestamp.timestamp,
+        timestampType: typeof messageWithTimestamp.timestamp,
       });
       
       // Add message locally immediately for better UX with 5-message limit
@@ -331,7 +347,7 @@ export const useConversationStore = create<ConversationStore>()(
             ? {
                 ...conv,
                 messages: (() => {
-                  const newMessages = [...conv.messages, message];
+                  const newMessages = [...conv.messages, messageWithTimestamp];
                   // Keep only the most recent 5 messages
                   if (newMessages.length > 5) {
                     console.log(`📝 Limiting conversation to 5 messages (was ${newMessages.length})`);
@@ -342,10 +358,10 @@ export const useConversationStore = create<ConversationStore>()(
                 // Update title to first user message (like Claude app)
                 title: (() => {
                   // Only update title if this is the first user message
-                  if (message.role === 'user' && conv.messages.length === 0) {
-                    const truncatedMessage = message.content.length > 50 
-                      ? message.content.substring(0, 50) + '...'
-                      : message.content;
+                  if (messageWithTimestamp.role === 'user' && conv.messages.length === 0) {
+                    const truncatedMessage = messageWithTimestamp.content.length > 50 
+                      ? messageWithTimestamp.content.substring(0, 50) + '...'
+                      : messageWithTimestamp.content;
                     console.log(`📝 Setting conversation title to first message: "${truncatedMessage}"`);
                     return truncatedMessage;
                   }
@@ -365,25 +381,26 @@ export const useConversationStore = create<ConversationStore>()(
           if (!conversationId) {
             throw new Error('❌ conversationId is required but not provided');
           }
-          if (!message.role) {
+          if (!messageWithTimestamp.role) {
             throw new Error('❌ message.role is required but not provided');
           }
-          if (!message.content || !message.content.trim()) {
+          if (!messageWithTimestamp.content || !messageWithTimestamp.content.trim()) {
             console.error('❌ message.content validation failed:', {
-              content: message.content,
-              contentType: typeof message.content,
-              contentValue: JSON.stringify(message.content),
-              trimmedContent: message.content?.trim(),
-              entireMessage: JSON.stringify(message),
+              content: messageWithTimestamp.content,
+              contentType: typeof messageWithTimestamp.content,
+              contentValue: JSON.stringify(messageWithTimestamp.content),
+              trimmedContent: messageWithTimestamp.content?.trim(),
+              entireMessage: JSON.stringify(messageWithTimestamp),
             });
             throw new Error('❌ message.content is required but not provided');
           }
           
           const payload = {
             conversationId,
-            role: message.role,
-            content: message.content,
-            sources: message.sources,
+            role: messageWithTimestamp.role,
+            content: messageWithTimestamp.content,
+            sources: messageWithTimestamp.sources,
+            timestamp: messageWithTimestamp.timestamp,
             processingTimeMs: 0, // Default for user messages
           };
           
@@ -403,12 +420,12 @@ export const useConversationStore = create<ConversationStore>()(
           });
           
           // Update conversation title if this is the first user message
-          if (message.role === 'user') {
+          if (messageWithTimestamp.role === 'user') {
             const currentConversation = get().conversations.find(c => c.id === conversationId);
             if (currentConversation && currentConversation.messages.length === 1) { // Only this message exists
-              const newTitle = message.content.length > 50 
-                ? message.content.substring(0, 50) + '...'
-                : message.content;
+              const newTitle = messageWithTimestamp.content.length > 50 
+                ? messageWithTimestamp.content.substring(0, 50) + '...'
+                : messageWithTimestamp.content;
               
               console.log('📝 Updating conversation title in database:', newTitle);
               try {
@@ -552,6 +569,97 @@ export const useConversationStore = create<ConversationStore>()(
       return null;
     },
 
+    loadConversation: async (conversationId: string) => {
+      const state = get();
+      state.setLoading(true);
+      state.setError(null);
+
+      try {
+        if (isDatabaseEnabled()) {
+          console.log('🔍 Loading specific conversation from database:', conversationId);
+          
+          // Check if conversation already exists in store with messages
+          const existingConversation = state.conversations.find(c => c.id === conversationId);
+          if (existingConversation && existingConversation.messages.length > 0) {
+            console.log('✅ Conversation already loaded:', conversationId);
+            state.setCurrentConversation(conversationId);
+            return;
+          }
+          
+          // Load messages for this specific conversation
+          const response = await apiCall(`/api/messages?conversationId=${conversationId}`);
+          
+          console.log('📡 Messages API response:', {
+            success: response.success,
+            conversationId,
+            messagesCount: response.data?.length || 0,
+            conversation: response.conversation
+          });
+          
+          if (response.success && response.data) {
+            const messages: Message[] = response.data.map((msg: MessageData) => ({
+              id: msg.id,
+              role: msg.role,
+              content: msg.content,
+              sources: msg.sources || [],
+              timestamp: new Date(msg.timestamp),
+            }));
+            
+            // Update or add conversation with loaded messages
+            set((state) => {
+              const updatedConversations = state.conversations.map((conv) => {
+                if (conv.id === conversationId) {
+                  return {
+                    ...conv,
+                    messages,
+                    title: response.conversation?.title || conv.title,
+                    selectedCourse: response.conversation?.selectedCourse || conv.selectedCourse,
+                  };
+                }
+                return conv;
+              });
+              
+              // If conversation doesn't exist in store, add it
+              if (!updatedConversations.find(c => c.id === conversationId) && response.conversation) {
+                updatedConversations.push({
+                  id: conversationId,
+                  title: response.conversation.title,
+                  messages,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                  selectedCourse: response.conversation.selectedCourse,
+                });
+              }
+              
+              return {
+                conversations: updatedConversations,
+                currentConversationId: conversationId,
+              };
+            });
+            
+            console.log('✅ Conversation loaded with messages:', {
+              conversationId,
+              messagesCount: messages.length
+            });
+          } else {
+            throw new Error('Failed to load conversation messages');
+          }
+        } else {
+          // Fallback to session storage
+          const savedConversations = loadFromSessionStorage();
+          const conversation = savedConversations.conversations.find(c => c.id === conversationId);
+          if (conversation) {
+            state.setCurrentConversation(conversationId);
+          }
+        }
+      } catch (error) {
+        console.error('❌ Failed to load conversation:', error);
+        state.setError('Failed to load conversation');
+      } finally {
+        state.setLoading(false);
+      }
+    },
+
     loadConversations: async () => {
       const state = get();
       state.setLoading(true);
@@ -569,15 +677,38 @@ export const useConversationStore = create<ConversationStore>()(
             rawData: response.data
           });
           
-          const conversations: Conversation[] = (response.data?.conversations || []).map((conv: ConversationData) => ({
-            ...conv,
-            createdAt: new Date(conv.createdAt),
-            updatedAt: new Date(conv.updatedAt),
-            messages: (conv.messages || []).map((msg: MessageData) => ({
-              ...msg,
-              timestamp: new Date(msg.timestamp)
-            })),
-          }));
+          const conversations: Conversation[] = (response.data?.conversations || []).map((conv: ConversationData) => {
+            console.log('🔍 Store loading conversation:', {
+              conversationId: conv.id,
+              messageCount: (conv.messages || []).length,
+              messages: (conv.messages || []).map(msg => ({
+                id: msg.id,
+                role: msg.role,
+                rawTimestamp: msg.timestamp,
+                timestampType: typeof msg.timestamp
+              }))
+            });
+            
+            return {
+              ...conv,
+              createdAt: new Date(conv.createdAt),
+              updatedAt: new Date(conv.updatedAt),
+              messages: (conv.messages || []).map((msg: MessageData) => {
+                const convertedTimestamp = new Date(msg.timestamp);
+                console.log('🕐 Store timestamp conversion:', {
+                  messageId: msg.id,
+                  rawTimestamp: msg.timestamp,
+                  convertedTimestamp,
+                  isValidDate: !isNaN(convertedTimestamp.getTime())
+                });
+                
+                return {
+                  ...msg,
+                  timestamp: convertedTimestamp
+                };
+              }),
+            };
+          });
 
           // Set the most recent conversation as current if none is selected
           const currentState = get();
