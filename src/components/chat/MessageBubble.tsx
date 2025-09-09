@@ -27,25 +27,55 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
   
   // Filter sources to show the most relevant single reference (same logic as SourcePanel)
   const getFilteredSources = (sources: typeof message.sources) => {
-    if (!sources) return [];
-    return sources
+    if (!sources || sources.length === 0) return [];
+    console.log(`🔍 MessageBubble - Raw sources before filtering:`, sources);
+    
+    // Sources from API are already sorted by score (highest first)
+    // Apply consistent filtering and take the best match
+    const filtered = sources
       .filter(source => {
         const relevanceMatch = source.relevance.match(/(\d+)%?/);
         if (relevanceMatch) {
           const percentage = parseInt(relevanceMatch[1]);
-          return percentage >= 40; // Same threshold as SourcePanel
+          const passesFilter = percentage >= 35; // Consistent threshold for quality sources
+          console.log(`🔍 MessageBubble - Source relevance check:`, {
+            relevance: source.relevance,
+            percentage,
+            passesFilter,
+            section: source.section,
+            timestamp: source.timestamp
+          });
+          return passesFilter;
         }
-        return true; // Keep sources without percentage
+        console.log(`🔍 MessageBubble - Source without percentage (keeping):`, {
+          relevance: source.relevance,
+          section: source.section,
+          timestamp: source.timestamp
+        });
+        return true; // Keep sources without percentage (assume they're relevant)
       })
       .sort((a, b) => {
-        // Sort by relevance score, highest first
+        // Sort by relevance score, highest first, with tie-breakers for deterministic results
         const aMatch = a.relevance.match(/(\d+)%?/);
         const bMatch = b.relevance.match(/(\d+)%?/);
-        const aScore = aMatch ? parseInt(aMatch[1]) : 0;
-        const bScore = bMatch ? parseInt(bMatch[1]) : 0;
-        return bScore - aScore;
+        const aScore = aMatch ? parseInt(aMatch[1]) : 100; // Default high score for non-percentage
+        const bScore = bMatch ? parseInt(bMatch[1]) : 100; // Default high score for non-percentage
+        
+        if (bScore !== aScore) {
+          return bScore - aScore; // Higher score first
+        }
+        
+        // If scores are equal, prefer earlier timestamps (more foundational content)
+        const aTime = a.timestamp.split(':').map(Number);
+        const bTime = b.timestamp.split(':').map(Number);
+        const aSeconds = (aTime[0] || 0) * 60 + (aTime[1] || 0);
+        const bSeconds = (bTime[0] || 0) * 60 + (bTime[1] || 0);
+        return aSeconds - bSeconds;
       })
       .slice(0, 1); // Take only the single best match
+      
+    console.log(`🔍 MessageBubble - After filtering and sorting (best match):`, filtered);
+    return filtered;
   };
 
   const filteredSources = getFilteredSources(message.sources);
@@ -56,16 +86,7 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
   });
   
   const formatTimestamp = (timestamp: Date | string | undefined) => {
-    console.log('🔍 MessageBubble formatTimestamp called:', {
-      timestamp,
-      timestampType: typeof timestamp,
-      messageId: message.id,
-      messageRole: message.role,
-      fullMessage: message
-    });
-
     if (!timestamp) {
-      console.log('❌ No timestamp provided, using fallback');
       return 'Just now';
     }
 
@@ -74,7 +95,7 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
     
     // Check if timestampDate is valid
     if (isNaN(timestampDate.getTime())) {
-      console.log('❌ Invalid timestamp date:', timestamp);
+      console.warn('Invalid timestamp for message:', message.id);
       return 'Just now';
     }
 
@@ -110,9 +131,32 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
     document.body.removeChild(element);
   };
 
+  const stripMarkdown = (content: string) => {
+    return content
+      // Remove code blocks
+      .replace(/```[\s\S]*?```/g, '[code block]')
+      // Remove inline code
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove headers
+      .replace(/^#{1,6}\s+(.*)$/gm, '$1')
+      // Remove bold/italic
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      // Remove links
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove list markers
+      .replace(/^\s*[-*+]\s+/gm, '• ')
+      // Remove numbered lists
+      .replace(/^\s*\d+\.\s+/gm, '• ')
+      // Clean up extra whitespace
+      .replace(/\n\s*\n/g, '\n')
+      .trim();
+  };
+
   const getPreviewText = (content: string, maxLength: number = 150) => {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
+    const plainText = stripMarkdown(content);
+    if (plainText.length <= maxLength) return plainText;
+    return plainText.substring(0, maxLength) + '...';
   };
 
   if (isCompactMode) {
@@ -230,12 +274,22 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             </motion.div>
 
             {/* Source Panel for Assistant Messages - Only show when filtered sources exist */}
-            {message.role === 'assistant' && filteredSources.length > 0 && (
-              <>
-                {console.log(`💬 Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
-                <SourcePanel sources={filteredSources} />
-              </>
-            )}
+            {(() => {
+              const shouldShow = message.role === 'assistant' && filteredSources.length > 0;
+              console.log(`💬 SourcePanel render decision:`, {
+                messageRole: message.role,
+                filteredSourcesLength: filteredSources.length,
+                shouldShow,
+                messageId: message.id,
+                filteredSources
+              });
+              return shouldShow ? (
+                <>
+                  {console.log(`💬 Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
+                  <SourcePanel sources={filteredSources} />
+                </>
+              ) : null;
+            })()}
           </div>
         </div>
       </motion.div>
@@ -339,12 +393,22 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
           </motion.div>
 
           {/* Source Panel for Assistant Messages - Only show when filtered sources exist */}
-          {message.role === 'assistant' && filteredSources.length > 0 && (
-            <>
-              {console.log(`💬 Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
-              <SourcePanel sources={filteredSources} />
-            </>
-          )}
+          {(() => {
+            const shouldShow = message.role === 'assistant' && filteredSources.length > 0;
+            console.log(`💬 Full mode SourcePanel render decision:`, {
+              messageRole: message.role,
+              filteredSourcesLength: filteredSources.length,
+              shouldShow,
+              messageId: message.id,
+              filteredSources
+            });
+            return shouldShow ? (
+              <>
+                {console.log(`💬 Full mode Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
+                <SourcePanel sources={filteredSources} />
+              </>
+            ) : null;
+          })()}
         </div>
       </div>
     </motion.div>
