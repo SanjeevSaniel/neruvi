@@ -9,6 +9,7 @@ FlowMind's AI assistant is built on the principle of **focused, reliable learnin
 ## 🎯 **What Makes FlowMind Different**
 
 ### **Transcript-Based Learning Assistant**
+
 - **NO web searches** - Responses come exclusively from course materials
 - **NO external APIs** - No Wikipedia, Stack Overflow, or documentation fetching  
 - **NO real-time data** - No current events, latest updates, or trending topics
@@ -20,11 +21,12 @@ FlowMind's AI assistant is built on the principle of **focused, reliable learnin
 
 ### **1. Data Processing Pipeline**
 
-```
+```Plaintext
 Course Videos → VTT Transcripts → Chunked Content → Vector Embeddings → Local Database
 ```
 
 #### **Step-by-Step Process:**
+
 1. **VTT Transcripts**: Video subtitle files with precise timestamps
 2. **Content Chunking**: Split into ~500 character semantic chunks  
 3. **Embedding Generation**: OpenAI `text-embedding-3-small` (1536 dimensions)
@@ -65,16 +67,19 @@ const handleUserQuery = async (query: string, course: string) => {
 ### **3. Search Strategies**
 
 #### **Semantic Search**
+
 - **Cosine Similarity**: Measures vector similarity between query and content
 - **Relevance Threshold**: Only returns results with >0.1 similarity score
 - **Course Filtering**: Searches within selected course (Node.js/Python/Both)
 
 #### **HyDE (Hypothetical Document Embeddings)**
+
 - **Generate**: AI creates a hypothetical answer to the question
 - **Search**: Uses that hypothetical answer to find actual course content
 - **Combine**: Merges with direct search results for better coverage
 
 #### **Query Rewriting**
+
 - **Multi-perspective**: Rewrites query using different technical terms
 - **Concept Focus**: Creates variations focusing on concepts vs implementation
 - **Language Levels**: Generates beginner and advanced versions
@@ -84,12 +89,14 @@ const handleUserQuery = async (query: string, course: string) => {
 ## 📊 **Data Sources & Content**
 
 ### **Course Content Processing**
+
 - **Node.js Course**: 46 VTT files → 31 processed chunks
 - **Python Course**: 80+ VTT files → 30 processed chunks  
 - **Total**: 61+ chunks covering core programming concepts
 
 ### **Content Categories**
-```
+
+```Plaintext
 Node.js:
 ├── Fundamentals (Runtime, V8 Engine)
 ├── Installation & Setup  
@@ -104,6 +111,7 @@ Python:
 ```
 
 ### **Metadata Structure**
+
 ```typescript
 interface ContentChunk {
   id: string
@@ -123,6 +131,7 @@ interface ContentChunk {
 ## 🔍 **Response Generation Process**
 
 ### **1. Context Preparation**
+
 ```typescript
 const systemPrompt = `You are FlowMind, an AI learning assistant for ${course} programming.
 
@@ -142,11 +151,13 @@ ${chunk.content}
 ```
 
 ### **2. Response Streaming**
+
 - **Vercel AI SDK**: Enables real-time response streaming
 - **Chunk Processing**: Displays response as it's generated
 - **Source Display**: Shows relevant timestamps and sections
 
 ### **3. Source Attribution**
+
 ```typescript
 interface ResponseSource {
   course: string      // "nodejs" | "python"
@@ -161,17 +172,20 @@ interface ResponseSource {
 ## ✅ **What FlowMind CAN Help With**
 
 ### **Programming Concepts**
+
 - "What is async/await in Node.js?"
 - "How do Python functions work?"
 - "Explain the V8 engine"
 - "What are Python data types?"
 
 ### **Course-Specific Content**
+
 - "How to install Node.js?" (if covered in course)
 - "Python syntax basics" (from transcript content)
 - "Authentication concepts" (from course materials)
 
 ### **Educational Explanations**
+
 - Step-by-step breakdowns of concepts
 - Code examples from course content
 - Progressive learning paths
@@ -182,18 +196,21 @@ interface ResponseSource {
 ## ❌ **What FlowMind CANNOT Help With**
 
 ### **External/Current Information**
+
 - Latest Node.js or Python versions
 - Current best practices not in courses
 - External library documentation
 - Real-world deployment guides (unless in course)
 
 ### **Broad Programming Topics**
+
 - Languages not covered (Java, C++, etc.)
 - Advanced topics not in course materials
 - Industry news or trends
 - Third-party tools and services
 
 ### **Implementation-Specific Issues**
+
 - Debugging specific user code
 - Environment setup issues
 - IDE configuration
