@@ -1,8 +1,8 @@
 import { getDatabase } from './connection';
-import { users, conversations, messages, messageChunks, userUsage, User, Conversation, Message, NewUser, NewConversation, NewMessage, UserRole } from './schema';
+import { users, conversations, messages, messageChunks, userUsage, User, Conversation, UserRole } from './schema';
 import { eq, desc, and, count, inArray } from 'drizzle-orm';
 import { ContentStorageManager } from './content-storage';
-import type { Message as ChatMessage, SourceTimestamp } from '@/components/chat/types';
+import type { Message as ChatMessage, SourceTimestamp } from '../../components/chat/types';
 
 export class DatabaseService {
   private db = getDatabase();
@@ -109,19 +109,22 @@ export class DatabaseService {
     const { limit = 20, offset = 0, course } = options;
     
     try {
-      let baseQuery = this.db
-        .select()
-        .from(conversations)
-        .where(eq(conversations.userId, userId));
-      
-      // Add course filter if specified
+      let baseQuery;
       if (course) {
-        baseQuery = baseQuery.where(
-          and(
-            eq(conversations.userId, userId),
-            eq(conversations.selectedCourse, course)
-          )
-        );
+        baseQuery = this.db
+          .select()
+          .from(conversations)
+          .where(
+            and(
+              eq(conversations.userId, userId),
+              eq(conversations.selectedCourse, course)
+            )
+          );
+      } else {
+        baseQuery = this.db
+          .select()
+          .from(conversations)
+          .where(eq(conversations.userId, userId));
       }
       
       // Get conversations with pagination
@@ -142,21 +145,17 @@ export class DatabaseService {
       );
       
       // Get total count
-      let countQuery = this.db
+      let countWhere = eq(conversations.userId, userId);
+      if (course) {
+        countWhere = and(
+          eq(conversations.userId, userId),
+          eq(conversations.selectedCourse, course)
+        ) ?? eq(conversations.userId, userId);
+      }
+      const [{ count: total }] = await this.db
         .select({ count: count() })
         .from(conversations)
-        .where(eq(conversations.userId, userId));
-      
-      if (course) {
-        countQuery = countQuery.where(
-          and(
-            eq(conversations.userId, userId),
-            eq(conversations.selectedCourse, course)
-          )
-        );
-      }
-      
-      const [{ count: total }] = await countQuery;
+        .where(countWhere);
       
       console.log('📊 Database service returning conversations:', {
         count: conversationsWithMessages.length,
@@ -374,11 +373,11 @@ export class DatabaseService {
           const messageChunksForMsg = chunks.filter(c => c.messageId === msgData.id);
           const fullContent = await this.contentStorage.retrieveContent(
             {
-              content: msgData.content,
-              contentLarge: msgData.contentLarge,
-              contentCompressed: msgData.contentCompressed,
-              compressionType: msgData.compressionType,
-              characterCount: msgData.characterCount,
+              content: msgData.content ?? undefined,
+              contentLarge: msgData.contentLarge ?? undefined,
+              contentCompressed: msgData.contentCompressed ?? undefined,
+              compressionType: msgData.compressionType ?? undefined,
+              characterCount: msgData.characterCount ?? 0,
             },
             messageChunksForMsg
           );
@@ -388,17 +387,35 @@ export class DatabaseService {
             sources = msgData.sources && typeof msgData.sources === 'string' && msgData.sources.trim()
               ? JSON.parse(msgData.sources as string)
               : [];
+            
+            console.log('🔍 Database service - Sources parsing:', {
+              messageId: msgData.id,
+              rawSources: msgData.sources,
+              parsedSources: sources,
+              sourcesLength: sources.length,
+              hasTimestamps: sources.map(s => ({ section: s.section, timestamp: s.timestamp }))
+            });
           } catch (error) {
             console.warn('Failed to parse sources JSON:', msgData.sources, error);
             sources = [];
           }
           
+          const timestampDate = msgData.createdAt ? new Date(msgData.createdAt) : new Date();
+          
+          console.log('🕐 Database service timestamp conversion:', {
+            messageId: msgData.id,
+            rawCreatedAt: msgData.createdAt,
+            convertedTimestamp: timestampDate,
+            timestampValid: !isNaN(timestampDate.getTime()),
+            timestampISO: timestampDate.toISOString()
+          });
+
           return {
             id: msgData.id,
             role: msgData.role as 'user' | 'assistant',
             content: fullContent,
             sources,
-            timestamp: msgData.createdAt ? new Date(msgData.createdAt) : new Date(),
+            timestamp: timestampDate,
           };
         })
       );
@@ -489,7 +506,7 @@ export class DatabaseService {
       } else {
         // Check if we need to reset (daily reset)
         const now = new Date();
-        const lastReset = new Date(usage.lastResetAt);
+        const lastReset = usage.lastResetAt ? new Date(usage.lastResetAt) : new Date();
         const hoursSinceReset = (now.getTime() - lastReset.getTime()) / (1000 * 60 * 60);
         
         if (hoursSinceReset >= 24) {
@@ -508,7 +525,7 @@ export class DatabaseService {
           [usage] = await this.db
             .update(userUsage)
             .set({
-              messageCount: usage.messageCount + 1,
+              messageCount: (usage.messageCount ?? 0) + 1,
               updatedAt: now,
             })
             .where(eq(userUsage.userId, userId))
@@ -517,7 +534,7 @@ export class DatabaseService {
       }
       
       return {
-        currentCount: usage.messageCount,
+        currentCount: usage.messageCount ?? 0,
         limit: RATE_LIMIT
       };
     } catch (error) {
@@ -542,11 +559,11 @@ export class DatabaseService {
       }
       
       // Calculate next reset time (24 hours from last reset)
-      const resetTime = new Date(usage.lastResetAt);
+      const resetTime = usage.lastResetAt ? new Date(usage.lastResetAt) : new Date();
       resetTime.setHours(resetTime.getHours() + 24);
       
       return {
-        messageCount: usage.messageCount,
+        messageCount: usage.messageCount ?? 0,
         limit: 15,
         resetTime
       };
@@ -561,7 +578,19 @@ export class DatabaseService {
   /**
    * Import data from SessionStorage (for migration)
    */
-  async importFromSessionStorage(userId: string, sessionData: any): Promise<{ 
+  async importFromSessionStorage(userId: string, sessionData: { 
+    conversations?: Array<{
+      title?: string;
+      selectedCourse?: 'nodejs' | 'python';
+      messages?: Array<{
+        id?: string;
+        role: 'user' | 'assistant';
+        content: string;
+        sources?: SourceTimestamp[];
+        timestamp?: string | Date;
+      }>;
+    }>;
+  }): Promise<{ 
     conversationsImported: number; 
     messagesImported: number; 
   }> {
@@ -615,7 +644,7 @@ export class DatabaseService {
   async deleteConversation(conversationId: string, userId: string): Promise<boolean> {
     try {
       // Verify ownership and delete (cascading will handle messages and chunks)
-      const result = await this.db
+      await this.db
         .delete(conversations)
         .where(
           and(
