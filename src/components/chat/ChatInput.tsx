@@ -84,8 +84,8 @@ export default function ChatInput({
       stopListening();
     }
 
+    // Don't clear here - let the parent component handle clearing immediately
     await onSubmit(value);
-    onChange('');
   };
 
   const handleMicClick = () => {

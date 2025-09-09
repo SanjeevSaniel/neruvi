@@ -1,9 +1,19 @@
 import OpenAI from 'openai';
 import { createHash } from 'crypto';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+// Lazy initialization of OpenAI client
+let openai: OpenAI | null = null;
+function getOpenAIClient() {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is required');
+    }
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+    });
+  }
+  return openai;
+}
 
 export type CourseType = 'nodejs' | 'python';
 
@@ -104,7 +114,7 @@ Keep responses brief but informative.
 
 Return only valid JSON with no additional text or markdown formatting.`;
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAIClient().chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
@@ -149,7 +159,7 @@ Return only valid JSON with no additional text or markdown formatting.`;
       hydeQuery.original || 'search query',
       
       // Hypothetical answers (each one separately for better matching)
-      ...(hydeQuery.hypotheticalAnswers || []).filter(answer => answer && answer.trim().length > 0),
+      ...(hydeQuery.hypotheticalAnswers || []).filter(answer => answer && typeof answer === 'string' && answer.trim().length > 0),
       
       // Technical context
       hydeQuery.technicalContext || 'technical context',
@@ -170,7 +180,7 @@ Return only valid JSON with no additional text or markdown formatting.`;
     }
 
     // Create embeddings in batch
-    const response = await openai.embeddings.create({
+    const response = await getOpenAIClient().embeddings.create({
       model: 'text-embedding-3-small',
       input: textsToEmbed,
       dimensions: 1536,

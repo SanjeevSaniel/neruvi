@@ -80,8 +80,10 @@ ${content}
     document.body.removeChild(element);
   };
 
-  const formatTimestamp = (timestamp?: Date) => {
-    return timestamp ? timestamp.toLocaleString('en-US', {
+  const formatTimestamp = (timestamp?: Date | string) => {
+    if (!timestamp) return 'Just now';
+    const timestampDate = timestamp instanceof Date ? timestamp : new Date(timestamp);
+    return timestampDate.toLocaleString('en-US', {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
@@ -89,7 +91,7 @@ ${content}
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
-    }) : 'Just now';
+    });
   };
 
   return (

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useConversationStore } from '@/store/conversationStore';
 
 interface ConversationSidebarProps {
@@ -12,6 +13,7 @@ export default function ConversationSidebar({
   isOpen,
   onClose,
 }: ConversationSidebarProps) {
+  const router = useRouter();
   const {
     conversations,
     currentConversationId,
@@ -19,9 +21,38 @@ export default function ConversationSidebar({
     deleteConversation,
     setCurrentConversation,
     clearConversations,
+    loadConversations,
   } = useConversationStore();
+  
+  // Debug logging for sidebar
+  console.log('📋 ConversationSidebar render:', {
+    isOpen,
+    conversationsCount: conversations.length,
+    currentConversationId,
+    conversations: conversations.map(c => ({
+      id: c.id,
+      title: c.title,
+      messageCount: c.messages?.length || 0,
+      updatedAt: c.updatedAt
+    }))
+  });
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  // Load conversations on component mount
+  useEffect(() => {
+    const initializeConversations = async () => {
+      try {
+        console.log('📋 ConversationSidebar: Loading conversations on mount');
+        await loadConversations();
+        console.log('✅ ConversationSidebar: Conversations loaded successfully');
+      } catch (error) {
+        console.error('❌ ConversationSidebar: Failed to load conversations:', error);
+      }
+    };
+
+    initializeConversations();
+  }, []); // Only run on mount
 
   // const handleNewConversation = () => {
   //   const newId = createConversation();
@@ -33,15 +64,16 @@ export default function ConversationSidebar({
     deleteConversation(id);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const dateObj = date instanceof Date ? date : new Date(date);
+    const diff = now.getTime() - dateObj.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (days === 0) return 'Today';
     if (days === 1) return 'Yesterday';
     if (days < 7) return `${days} days ago`;
-    return date.toLocaleDateString();
+    return dateObj.toLocaleDateString();
   };
 
   return (
@@ -123,7 +155,10 @@ export default function ConversationSidebar({
                             messageCount: conversation.messages.length,
                             firstMessage: conversation.messages[0]?.content.substring(0, 50)
                           });
-                          setCurrentConversation(conversation.id);
+                          
+                          // Navigate to the conversation URL instead of just setting current conversation
+                          const courseId = conversation.selectedCourse || 'nodejs';
+                          router.push(`/chat/courses/${courseId}/${conversation.id}`);
                           onClose();
                         }}
                         onMouseEnter={() => setHoveredId(conversation.id)}

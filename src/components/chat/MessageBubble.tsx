@@ -17,39 +17,94 @@ interface MessageBubbleProps {
 export default function MessageBubble({ message, index, onClick, isCompactMode, isSelected }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   
+  // Debug sources
+  console.log(`🔍 MessageBubble - Message sources:`, {
+    messageId: message.id,
+    messageRole: message.role,
+    sources: message.sources,
+    sourcesLength: message.sources?.length || 0
+  });
+  
   // Filter sources to show the most relevant single reference (same logic as SourcePanel)
   const getFilteredSources = (sources: typeof message.sources) => {
-    if (!sources) return [];
-    return sources
+    if (!sources || sources.length === 0) return [];
+    console.log(`🔍 MessageBubble - Raw sources before filtering:`, sources);
+    
+    // Sources from API are already sorted by score (highest first)
+    // Apply consistent filtering and take the best match
+    const filtered = sources
       .filter(source => {
         const relevanceMatch = source.relevance.match(/(\d+)%?/);
         if (relevanceMatch) {
           const percentage = parseInt(relevanceMatch[1]);
-          return percentage >= 40; // Same threshold as SourcePanel
+          const passesFilter = percentage >= 35; // Consistent threshold for quality sources
+          console.log(`🔍 MessageBubble - Source relevance check:`, {
+            relevance: source.relevance,
+            percentage,
+            passesFilter,
+            section: source.section,
+            timestamp: source.timestamp
+          });
+          return passesFilter;
         }
-        return true; // Keep sources without percentage
+        console.log(`🔍 MessageBubble - Source without percentage (keeping):`, {
+          relevance: source.relevance,
+          section: source.section,
+          timestamp: source.timestamp
+        });
+        return true; // Keep sources without percentage (assume they're relevant)
       })
       .sort((a, b) => {
-        // Sort by relevance score, highest first
+        // Sort by relevance score, highest first, with tie-breakers for deterministic results
         const aMatch = a.relevance.match(/(\d+)%?/);
         const bMatch = b.relevance.match(/(\d+)%?/);
-        const aScore = aMatch ? parseInt(aMatch[1]) : 0;
-        const bScore = bMatch ? parseInt(bMatch[1]) : 0;
-        return bScore - aScore;
+        const aScore = aMatch ? parseInt(aMatch[1]) : 100; // Default high score for non-percentage
+        const bScore = bMatch ? parseInt(bMatch[1]) : 100; // Default high score for non-percentage
+        
+        if (bScore !== aScore) {
+          return bScore - aScore; // Higher score first
+        }
+        
+        // If scores are equal, prefer earlier timestamps (more foundational content)
+        const aTime = a.timestamp.split(':').map(Number);
+        const bTime = b.timestamp.split(':').map(Number);
+        const aSeconds = (aTime[0] || 0) * 60 + (aTime[1] || 0);
+        const bSeconds = (bTime[0] || 0) * 60 + (bTime[1] || 0);
+        return aSeconds - bSeconds;
       })
       .slice(0, 1); // Take only the single best match
+      
+    console.log(`🔍 MessageBubble - After filtering and sorting (best match):`, filtered);
+    return filtered;
   };
 
   const filteredSources = getFilteredSources(message.sources);
+  console.log(`🔍 MessageBubble - Filtered sources:`, {
+    messageId: message.id,
+    filteredSources,
+    filteredLength: filteredSources.length
+  });
   
-  const formatTimestamp = (timestamp: Date) => {
+  const formatTimestamp = (timestamp: Date | string | undefined) => {
+    if (!timestamp) {
+      return 'Just now';
+    }
+
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
+    const timestampDate = timestamp instanceof Date ? timestamp : new Date(timestamp);
+    
+    // Check if timestampDate is valid
+    if (isNaN(timestampDate.getTime())) {
+      console.warn('Invalid timestamp for message:', message.id);
+      return 'Just now';
+    }
+
+    const diffInMinutes = Math.floor((now.getTime() - timestampDate.getTime()) / (1000 * 60));
     
     if (diffInMinutes <= 0) return 'Just now';
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     
-    return timestamp.toLocaleTimeString('en-US', {
+    return timestampDate.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
@@ -76,9 +131,32 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
     document.body.removeChild(element);
   };
 
+  const stripMarkdown = (content: string) => {
+    return content
+      // Remove code blocks
+      .replace(/```[\s\S]*?```/g, '[code block]')
+      // Remove inline code
+      .replace(/`([^`]+)`/g, '$1')
+      // Remove headers
+      .replace(/^#{1,6}\s+(.*)$/gm, '$1')
+      // Remove bold/italic
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      // Remove links
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      // Remove list markers
+      .replace(/^\s*[-*+]\s+/gm, '• ')
+      // Remove numbered lists
+      .replace(/^\s*\d+\.\s+/gm, '• ')
+      // Clean up extra whitespace
+      .replace(/\n\s*\n/g, '\n')
+      .trim();
+  };
+
   const getPreviewText = (content: string, maxLength: number = 150) => {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
+    const plainText = stripMarkdown(content);
+    if (plainText.length <= maxLength) return plainText;
+    return plainText.substring(0, maxLength) + '...';
   };
 
   if (isCompactMode) {
@@ -133,8 +211,10 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              onClick={() => onClick?.(message)}
-              className={`relative px-4 py-3 rounded-2xl shadow-md cursor-pointer transition-all duration-200 hover:shadow-lg ${
+              onClick={() => message.role === 'assistant' && onClick?.(message)}
+              className={`relative px-4 py-3 rounded-2xl shadow-md transition-all duration-200 hover:shadow-lg ${
+                message.role === 'assistant' ? 'cursor-pointer' : 'cursor-default'
+              } ${
                 message.role === 'user'
                   ? `ml-6 ${
                       isSelected ? 'ring-2 ring-green-300 ring-offset-2' : ''
@@ -194,12 +274,22 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             </motion.div>
 
             {/* Source Panel for Assistant Messages - Only show when filtered sources exist */}
-            {message.role === 'assistant' && filteredSources.length > 0 && (
-              <>
-                {console.log(`💬 Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
-                <SourcePanel sources={filteredSources} />
-              </>
-            )}
+            {(() => {
+              const shouldShow = message.role === 'assistant' && filteredSources.length > 0;
+              console.log(`💬 SourcePanel render decision:`, {
+                messageRole: message.role,
+                filteredSourcesLength: filteredSources.length,
+                shouldShow,
+                messageId: message.id,
+                filteredSources
+              });
+              return shouldShow ? (
+                <>
+                  {console.log(`💬 Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
+                  <SourcePanel sources={filteredSources} />
+                </>
+              ) : null;
+            })()}
           </div>
         </div>
       </motion.div>
@@ -258,8 +348,10 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
             whileHover={{ scale: 1.01, boxShadow: message.role === 'user' ? '0 8px 25px rgba(78, 166, 116, 0.15)' : '0 8px 25px rgba(139, 92, 246, 0.15)' }}
-            onClick={() => onClick?.(message)}
-            className={`relative group px-5 py-4 rounded-2xl shadow-md cursor-pointer transition-all duration-200 ${
+            onClick={() => message.role === 'assistant' && onClick?.(message)}
+            className={`relative group px-5 py-4 rounded-2xl shadow-md transition-all duration-200 ${
+              message.role === 'assistant' ? 'cursor-pointer' : 'cursor-default'
+            } ${
               message.role === 'user'
                 ? 'ml-6'
                 : 'bg-white border border-slate-200 shadow-lg hover:border-green-200 hover:shadow-xl'
@@ -300,7 +392,23 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             )}
           </motion.div>
 
-          {/* Source Panel removed from compact cards - only shown in detail panel */}
+          {/* Source Panel for Assistant Messages - Only show when filtered sources exist */}
+          {(() => {
+            const shouldShow = message.role === 'assistant' && filteredSources.length > 0;
+            console.log(`💬 Full mode SourcePanel render decision:`, {
+              messageRole: message.role,
+              filteredSourcesLength: filteredSources.length,
+              shouldShow,
+              messageId: message.id,
+              filteredSources
+            });
+            return shouldShow ? (
+              <>
+                {console.log(`💬 Full mode Rendering SourcePanel with ${filteredSources.length} sources:`, filteredSources)}
+                <SourcePanel sources={filteredSources} />
+              </>
+            ) : null;
+          })()}
         </div>
       </div>
     </motion.div>

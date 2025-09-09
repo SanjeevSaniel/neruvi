@@ -28,9 +28,13 @@
 
 ✅ **Advanced RAG System Implementation**  
 ✅ **Real-time Chat Interface with Streaming**  
+✅ **Conversation Threading & Tracing System**  
+✅ **Role-Based Access Control (User/Moderator/Admin)**  
+✅ **Interactive Thread Visualization**  
 ✅ **Vector Embeddings & Semantic Search**  
 ✅ **HyDE (Hypothetical Document Embeddings)**  
 ✅ **Intelligent Context Rewriting**  
+✅ **Admin Dashboard with Analytics**  
 ✅ **Lavender Theme with Figtree Typography**  
 ✅ **61+ Course Content Chunks Processed**  
 
@@ -64,12 +68,14 @@ FlowMind's AI assistant is designed as a **focused learning companion** that exc
 #### **📊 Response Flow:**
 ```mermaid
 graph TD
-    A[User Question] --> B[RAG System Search]
-    B --> C[Local Course Database]
-    C --> D[Find Relevant Chunks]
-    D --> E[AI Synthesis]
-    E --> F[Response with Sources]
-    F --> G[Display Timestamps]
+    A[User Question] --> B[Threading System]
+    B --> C[RAG System Search]
+    C --> D[Local Course Database]
+    D --> E[Find Relevant Chunks]
+    E --> F[AI Synthesis]
+    F --> G[Response with Sources]
+    G --> H[Message Tracing]
+    H --> I[Display with Thread Context]
 ```
 
 ---
@@ -79,6 +85,15 @@ graph TD
 > 📊 **[View Complete Architecture Flow Diagram →](./docs/ARCHITECTURE.md)**
 
 ![FlowMind Architecture](./public/architecture-diagram.svg)
+
+### **Threading System Core**
+
+- **Conversation Threading**: Branch conversations from any message point
+- **Message Tracing**: Complete lineage tracking for all messages  
+- **Role-Based Access**: User/Moderator/Admin permission tiers
+- **Interactive Visualization**: Graph-based conversation flow display
+- **Thread Management**: Create, rename, archive, and delete threads
+- **Audit Logging**: Complete history of all threading operations
 
 ### **RAG System Core**
 
@@ -100,6 +115,90 @@ graph TD
 - **Tailwind CSS**: Custom Figtree font integration + Lavender theme
 - **Framer Motion**: Smooth animations and transitions
 - **Streaming UI**: Real-time response rendering
+- **Interactive Components**: Threading sidebar and visualization
+
+---
+
+## 🧵 **Threading System Implementation**
+
+> 📖 **[View Complete Threading Documentation →](./THREADING.md)**
+
+### **Core Features**
+
+#### **1. Conversation Branching**
+```typescript
+// Create alternative conversation paths from any message
+const { createBranch } = useThreadingStore();
+const newThreadId = await createBranch(sourceMessageId, 'Alternative Discussion');
+```
+
+#### **2. Message Lineage Tracking**  
+```typescript
+// Complete ancestry tracking for every message
+interface MessageTrace {
+  messageId: string;
+  threadId: string;
+  parentMessageId: string | null;
+  childMessageIds: string[];
+  lineage: string[];        // Complete conversation path
+  depth: number;           // Message depth in conversation
+  branchPoint?: BranchInfo; // If this message spawned branches
+}
+```
+
+#### **3. Role-Based Permissions**
+```typescript
+// Three-tier access control system
+type UserRole = 'user' | 'moderator' | 'admin';
+
+const permissions = {
+  user: {
+    canViewThreads: true,          // View own threads
+    canCreateBranches: false,      // No branching rights
+    canViewVisualization: false    // No advanced UI
+  },
+  moderator: {
+    canViewThreads: true,
+    canCreateBranches: true,       // Full thread management
+    canDeleteThreads: true,
+    canViewVisualization: true,    // Access to graph view
+    canModerateThreads: true
+  },
+  admin: {
+    // All moderator permissions plus:
+    canViewAllConversations: true, // Cross-user access
+    canExportThreadData: true,     // Data export rights
+    canViewAnalytics: true         // System analytics
+  }
+}
+```
+
+#### **4. Interactive Thread Visualization**
+- **Graph Display**: Node-based conversation flow visualization
+- **Dynamic Connections**: Real-time relationship mapping
+- **Branch Creation**: Click-to-branch from any message node
+- **Thread Navigation**: Visual thread switching interface
+- **Performance Optimized**: Efficient rendering for large conversation trees
+
+#### **5. Admin Analytics Dashboard**  
+```typescript
+interface ThreadAnalytics {
+  totalThreads: number;
+  activeThreads: number;
+  branchPoints: number;
+  averageDepth: number;
+  userActivity: ActivityMetric[];
+  popularTopics: TopicMetric[];
+}
+```
+
+### **Database Schema**
+```sql
+-- Core threading tables with optimized indexes
+conversation_threads: thread metadata and hierarchy
+message_traces: complete message lineage tracking  
+thread_actions: comprehensive audit log with undo support
+```
 
 ---
 

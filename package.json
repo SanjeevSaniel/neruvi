@@ -16,11 +16,14 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "test-db": "tsx src/scripts/test-database.ts"
+    "test-db": "tsx src/scripts/test-database.ts",
+    "check-db": "tsx src/scripts/check-database-tables.ts",
+    "migrate-users": "tsx src/scripts/migrate-existing-users.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.19",
     "@ai-sdk/react": "^2.0.22",
+    "@clerk/backend": "^2.10.1",
     "@clerk/nextjs": "^6.31.4",
     "@clerk/themes": "^2.4.13",
     "@neondatabase/serverless": "^1.0.1",
@@ -30,6 +33,7 @@
     "ai": "^5.0.22",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.5",
     "framer-motion": "^12.23.12",
@@ -45,6 +49,7 @@
     "react-hot-toast": "^2.6.0",
     "react-icons": "^5.5.0",
     "react-syntax-highlighter": "^15.6.3",
+    "svix": "^1.75.0",
     "tailwind-merge": "^3.3.1",
     "tsx": "^4.20.4",
     "zod": "^4.1.0",

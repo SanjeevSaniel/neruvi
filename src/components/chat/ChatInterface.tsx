@@ -1,9 +1,16 @@
 // components/chat/ChatInterface.tsx
 'use client';
 
+import StudentThreadView from '@/components/threading/StudentThreadView';
+import ThreadSidebar from '@/components/threading/ThreadSidebar';
+import ThreadVisualization from '@/components/threading/ThreadVisualization';
+import { hasThreadingPermission, UserRole } from '@/lib/threading/permissions';
 import { useConversationStore } from '@/store/conversationStore';
+import { useThreadingStore } from '@/store/threadingStore';
+import { useUser } from '@clerk/nextjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import ConversationSidebar from './ConversationSidebar';
@@ -13,21 +20,53 @@ import MessagesContainer from './MessagesContainer';
 import { Message, SourceTimestamp } from './types';
 import WelcomeScreen from './WelcomeScreen';
 
-export default function ChatInterface() {
+interface ChatInterfaceProps {
+  courseId?: CourseType;
+  conversationId?: string;
+}
+
+export default function ChatInterface({ courseId, conversationId }: ChatInterfaceProps = {}) {
+  console.log('🚀 ChatInterface component loaded:', {
+    courseIdProp: courseId,
+    conversationIdProp: conversationId,
+    timestamp: new Date().toISOString()
+  });
+  const { user } = useUser();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     getCurrentConversation,
     createConversation,
     addMessage,
     updateMessage,
     currentConversationId,
-    getOrCreateConversationForCourse,
+    setCurrentConversation,
+    loadConversation,
   } = useConversationStore();
+
+  const {
+    currentThreadId,
+    threads,
+    traces,
+    showThreadSidebar,
+    showThreadVisualization,
+    initializeConversationThreading,
+    createBranch,
+    switchThread,
+    deleteThread,
+    renameThread,
+    toggleThreadVisibility,
+    addMessageTrace,
+    setShowThreadSidebar,
+    loadConversationThreads,
+    updateThreadMessageCount,
+  } = useThreadingStore();
 
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [hasStartedChat, setHasStartedChat] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showCourseSelector, setShowCourseSelector] = useState(true); // Start with true to show course selector by default
+  const [showCourseSelector, setShowCourseSelector] = useState(!courseId); // Only show course selector if no courseId is provided
   const [isInitialLoad, setIsInitialLoad] = useState(true); // Track if this is the first load
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [messageDetailOpen, setMessageDetailOpen] = useState(false);
@@ -36,16 +75,64 @@ export default function ChatInterface() {
   );
   const [keepPanelOpen, setKeepPanelOpen] = useState(false);
   const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingContentRef = useRef<string>('');
+  // const pendingContentRef = useRef<string>('');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Threading permissions based on user role
+  const userRole: UserRole =
+    user?.publicMetadata?.role === 'admin'
+      ? 'admin'
+      : user?.publicMetadata?.role === 'moderator'
+      ? 'moderator'
+      : 'user';
+  // const threadingPermissions = getThreadingPermissions(userRole);
+  const canViewThreads = hasThreadingPermission(userRole, 'canViewThreads');
+  const canViewVisualization = hasThreadingPermission(
+    userRole,
+    'canViewVisualization',
+  );
+  // const canCreateBranches = hasThreadingPermission(
+  //   userRole,
+  //   'canCreateBranches',
+  // );
+  // const canNavigateThreads = hasThreadingPermission(
+  //   userRole,
+  //   'canNavigateThreads',
+  // );
+  const canToggleThreadView = hasThreadingPermission(
+    userRole,
+    'canToggleThreadView',
+  );
 
   // Get current conversation or create one if none exists
   const conversation = getCurrentConversation();
-  const messages = useMemo(() => conversation?.messages || [], [conversation]);
-  const selectedCourse = conversation?.selectedCourse || null;
+  
+  // Use courseId from prop, fallback to conversation course, then null
+  const selectedCourse = courseId || conversation?.selectedCourse || null;
+  
+  // Get suggestion from URL params if present
+  const suggestion = searchParams.get('suggestion');
+  
+  const messages = useMemo(() => {
+    const msgs = conversation?.messages || [];
+    console.log('🔍 Messages updated:', {
+      conversationId: conversation?.id,
+      messageCount: msgs.length,
+      userMessages: msgs.filter(m => m.role === 'user').length,
+      assistantMessages: msgs.filter(m => m.role === 'assistant').length,
+      messages: msgs.map((m) => ({
+        role: m.role,
+        content: m.content.substring(0, 50),
+        id: m.id,
+        timestamp: m.timestamp
+      })),
+    });
+    return msgs;
+  }, [conversation]);
 
-  // Check if we need course selection (no current conversation or conversation has messages but no course)
-  const needsCourseSelection = !currentConversationId || (!selectedCourse && messages.length === 0);
+  // Check if we need course selection - only when no conversation exists and no courseId prop
+  // If a conversation exists, we should show it regardless of course selection state
+  const needsCourseSelection = !currentConversationId && !courseId;
 
   // Check if we should show welcome screen (course selected but no messages yet)
   const shouldShowWelcome =
@@ -54,22 +141,44 @@ export default function ChatInterface() {
     messages.length === 0 &&
     !showCourseSelector;
 
+  // Calculate if we should show thread button
+  const shouldShowThreadButton =
+    !!currentConversationId &&
+    !!conversation &&
+    !showCourseSelector &&
+    !needsCourseSelection &&
+    !shouldShowWelcome;
+
   // Debug logging
-  console.log('🔍 ChatInterface state:', {
+  console.log('🔍 ChatInterface render state:', {
+    courseIdProp: courseId,
+    conversationIdProp: conversationId,
     currentConversationId,
     selectedCourse,
     messagesLength: messages.length,
     needsCourseSelection,
     shouldShowWelcome,
     showCourseSelector,
-    hasStartedChat
+    hasStartedChat,
+    shouldShowThreadButton,
+    suggestion,
+    inputValue: input,
+    // Threading state
+    canViewThreads,
+    currentThreadId,
+    threadsCount: threads.length,
+    showThreadSidebar,
+    renderDecision: {
+      willShowThreadVisualization: showThreadVisualization,
+      willShowCourseSelector: showCourseSelector || needsCourseSelection,
+      willShowWelcome: shouldShowWelcome,
+      willShowChat: !showThreadVisualization && !(showCourseSelector || needsCourseSelection) && !shouldShowWelcome
+    }
   });
 
-  // Handle header click to show course selector
+  // Handle header click to navigate to home page
   const handleHeaderClick = () => {
-    setShowCourseSelector(true);
-    setMessageDetailOpen(false); // Close message detail panel
-    setSelectedMessage(null);
+    router.push('/');
   };
 
   const handleMessageClick = (message: Message) => {
@@ -91,25 +200,112 @@ export default function ChatInterface() {
   // }, [currentConversationId, createConversation]);
 
   // Track previous conversation ID to detect actual conversation changes
-  const prevConversationIdRef = useRef<string | null>(null);
+  const prevConversationIdRef = useRef<string | null>(currentConversationId);
+
+  // Initialize threading when conversation changes
+  useEffect(() => {
+    console.log('🧵 Threading useEffect triggered:', {
+      currentConversationId,
+      previousConversationId: prevConversationIdRef.current,
+      canViewThreads,
+      currentThreadId,
+      threadsCount: threads.length
+    });
+    
+    const initializeThreading = async () => {
+      const conversation = getCurrentConversation();
+      console.log('🧵 Threading initialization check:', {
+        hasConversation: !!conversation,
+        conversationId: conversation?.id,
+        previousId: prevConversationIdRef.current,
+        isNewConversation: conversation && conversation.id !== prevConversationIdRef.current,
+        canViewThreads,
+        currentThreadId
+      });
+      
+      if (conversation && conversation.id !== prevConversationIdRef.current) {
+        console.log('🧵 New conversation detected, initializing threading:', {
+          conversationId: conversation.id,
+          previousId: prevConversationIdRef.current,
+          canViewThreads,
+          currentThreadId,
+          messageCount: conversation.messages?.length || 0
+        });
+        
+        // Initialize threading for this conversation
+        if (canViewThreads) {
+          loadConversationThreads(conversation.id);
+
+          // Initialize threading for any conversation, with or without messages
+          // Always initialize for new conversations, regardless of currentThreadId
+          console.log('🧵 Checking if threading needs initialization:', {
+            currentThreadId,
+            shouldInitialize: !currentThreadId || currentThreadId !== conversation.id
+          });
+          
+          if (!currentThreadId) {
+            const firstMessageId = conversation.messages.length > 0 ? conversation.messages[0]?.id : undefined;
+            if (conversation.id) {
+              console.log(
+                '🔗 Initializing threading for conversation:',
+                conversation.id,
+                firstMessageId ? `with first message: ${firstMessageId}` : 'without messages (new conversation)',
+              );
+              try {
+                await initializeConversationThreading(
+                  conversation.id,
+                  firstMessageId,
+                );
+              } catch (error) {
+                console.error(
+                  '❌ Error initializing conversation threading:',
+                  error,
+                );
+              }
+            } else {
+              console.warn('⚠️ Cannot initialize threading - missing conversation ID');
+            }
+          }
+        }
+        
+        // Update the ref to prevent re-initialization
+        prevConversationIdRef.current = conversation.id;
+      }
+    };
+
+    initializeThreading();
+  }, [
+    currentConversationId,
+    getCurrentConversation,
+    canViewThreads,
+    loadConversationThreads,
+    initializeConversationThreading,
+    currentThreadId,
+  ]);
 
   // Reset chat state when conversation changes
   useEffect(() => {
     const conversation = getCurrentConversation();
     if (conversation) {
-      console.log('🔄 Conversation changed:', conversation.id, 'Messages:', conversation.messages.length);
+      console.log(
+        '🔄 Conversation changed:',
+        conversation.id,
+        'Messages:',
+        conversation.messages.length,
+      );
       setHasStartedChat(conversation.messages.length > 0);
-      
-      // Only hide course selector when actually switching conversations, not on initial load
+
+      // When switching to an existing conversation (from history), always hide course selector
       const conversationChanged =
-        prevConversationIdRef.current !== null &&
         prevConversationIdRef.current !== currentConversationId;
-      
-      if (conversationChanged) {
-        console.log('👥 Conversation switched - hiding course selector');
-        setShowCourseSelector(false); // Hide course selector when switching conversations
+
+      if (conversationChanged && prevConversationIdRef.current !== null) {
+        console.log(
+          '👥 Conversation switched from history - hiding course selector',
+        );
+        setShowCourseSelector(false); // Always hide course selector when switching from history
         setIsInitialLoad(false); // Mark as no longer initial load
-        
+
         if (!streamingMessage && !keepPanelOpen) {
           setMessageDetailOpen(false);
           setSelectedMessage(null);
@@ -134,17 +330,111 @@ export default function ChatInterface() {
     }
   }, [needsCourseSelection, showCourseSelector]);
 
-  // Ensure course selector is shown on initial load, regardless of stored state
+  // Handle initial load state
   useEffect(() => {
     if (isInitialLoad) {
-      setShowCourseSelector(true);
+      // Only show course selector if there's no current conversation AND no courseId prop
+      if (!currentConversationId && !courseId) {
+        setShowCourseSelector(true);
+      } else if (courseId) {
+        // If courseId is provided, never show course selector
+        setShowCourseSelector(false);
+      }
       // Mark initial load as complete after a short delay to allow store to load
       const timer = setTimeout(() => {
         setIsInitialLoad(false);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isInitialLoad]);
+  }, [isInitialLoad, currentConversationId, courseId]);
+
+  // Handle courseId prop - create conversation if courseId is provided but no conversation exists
+  useEffect(() => {
+    console.log('🔍 ChatInterface - courseId useEffect triggered:', {
+      courseId,
+      currentConversationId,
+      suggestion,
+      hasCurrentConversation: !!currentConversationId,
+      shouldCreateConversation: courseId && !currentConversationId
+    });
+
+    const createCourseConversation = async () => {
+      if (courseId && !currentConversationId) {
+        console.log('🆕 Creating conversation for courseId:', courseId);
+        try {
+          const conversationId = await createConversation(undefined, courseId);
+          console.log('✅ Conversation created successfully:', conversationId);
+          setShowCourseSelector(false);
+          setIsInitialLoad(false);
+          
+          // If there's a suggestion in URL, set it as input for user to submit
+          if (suggestion) {
+            console.log('📝 Setting suggestion as input:', suggestion);
+            setInput(suggestion);
+          }
+        } catch (error) {
+          console.error('❌ Failed to create conversation for course:', error);
+        }
+      } else {
+        console.log('ℹ️ Skipping conversation creation:', {
+          reason: !courseId ? 'No courseId' : 'Conversation already exists',
+          courseId,
+          currentConversationId
+        });
+      }
+    };
+
+    createCourseConversation();
+  }, [courseId, currentConversationId, createConversation, suggestion, setInput]);
+
+  // Handle conversationId prop - load specific conversation
+  useEffect(() => {
+    if (conversationId && conversationId !== currentConversationId) {
+      console.log('🔄 Loading conversation from URL:', conversationId);
+      setCurrentConversation(conversationId);
+      setShowCourseSelector(false);
+      setIsInitialLoad(false);
+    }
+  }, [conversationId, currentConversationId, setCurrentConversation]);
+
+  // Handle suggestion when conversationId is provided (from suggestions page)
+  useEffect(() => {
+    if (conversationId && suggestion && currentConversationId === conversationId) {
+      console.log('📝 Setting suggestion as input for existing conversation:', {
+        conversationId,
+        suggestion
+      });
+      setInput(suggestion);
+    }
+  }, [conversationId, suggestion, currentConversationId, setInput]);
+
+  // Handle conversation loading when conversationId is provided
+  useEffect(() => {
+    if (courseId && conversationId) {
+      console.log('🔍 ChatInterface - Loading conversation:', {
+        courseId,
+        conversationId,
+        currentConversationId
+      });
+      
+      // Load the conversation if it's not already the current one or if it doesn't have messages
+      if (conversationId !== currentConversationId || !getCurrentConversation()?.messages.length) {
+        loadConversation(conversationId);
+        setCurrentConversation(conversationId);
+      }
+    }
+  }, [courseId, conversationId, loadConversation, setCurrentConversation, currentConversationId, getCurrentConversation]);
+
+  // Reset component state when navigating with courseId but no conversation
+  useEffect(() => {
+    if (courseId && !conversationId && !currentConversationId) {
+      console.log('🔄 Resetting state for course page:', courseId);
+      setShowCourseSelector(false);
+      setIsInitialLoad(false);
+      setMessageDetailOpen(false);
+      setSelectedMessage(null);
+    }
+  }, [courseId, conversationId, currentConversationId]);
 
   const scrollToBottom = (forceBehavior: 'smooth' | 'instant' = 'smooth') => {
     if (messagesContainerRef.current) {
@@ -160,19 +450,21 @@ export default function ChatInterface() {
     if (messagesContainerRef.current) {
       const attemptScroll = (retries = 3) => {
         if (!messagesContainerRef.current || retries <= 0) return;
-        
+
         const container = messagesContainerRef.current;
-        const targetScrollTop = container.scrollHeight - container.clientHeight;
-        
+        // const targetScrollTop = container.scrollHeight - container.clientHeight;
+
         // Scroll to bottom
         container.scrollTop = container.scrollHeight;
-        
+
         // Verify we actually reached the bottom and retry if not
         setTimeout(() => {
           if (messagesContainerRef.current) {
             const currentScrollTop = messagesContainerRef.current.scrollTop;
-            const actualTarget = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.clientHeight;
-            
+            const actualTarget =
+              messagesContainerRef.current.scrollHeight -
+              messagesContainerRef.current.clientHeight;
+
             // If we're not within 10px of the bottom, try again
             if (Math.abs(currentScrollTop - actualTarget) > 10) {
               attemptScroll(retries - 1);
@@ -180,7 +472,7 @@ export default function ChatInterface() {
           }
         }, 20);
       };
-      
+
       // Use RAF to ensure DOM updates, then attempt scroll with retries
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -201,14 +493,14 @@ export default function ChatInterface() {
     if (streamingMessage) {
       scrollToBottomDuringStreaming();
     }
-  }, [streamingMessage?.content]);
+  }, [streamingMessage?.content, streamingMessage]);
 
   // More aggressive scroll effect specifically for streaming content changes
   useEffect(() => {
     if (streamingMessage?.content) {
       // Use multiple timing strategies to ensure scroll reaches bottom
       const scrollAttempts = [0, 50, 100, 200]; // Multiple attempts with different delays
-      
+
       scrollAttempts.forEach((delay) => {
         setTimeout(() => {
           if (messagesContainerRef.current) {
@@ -220,26 +512,31 @@ export default function ChatInterface() {
     }
   }, [streamingMessage?.content]);
 
-  const safeFormatTimestamp = (timestamp: string): string => {
-    if (!timestamp || timestamp.includes('NaN') || timestamp === 'undefined') {
-      return '0:00';
-    }
-    const parts = timestamp.split(':');
-    if (parts.length === 2 && !parts.some((part) => isNaN(Number(part)))) {
-      const minutes = parseInt(parts[0]);
-      const seconds = parseInt(parts[1]);
-      if (minutes >= 0 && seconds >= 0) {
-        return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      }
-    }
-    return '0:00';
-  };
+  // const safeFormatTimestamp = (timestamp: string): string => {
+  //   if (!timestamp || timestamp.includes('NaN') || timestamp === 'undefined') {
+  //     return '0:00';
+  //   }
+  //   const parts = timestamp.split(':');
+  //   if (parts.length === 2 && !parts.some((part) => isNaN(Number(part)))) {
+  //     const minutes = parseInt(parts[0]);
+  //     const seconds = parseInt(parts[1]);
+  //     if (minutes >= 0 && seconds >= 0) {
+  //       return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  //     }
+  //   }
+  //   return '0:00';
+  // };
 
-  const handleCourseSelect = (course: CourseType) => {
-    // Get or create a conversation specific to this course
-    getOrCreateConversationForCourse(course);
-    setShowCourseSelector(false); // Hide selector after selection
-    setIsInitialLoad(false); // Mark that user has interacted
+  const handleCourseSelect = async (course: CourseType) => {
+    try {
+      // Always create a NEW conversation for the selected course
+      console.log('🆕 Creating new conversation for course:', course);
+      await createConversation(undefined, course);
+      setShowCourseSelector(false); // Hide selector after selection
+      setIsInitialLoad(false); // Mark that user has interacted
+    } catch (error) {
+      console.error('Failed to select course:', error);
+    }
   };
 
   const handleSuggestionClick = async (
@@ -247,39 +544,131 @@ export default function ChatInterface() {
     course: CourseType,
   ) => {
     console.log('🚀 Starting conversation:', suggestion, '- Course:', course);
-    
+    console.log('🔍 Debug - Suggestion text:', {
+      suggestion,
+      suggestionType: typeof suggestion,
+      suggestionLength: suggestion?.length,
+      suggestionTrimmed: suggestion?.trim(),
+    });
+
     try {
-      // Ensure we have the right conversation for this course (this updates selectedCourse)
-      const conversationId = getOrCreateConversationForCourse(course);
-      
+      // Validate suggestion text
+      if (!suggestion || !suggestion.trim()) {
+        console.error('❌ Invalid suggestion text:', suggestion);
+        return;
+      }
+
+      // Create a NEW conversation for this suggestion and course
+      const conversationId = await createConversation(undefined, course);
+      console.log(
+        '🆕 Created new conversation for suggestion:',
+        conversationId,
+      );
+
+      // Ensure conversation is set before proceeding
+      if (!conversationId) {
+        console.error('❌ Failed to create conversation');
+        return;
+      }
+
       // Update states immediately
-      setShowCourseSelector(false); // Hide selector after selection  
+      setShowCourseSelector(false); // Hide selector after selection
       setIsInitialLoad(false); // Mark that user has interacted
       setHasStartedChat(true); // Mark chat as started immediately
 
       // Start the chat immediately with the suggestion
-      await handleSubmit(suggestion);
+      await handleSubmit(suggestion.trim());
     } catch (error) {
       console.error('❌ Error in handleSuggestionClick:', error);
     }
   };
 
   const handleSubmit = async (inputText: string) => {
-    if (!inputText.trim() || isLoading) return;
+    console.log('🔍 handleSubmit called with:', {
+      inputText,
+      inputType: typeof inputText,
+      inputLength: inputText?.length,
+      trimmed: inputText?.trim(),
+      isLoading,
+      currentConversationId,
+    });
+
+    // Enhanced validation
+    if (!inputText || typeof inputText !== 'string') {
+      console.error('❌ handleSubmit received invalid input:', { inputText, type: typeof inputText });
+      return;
+    }
+    
+    if (!inputText.trim() || isLoading) {
+      console.log('🔍 handleSubmit early return:', { trimmed: inputText.trim(), isLoading });
+      return;
+    }
+    
+    // Clear input immediately at the start to provide instant feedback
+    setInput('');
+    
     if (!hasStartedChat) setHasStartedChat(true);
 
-    const conversationId = currentConversationId || createConversation();
+    let conversationId = currentConversationId;
+    console.log('🔍 Current conversation state:', {
+      currentConversationId,
+      hasConversation: !!conversation,
+      conversationIdInDb: conversation?.id,
+    });
+
+    if (!conversationId) {
+      const course = selectedCourse || 'nodejs'; // Default to nodejs
+      conversationId = await createConversation(undefined, course);
+      console.log('🔍 Created new conversation:', conversationId);
+    }
+
+    // Ensure conversationId is valid
+    if (!conversationId) {
+      console.error('❌ No valid conversationId available');
+      return;
+    }
+
+    const trimmedContent = inputText.trim();
+    if (!trimmedContent) {
+      console.error('❌ Content is empty after trimming:', { original: inputText, trimmed: trimmedContent });
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputText,
+      content: trimmedContent,
       timestamp: new Date(),
       sources: [],
     };
 
-    addMessage(conversationId, userMessage);
-    setInput(''); // Clear input box immediately after sending
+    console.log('🔍 Debug - Adding message:', {
+      conversationId,
+      messageRole: userMessage.role,
+      messageContent: userMessage.content,
+      messageContentType: typeof userMessage.content,
+      hasConversationId: !!conversationId,
+      fullMessage: userMessage,
+    });
+
+    try {
+      await addMessage(conversationId, userMessage);
+      console.log('✅ Message added successfully');
+    } catch (messageError) {
+      console.error('❌ Failed to add message:', messageError);
+      return;
+    }
+
+    // Add message trace and update thread if threading is enabled
+    if (canViewThreads && currentThreadId) {
+      const parentMessageId =
+        messages.length > 0 ? messages[messages.length - 1].id : null;
+      await addMessageTrace(userMessage.id, currentThreadId, parentMessageId);
+      
+      // Update thread message count and current message
+      updateThreadMessageCount(currentThreadId, userMessage.id);
+    }
+
     setIsLoading(true);
 
     let accumulatedContent = ''; // Move to broader scope
@@ -309,7 +698,10 @@ export default function ChatInterface() {
         try {
           const parsedSources = JSON.parse(sourcesHeader);
           sources = parsedSources; // Use exact timestamps from API
-          console.log(`🔍 Frontend received ${sources.length} sources:`, sources);
+          console.log(
+            `🔍 Frontend received ${sources.length} sources:`,
+            sources,
+          );
         } catch (error) {
           console.error('Error parsing sources:', error);
           // Continue without sources - deployment compatibility
@@ -331,7 +723,19 @@ export default function ChatInterface() {
         sources,
       };
 
-      addMessage(conversationId, assistantMessage);
+      // Note: Assistant message will be saved after streaming completes with final content
+
+      // Add message trace for assistant message if threading is enabled
+      if (canViewThreads && currentThreadId) {
+        await addMessageTrace(
+          assistantMessage.id,
+          currentThreadId,
+          userMessage.id,
+        );
+        
+        // Update thread message count and current message
+        updateThreadMessageCount(currentThreadId, assistantMessage.id);
+      }
 
       // Auto-show the right panel when streaming starts
       setStreamingMessage(assistantMessage);
@@ -373,11 +777,12 @@ export default function ChatInterface() {
 
               // Ensure scrolling stays at bottom during content updates
               scrollToBottomDuringStreaming();
-              
+
               // Additional immediate scroll with setTimeout to catch any DOM delays
               setTimeout(() => {
                 if (messagesContainerRef.current) {
-                  messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+                  messagesContainerRef.current.scrollTop =
+                    messagesContainerRef.current.scrollHeight;
                 }
               }, 20);
             }
@@ -400,19 +805,21 @@ export default function ChatInterface() {
           const chunk = decoder.decode(value, { stream: true });
           accumulatedContent += chunk;
           updateStreamingContent(accumulatedContent);
-          
+
           // Multiple scroll triggers for new stream chunks to ensure we reach bottom
           scrollToBottomDuringStreaming();
-          
+
           // Immediate scroll
           if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+            messagesContainerRef.current.scrollTop =
+              messagesContainerRef.current.scrollHeight;
           }
-          
+
           // Delayed scroll to catch any rendering delays
           setTimeout(() => {
             if (messagesContainerRef.current) {
-              messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+              messagesContainerRef.current.scrollTop =
+                messagesContainerRef.current.scrollHeight;
             }
           }, 30);
         }
@@ -426,6 +833,11 @@ export default function ChatInterface() {
       // Set final content and ensure display catches up
       if (assistantMessage) {
         displayContent = accumulatedContent;
+        console.log('🔄 Updating assistant message with final content:', {
+          messageId: assistantMessage.id,
+          finalContentLength: accumulatedContent.length,
+          conversationId
+        });
         updateMessage(conversationId, assistantMessage.id, accumulatedContent);
 
         // Create final message object for panel
@@ -435,7 +847,7 @@ export default function ChatInterface() {
         };
 
         setStreamingMessage(finalMessage);
-        
+
         // Final scroll to bottom after streaming completes
         setTimeout(() => scrollToBottom('instant'), 100);
       }
@@ -449,7 +861,7 @@ export default function ChatInterface() {
         timestamp: new Date(),
         sources: [],
       };
-      addMessage(conversationId, errorMsg);
+      await addMessage(conversationId, errorMsg);
 
       // If we were streaming and got an error, show the error in the panel
       if (streamingMessage) {
@@ -458,28 +870,60 @@ export default function ChatInterface() {
     } finally {
       setIsLoading(false);
       // Clear streaming state when done but keep panel open with final message
-      setTimeout(() => {
+      setTimeout(async () => {
         // Create final message from the accumulated content if assistantMessage exists
-        if (assistantMessage) {
+        if (assistantMessage && accumulatedContent) {
           const finalMessage: Message = {
             ...assistantMessage,
             content: accumulatedContent,
           };
 
+          // CRITICAL: Persist the final assistant message to database
+          console.log('🤖 About to save final assistant message:', {
+            conversationId,
+            messageId: assistantMessage.id,
+            role: assistantMessage.role,
+            contentLength: accumulatedContent.length,
+            sources: assistantMessage.sources?.length || 0,
+            timestamp: assistantMessage.timestamp
+          });
+
+          try {
+            // Only add message if it doesn't already exist in the messages array
+            const existingMessage = messages.find(msg => msg.id === assistantMessage.id);
+            if (!existingMessage) {
+              await addMessage(conversationId, finalMessage);
+              console.log('✅ Final assistant message saved successfully:', assistantMessage.id);
+            } else {
+              console.log('ℹ️ Assistant message already exists, skipping duplicate save');
+            }
+          } catch (assistantSaveError) {
+            console.error('❌ Failed to save final assistant message:', assistantSaveError);
+            console.error('💥 Final assistant message data:', finalMessage);
+          }
+
           // Clear streaming state but keep panel open
           setStreamingMessage(null);
           setSelectedMessage(finalMessage);
           setMessageDetailOpen(true); // Explicitly ensure panel stays open
-          
+
           // Final scroll after streaming state is cleared
           scrollToBottom('smooth');
+        } else {
+          // Just clear streaming state if no valid message
+          setStreamingMessage(null);
         }
       }, 500);
     }
   };
 
   return (
-    <div className='h-screen flex flex-col overflow-hidden relative' style={{background: 'linear-gradient(to bottom right, #bde0ca, #dcefe2, #459071)'}}>
+    <div
+      className='h-screen flex flex-col overflow-hidden relative'
+      style={{
+        background:
+          'linear-gradient(to bottom right, #bde0ca, #dcefe2, #459071)',
+      }}>
       <div className='absolute inset-0 bg-gradient-to-tr from-green-100/50 via-transparent to-green-200/30 animate-pulse'></div>
 
       <ConversationSidebar
@@ -491,21 +935,81 @@ export default function ChatInterface() {
         <ChatHeader
           onOpenSidebar={() => setSidebarOpen(true)}
           onHeaderClick={handleHeaderClick}
+          canToggleThreadView={canToggleThreadView}
+          userRole={userRole}
+          showThreadSidebar={showThreadSidebar}
+          onToggleThreadSidebar={setShowThreadSidebar}
+          threadsCount={threads.length}
+          hasActiveConversation={!!currentConversationId && !!conversation}
         />
       </div>
 
       <div className='flex-1 flex min-h-0 relative z-10'>
+        {/* Thread Sidebar - Only for admin/moderator */}
+        <AnimatePresence mode='wait'>
+          {showThreadSidebar && canViewThreads && (
+            <motion.div
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className='w-[300px] border-r border-slate-200 bg-white'>
+              {userRole === 'user' ? (
+                // Student-friendly read-only thread view
+                <>
+                  {console.log('🔍 ChatInterface Debug - Passing threads to StudentThreadView:', {
+                    threadsCount: threads.length,
+                    threads: threads.map(t => ({ id: t.id, name: t.name, isMainThread: t.isMainThread })),
+                    currentThreadId,
+                    hasActiveConversation: !!currentConversationId && !!conversation,
+                    messageCount: messages.length
+                  })}
+                  <StudentThreadView
+                    threads={threads}
+                    currentThreadId={currentThreadId || ''}
+                    onThreadSwitch={switchThread}
+                    hasActiveConversation={
+                      !!currentConversationId && !!conversation
+                    }
+                    messageCount={messages.length}
+                  />
+                </>
+              ) : (
+                // Admin/Moderator full management view
+                <ThreadSidebar
+                  threads={threads}
+                  currentThreadId={currentThreadId || ''}
+                  onThreadSwitch={switchThread}
+                  onCreateBranch={createBranch}
+                  onDeleteThread={deleteThread}
+                  onRenameThread={renameThread}
+                  onToggleThreadVisibility={toggleThreadVisibility}
+                />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Main Content Area */}
-        <motion.div
-          animate={{
-            width: messageDetailOpen ? '50%' : '100%',
-          }}
-          transition={{
-            duration: 0.4,
-            ease: [0.25, 0.46, 0.45, 0.94],
-          }}
-          className='flex justify-center'>
-          {showCourseSelector || needsCourseSelection ? (
+        <div className='flex-1 flex justify-center min-w-0'>
+          {showThreadVisualization && canViewVisualization ? (
+            // Thread Visualization - Only for admin/moderator
+            <div className='w-full h-full'>
+              <ThreadVisualization
+                threads={threads}
+                traces={traces}
+                currentThreadId={currentThreadId || ''}
+                onThreadSwitch={switchThread}
+                onCreateBranch={createBranch}
+                onRegenerateMessage={async (messageId: string) => {
+                  // Handle message regeneration
+                  console.log('Regenerate message:', messageId);
+                }}
+                onDeleteThread={deleteThread}
+                messages={messages}
+              />
+            </div>
+          ) : showCourseSelector || needsCourseSelection ? (
             // Full screen course selection
             <div className='w-full h-full flex flex-col'>
               <CourseSelector
@@ -557,23 +1061,23 @@ export default function ChatInterface() {
               </motion.div>
             </div>
           )}
-        </motion.div>
+        </div>
 
-        {/* Message Detail Panel - Side by side - Only show in chat interface */}
+        {/* Message Detail Panel - Side by side - Only show in chat interface when not in visualization mode */}
         <AnimatePresence>
           {messageDetailOpen &&
             !needsCourseSelection &&
-            !showCourseSelector && (
+            !showCourseSelector &&
+            !showThreadVisualization && (
               <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: '50%', opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
+                initial={{ x: '100%', opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: '100%', opacity: 0 }}
                 transition={{
-                  duration: 0.4,
-                  ease: [0.25, 0.46, 0.45, 0.94],
-                  opacity: { duration: 0.3 },
+                  duration: 0.3,
+                  ease: 'easeInOut',
                 }}
-                className='overflow-hidden'>
+                className='w-1/2 bg-white border-l border-slate-200'>
                 <MessageDetailPanel
                   message={streamingMessage || selectedMessage}
                   isOpen={messageDetailOpen}

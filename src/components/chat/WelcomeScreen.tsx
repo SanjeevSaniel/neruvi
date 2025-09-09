@@ -68,11 +68,22 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
   const suggestions = getSuggestions(selectedCourse);
 
   const handleSuggestionClick = async (text: string) => {
-    if (isSubmitting) return;
+    console.log('🔍 WelcomeScreen handleSuggestionClick called with:', {
+      text,
+      textType: typeof text,
+      textLength: text?.length,
+      trimmed: text?.trim(),
+      isSubmitting
+    });
+    
+    if (isSubmitting || !text || !text.trim()) {
+      console.warn('⚠️ Suggestion click ignored:', { isSubmitting, text: text?.trim() });
+      return;
+    }
     
     setIsSubmitting(true);
     try {
-      await onSubmit(text);
+      await onSubmit(text.trim());
     } catch (error) {
       console.error('Error starting conversation:', error);
     } finally {
@@ -306,7 +317,14 @@ const SuggestionCard = ({
         boxShadow: disabled ? 'none' : `0 8px 25px ${colors.shadowColor}`
       }}
       whileTap={{ scale: disabled ? 1 : 0.98 }}
-      onClick={() => !disabled && onClick(suggestion.text)}
+      onClick={() => {
+        console.log('🔍 SuggestionCard click:', { 
+          disabled, 
+          suggestionText: suggestion.text,
+          suggestionData: suggestion 
+        });
+        if (!disabled) onClick(suggestion.text);
+      }}
       disabled={disabled}
       className='p-4 bg-white/95 backdrop-blur-sm rounded-xl text-left transition-all duration-300 disabled:opacity-50'
       style={{
