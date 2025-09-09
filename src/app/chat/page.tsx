@@ -1,13 +1,6 @@
-import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
-import ChatInterface from '@/components/chat/ChatInterface';
 
 export default async function ChatPage() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    redirect('/sign-in');
-  }
-
-  return <ChatInterface />;
+  // Redirect /chat to the main page (which now shows the course selector)
+  redirect('/');
 }
