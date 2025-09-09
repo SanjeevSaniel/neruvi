@@ -10,30 +10,60 @@ interface SourcePanelProps {
 }
 
 export default function SourcePanel({ sources }: SourcePanelProps) {
+  console.log('🔍 SourcePanel - Received sources:', {
+    sources,
+    sourcesLength: sources?.length || 0,
+    sourcesData: sources?.map(s => ({
+      course: s.course,
+      section: s.section,
+      timestamp: s.timestamp,
+      relevance: s.relevance,
+      videoId: s.videoId
+    }))
+  });
+
   // Filter sources to show the most relevant single reference
+  // Sources from API are already sorted by score (highest first)
   const filteredSources = sources
     .filter(source => {
-      // Show sources with relevance percentage >= 40% or sources without percentage
+      // Show sources with relevance percentage >= 35% or sources without percentage
       const relevanceMatch = source.relevance.match(/(\d+)%?/);
       if (relevanceMatch) {
         const percentage = parseInt(relevanceMatch[1]);
-        return percentage >= 40;
+        return percentage >= 35; // Consistent threshold for quality sources
       }
       // Keep sources without percentage (assume they're relevant)
       return true;
     })
     .sort((a, b) => {
-      // Sort by relevance score, highest first
+      // Sort by relevance score, highest first, with tie-breakers for deterministic results
       const aMatch = a.relevance.match(/(\d+)%?/);
       const bMatch = b.relevance.match(/(\d+)%?/);
-      const aScore = aMatch ? parseInt(aMatch[1]) : 0;
-      const bScore = bMatch ? parseInt(bMatch[1]) : 0;
-      return bScore - aScore;
+      const aScore = aMatch ? parseInt(aMatch[1]) : 100; // Default high score for non-percentage
+      const bScore = bMatch ? parseInt(bMatch[1]) : 100; // Default high score for non-percentage
+      
+      if (bScore !== aScore) {
+        return bScore - aScore; // Higher score first
+      }
+      
+      // If scores are equal, prefer earlier timestamps (more foundational content)
+      const aTime = a.timestamp.split(':').map(Number);
+      const bTime = b.timestamp.split(':').map(Number);
+      const aSeconds = (aTime[0] || 0) * 60 + (aTime[1] || 0);
+      const bSeconds = (bTime[0] || 0) * 60 + (bTime[1] || 0);
+      return aSeconds - bSeconds;
     })
     .slice(0, 1); // Take only the single best match
 
+  console.log('🔍 SourcePanel - After filtering:', {
+    filteredSources,
+    filteredLength: filteredSources.length,
+    shouldRender: filteredSources.length > 0
+  });
+
   // If no high-quality sources, don't render the panel
   if (filteredSources.length === 0) {
+    console.log('⚠️ SourcePanel - No sources to display, returning null');
     return null;
   }
 
@@ -166,6 +196,15 @@ const SourceItem = ({
   source: SourceTimestamp;
   showCourse?: boolean;
 }) => {
+  console.log('🔍 SourceItem rendering:', {
+    course: source.course,
+    section: source.section,
+    timestamp: source.timestamp,
+    relevance: source.relevance,
+    videoId: source.videoId,
+    showCourse
+  });
+
   // Check if relevance is a reason text or percentage
   const isPercentage = /^\d+\.?\d*$/.test(source.relevance);
 
@@ -232,8 +271,12 @@ const SourceItem = ({
         <span className='text-slate-400'>•</span>
         <button
           onClick={handleTimestampClick}
-          className='font-mono px-2 py-1 rounded transition-colors cursor-pointer'
-          style={{color: '#459071', backgroundColor: '#f0f9f3'}}
+          className='font-mono px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer hover:shadow-md border font-semibold'
+          style={{
+            color: '#2d6b3d', 
+            backgroundColor: '#e8f5e8',
+            borderColor: '#4ea674'
+          }}
           title={`Jump to ${source.timestamp} in ${source.course}`}>
           <Clock className='w-3 h-3 inline mr-1' />
           {source.timestamp}
