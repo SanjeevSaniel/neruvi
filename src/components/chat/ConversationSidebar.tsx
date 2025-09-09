@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, Trash2, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useConversationStore } from '@/store/conversationStore';
 
 interface ConversationSidebarProps {
@@ -12,6 +13,7 @@ export default function ConversationSidebar({
   isOpen,
   onClose,
 }: ConversationSidebarProps) {
+  const router = useRouter();
   const {
     conversations,
     currentConversationId,
@@ -153,7 +155,10 @@ export default function ConversationSidebar({
                             messageCount: conversation.messages.length,
                             firstMessage: conversation.messages[0]?.content.substring(0, 50)
                           });
-                          setCurrentConversation(conversation.id);
+                          
+                          // Navigate to the conversation URL instead of just setting current conversation
+                          const courseId = conversation.selectedCourse || 'nodejs';
+                          router.push(`/chat/courses/${courseId}/${conversation.id}`);
                           onClose();
                         }}
                         onMouseEnter={() => setHoveredId(conversation.id)}
