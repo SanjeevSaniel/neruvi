@@ -1,6 +1,38 @@
 # FlowMind Chat App - Changelog
 
-## [Latest] Speech Recognition & UI Improvements
+## [Latest - 2025-01-09] Complete Navigation & Routing Overhaul
+
+### 🔄 **Major Architecture Changes**
+- **Complete Routing Restructure**: Migrated from state-based to dynamic routing with Next.js App Router
+- **Three-Step Flow Implementation**: Homepage → Suggestions → Individual Conversations
+- **Conversation-Level URLs**: Each conversation now has unique URLs (`/chat/courses/[courseId]/[conversationId]`)
+- **Scalable Course Management**: Easy addition of new courses and content
+
+### 🎯 **Navigation Flow Enhancement**
+- **Homepage Redesign**: Clean course selection with green theme restoration
+- **Suggestions Page**: Dedicated course-specific topic suggestions with conversation creation
+- **Direct Chat Navigation**: Automatic conversation creation and navigation to chat interface
+- **URL-Based State Management**: Suggestions passed via URL parameters for better UX
+
+### 🔧 **Source Reference System**
+- **Timestamp Display Fix**: Course video timestamps now properly display (e.g., "2:34")
+- **Reference Panel Enhancement**: Source references show below assistant messages with relevance filtering
+- **Database Integration**: Proper source persistence and retrieval from database
+- **Visual Improvements**: Course-specific icons and clickable timestamp navigation
+
+### 🎨 **UI/UX Improvements**
+- **Green Theme Restoration**: Beautiful green gradient backgrounds and course card theming
+- **Enhanced Course Cards**: Course-specific backgrounds, borders, and hover effects
+- **Message Formatting**: Fixed markdown to plain text conversion in message bubbles
+- **Visual Consistency**: Cohesive color scheme throughout the application
+
+### 🐛 **Critical Fixes**
+- **State Management**: Resolved conversation creation and navigation stuck issues
+- **Timestamp Persistence**: Fixed message timestamp storage and display
+- **Course Selection Flow**: Eliminated infinite loops and stuck suggestion screens
+- **Route Validation**: Proper conversation ID format validation (UUID and custom formats)
+
+## [Previous] Speech Recognition & UI Improvements
 
 ### 🎤 Speech-to-Text System
 - **Complete Speech Recognition**: Modular speech-to-text system with real-time feedback
