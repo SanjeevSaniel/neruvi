@@ -1,13 +1,13 @@
 import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import RefreshingLandingPage from '@/components/landing/RefreshingLandingPage';
+import HomePage from '@/components/home/HomePage';
 
 export default async function Home() {
   const { userId } = await auth();
   
-  // Immediately redirect authenticated users to chat
+  // Show home page with course selector for authenticated users, landing page for others
   if (userId) {
-    redirect('/chat');
+    return <HomePage />;
   }
 
   return <RefreshingLandingPage />;
