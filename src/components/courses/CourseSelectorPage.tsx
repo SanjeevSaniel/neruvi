@@ -110,14 +110,27 @@ export default function CourseSelectorPage() {
   };
 
   const handleSuggestionClick = (suggestion: string, courseId: CourseType) => {
-    // Navigate to course with suggestion as query parameter
-    router.push(
-      `/chat/courses/${courseId}?suggestion=${encodeURIComponent(suggestion)}`,
-    );
+    // Generate optimized conversation ID for suggestion navigation
+    const timestamp = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).substring(2, 8);
+    const conversationId = `${courseId}-${timestamp}-${randomPart}`;
+
+    console.log('🚀 Suggestion clicked - Generated conversation ID:', conversationId);
+
+    // Navigate to the new URL structure with conversation ID and suggestion
+    router.push(`/${courseId}/${conversationId}?suggestion=${encodeURIComponent(suggestion)}`);
   };
 
   const handleCourseNavigation = (courseId: CourseType) => {
-    router.push(`/chat/courses/${courseId}`);
+    // Generate optimized conversation ID for immediate navigation
+    const timestamp = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).substring(2, 8);
+    const conversationId = `${courseId}-${timestamp}-${randomPart}`;
+
+    console.log('🚀 Start Learning clicked - Generated conversation ID:', conversationId);
+
+    // Navigate directly to the new URL structure with conversation ID
+    router.push(`/${courseId}/${conversationId}`);
   };
 
   const containerVariants = {

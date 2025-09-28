@@ -50,6 +50,7 @@ interface ConversationStore {
   
   // Actions
   createConversation: (title?: string, course?: 'nodejs' | 'python') => Promise<string>;
+  createTempConversation: (title?: string, course?: 'nodejs' | 'python', id?: string) => string;
   deleteConversation: (id: string) => Promise<void>;
   updateConversation: (id: string, updates: Partial<Conversation>) => Promise<void>;
   addMessage: (conversationId: string, message: Message) => Promise<void>;
@@ -62,6 +63,9 @@ interface ConversationStore {
   // Course-specific methods
   getOrCreateConversationForCourse: (course: 'nodejs' | 'python') => Promise<string>;
   getCurrentConversationForCourse: (course: 'nodejs' | 'python') => Conversation | null;
+
+  // Navigation helper for new URL structure
+  navigateToConversation: (conversationId: string, course: 'nodejs' | 'python') => void;
   
   // Data management
   loadConversations: () => Promise<void>;
@@ -78,9 +82,16 @@ const STORAGE_KEY = 'flowmind-conversations';
 const CURRENT_CONVERSATION_KEY = 'flowmind-current-conversation';
 const MIGRATION_KEY = 'flowmind-database-migrated';
 
+// Fast conversation ID generation for smooth UI flow
+const generateOptimizedConversationId = (course: 'nodejs' | 'python'): string => {
+  const timestamp = Date.now().toString(36); // Base36 encoding for shorter IDs
+  const randomPart = Math.random().toString(36).substring(2, 8); // 6 character random
+  return `${course}-${timestamp}-${randomPart}`;
+};
+
 // Check if database is enabled
 const isDatabaseEnabled = () => {
-  const enabled = typeof window !== 'undefined' && 
+  const enabled = typeof window !== 'undefined' &&
                   process.env.NEXT_PUBLIC_USE_DATABASE === 'true';
   console.log('🔍 Database enabled check:', {
     isClient: typeof window !== 'undefined',
@@ -138,9 +149,21 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
         const token = await window.Clerk.session.getToken();
         if (token) {
           authHeaders = { Authorization: `Bearer ${token}` };
+          console.log('🔑 Auth token retrieved successfully for API call');
+        } else {
+          console.warn('⚠️ No auth token available from Clerk session');
         }
       } catch (error) {
-        console.warn('Failed to get auth token:', error);
+        console.warn('❌ Failed to get auth token:', error);
+        // If we can't get auth token and database is enabled, this will likely fail
+        if (isDatabaseEnabled()) {
+          throw new Error('Authentication required but token unavailable');
+        }
+      }
+    } else {
+      console.warn('⚠️ Clerk session not available');
+      if (isDatabaseEnabled()) {
+        throw new Error('Authentication required but Clerk session not initialized');
       }
     }
 
@@ -183,6 +206,39 @@ export const useConversationStore = create<ConversationStore>()(
 
     setLoading: (loading) => set({ isLoading: loading }),
     setError: (error) => set({ error }),
+
+    createTempConversation: (title, course, id) => {
+      // Create conversation in memory only - no database persistence until first message
+      const conversationId = id || generateOptimizedConversationId(course || 'nodejs');
+      const now = new Date();
+
+      const conversation: Conversation = {
+        id: conversationId,
+        title: title || `${course === 'nodejs' ? 'Node.js' : 'Python'} Chat`,
+        messages: [],
+        createdAt: now,
+        updatedAt: now,
+        selectedCourse: course || 'nodejs',
+      };
+
+      console.log('🔄 Creating temporary conversation (not persisted until first message):', {
+        id: conversationId,
+        title: conversation.title,
+        course: conversation.selectedCourse
+      });
+
+      set((state) => ({
+        conversations: [...state.conversations, conversation],
+        currentConversationId: conversationId,
+      }));
+
+      // Save to SessionStorage for immediate UI consistency
+      if (!isDatabaseEnabled()) {
+        saveToSessionStorage(get().conversations, conversationId);
+      }
+
+      return conversationId;
+    },
 
     createConversation: async (title, course) => {
       const state = get();
@@ -230,7 +286,7 @@ export const useConversationStore = create<ConversationStore>()(
         } else {
           // Fallback to SessionStorage
           console.log('💾 Creating conversation via SessionStorage');
-          const id = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          const id = generateOptimizedConversationId(course || 'nodejs');
           const now = new Date();
           
           const conversation: Conversation = {
@@ -327,6 +383,32 @@ export const useConversationStore = create<ConversationStore>()(
         timestampType: typeof message.timestamp,
         timestampString: message.timestamp?.toString(),
       });
+
+      // Check if this is the first message in a temporary conversation
+      const state = get();
+      const currentConversation = state.conversations.find(conv => conv.id === conversationId);
+      const isFirstMessage = currentConversation && currentConversation.messages.length === 0;
+
+      if (isFirstMessage && isDatabaseEnabled()) {
+        console.log('🆕 First message - persisting temporary conversation to database:', conversationId);
+        try {
+          // Create the conversation in the database now that we have the first message
+          const requestPayload = {
+            title: currentConversation.title,
+            selectedCourse: currentConversation.selectedCourse,
+          };
+
+          await apiCall('/api/conversations', {
+            method: 'POST',
+            body: JSON.stringify(requestPayload),
+          });
+
+          console.log('✅ Temporary conversation persisted to database:', conversationId);
+        } catch (error) {
+          console.error('❌ Failed to persist conversation to database:', error);
+          // Continue with local storage - don't block the user
+        }
+      }
 
       // Ensure message has timestamp
       const messageWithTimestamp = {
@@ -561,12 +643,19 @@ export const useConversationStore = create<ConversationStore>()(
     getCurrentConversationForCourse: (course) => {
       const state = get();
       const currentConv = state.conversations.find(conv => conv.id === state.currentConversationId);
-      
+
       if (currentConv && currentConv.selectedCourse === course) {
         return currentConv;
       }
-      
+
       return null;
+    },
+
+    navigateToConversation: (conversationId, course) => {
+      if (typeof window !== 'undefined') {
+        // Use the new simplified URL structure
+        window.location.href = `/${course}/${conversationId}`;
+      }
     },
 
     loadConversation: async (conversationId: string) => {
@@ -668,6 +757,26 @@ export const useConversationStore = create<ConversationStore>()(
       try {
         if (isDatabaseEnabled()) {
           console.log('📡 Loading conversations from database');
+
+          // Wait for Clerk to be ready before making API calls
+          if (typeof window !== 'undefined') {
+            let attempts = 0;
+            const maxAttempts = 10;
+
+            while (!window.Clerk?.session && attempts < maxAttempts) {
+              console.log(`⏳ Waiting for Clerk session... (attempt ${attempts + 1}/${maxAttempts})`);
+              await new Promise(resolve => setTimeout(resolve, 100));
+              attempts++;
+            }
+
+            if (!window.Clerk?.session) {
+              console.warn('⚠️ Clerk session not ready after waiting, falling back to SessionStorage');
+              const { conversations, currentId } = loadFromSessionStorage();
+              set({ conversations, currentConversationId: currentId });
+              return;
+            }
+          }
+
           const response = await apiCall('/api/conversations');
           
           console.log('📡 Database API response:', {

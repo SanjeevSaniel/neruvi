@@ -173,15 +173,17 @@ export const useThreadingStore = create<ThreadingState>()(
         
         if (!mainThread) {
           console.error('❌ No main thread found after initialization:', { conversationId, threads, mainThreadId });
-          
-          // Try to recover by creating a simple main thread directly
-          console.log('🔧 Attempting to recover by creating main thread directly...');
-          const recoveryThread = {
+
+          // This is expected for new conversations - don't throw an error
+          console.log('ℹ️ No main thread found - this is normal for new conversations without messages');
+
+          // Create a minimal thread state for UI consistency
+          const defaultThread = {
             id: mainThreadId,
             conversationId,
             name: 'Main Thread',
             description: 'Primary conversation thread',
-            rootMessageId: firstMessageId || '',
+            rootMessageId: firstMessageId || null,
             currentMessageId: firstMessageId || '',
             messageCount: firstMessageId ? 1 : 0,
             isMainThread: true,
@@ -192,20 +194,20 @@ export const useThreadingStore = create<ThreadingState>()(
           
           // Add to engine state directly
           try {
-            engine.state.availableThreads.push(recoveryThread);
-            engine.state.currentThreadId = recoveryThread.id;
+            engine.state.availableThreads.push(defaultThread);
+            engine.state.currentThreadId = defaultThread.id;
             console.log('🔧 Recovery thread added to engine state:', {
-              threadId: recoveryThread.id,
+              threadId: defaultThread.id,
               engineThreadsCount: engine.state.availableThreads.length
             });
           } catch (engineError) {
             console.error('❌ Failed to add recovery thread to engine:', engineError);
           }
-          
+
           // Update store state directly with recovery thread
           set({
             currentThreadId: mainThreadId,
-            threads: [recoveryThread],
+            threads: [defaultThread],
           });
           
           console.log('🔧 Recovery successful - created thread directly in store');

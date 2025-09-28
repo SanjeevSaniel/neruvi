@@ -37,6 +37,7 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
   const {
     getCurrentConversation,
     createConversation,
+    createTempConversation,
     addMessage,
     updateMessage,
     currentConversationId,
@@ -366,7 +367,13 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
           console.log('✅ Conversation created successfully:', conversationId);
           setShowCourseSelector(false);
           setIsInitialLoad(false);
-          
+
+          // Navigate to the new URL format with conversation ID
+          if (conversationId) {
+            console.log('🔄 Navigating to new conversation URL:', `/${courseId}/${conversationId}`);
+            router.push(`/${courseId}/${conversationId}`);
+          }
+
           // If there's a suggestion in URL, set it as input for user to submit
           if (suggestion) {
             console.log('📝 Setting suggestion as input:', suggestion);
@@ -416,14 +423,29 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
         conversationId,
         currentConversationId
       });
-      
-      // Load the conversation if it's not already the current one or if it doesn't have messages
-      if (conversationId !== currentConversationId || !getCurrentConversation()?.messages.length) {
+
+      // Check if conversation exists
+      const existingConversation = getCurrentConversation();
+
+      if (conversationId !== currentConversationId) {
+        // Try to load existing conversation first
+        loadConversation(conversationId).catch(() => {
+          // If conversation doesn't exist, create a temporary one
+          console.log('🔄 Conversation not found, creating temporary conversation:', conversationId);
+
+          // Extract course from conversationId if it follows our format
+          const courseFromId = conversationId.startsWith('nodejs-') ? 'nodejs' :
+                              conversationId.startsWith('python-') ? 'python' : courseId as 'nodejs' | 'python';
+
+          createTempConversation(undefined, courseFromId, conversationId);
+          setCurrentConversation(conversationId);
+        });
+      } else if (!existingConversation?.messages.length) {
+        // Reload conversation if it exists but has no messages
         loadConversation(conversationId);
-        setCurrentConversation(conversationId);
       }
     }
-  }, [courseId, conversationId, loadConversation, setCurrentConversation, currentConversationId, getCurrentConversation]);
+  }, [courseId, conversationId, loadConversation, setCurrentConversation, currentConversationId, getCurrentConversation, createTempConversation]);
 
   // Reset component state when navigating with courseId but no conversation
   useEffect(() => {
@@ -571,6 +593,10 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
         return;
       }
 
+      // Navigate to the new URL format with conversation ID
+      console.log('🔄 Navigating to suggestion conversation URL:', `/${course}/${conversationId}`);
+      router.push(`/${course}/${conversationId}`);
+
       // Update states immediately
       setShowCourseSelector(false); // Hide selector after selection
       setIsInitialLoad(false); // Mark that user has interacted
@@ -694,6 +720,11 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
       const sourcesHeader = response.headers.get('X-Sources');
       let sources: SourceTimestamp[] = [];
 
+      console.log('🔍 DEBUG: All response headers:', {
+        headers: Object.fromEntries(response.headers.entries()),
+        sourcesHeader: sourcesHeader
+      });
+
       if (sourcesHeader) {
         try {
           const parsedSources = JSON.parse(sourcesHeader);
@@ -702,12 +733,20 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
             `🔍 Frontend received ${sources.length} sources:`,
             sources,
           );
+          console.log('🔍 Detailed source analysis:', sources.map(s => ({
+            course: s.course,
+            section: s.section,
+            timestamp: s.timestamp,
+            relevance: s.relevance,
+            videoId: s.videoId
+          })));
         } catch (error) {
           console.error('Error parsing sources:', error);
           // Continue without sources - deployment compatibility
         }
       } else {
         console.log('❌ No X-Sources header received from API');
+        console.log('🔍 All available headers:', Array.from(response.headers.keys()));
       }
 
       // For deployment: No sources available, but still show AI response

@@ -274,9 +274,15 @@ export const POST = async (req: Request) => {
       }
       
       ragMetrics.processingTime = Date.now() - ragStartTime;
-      
-      // Don't add mock sources - just proceed without RAG context for speed
-      console.log('🚀 Proceeding with direct LLM response for maximum speed');
+
+      // Log RAG failure but don't add mock sources now that Qdrant is working
+      console.log('🚀 Proceeding with direct LLM response');
+      console.log('⚠️ No RAG context available - real sources should now work with reactivated Qdrant', {
+        error: error.message,
+        selectedCourse,
+        userQuery,
+        queryComplexity
+      });
     }
 
     // Create optimized system prompt based on query complexity and context
@@ -328,9 +334,18 @@ Answer based on your ${selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} exper
     // Add sources and metrics headers if we found any relevant transcript content
     if (sourceTimestamps.length > 0) {
       console.log(`📚 Found ${sourceTimestamps.length} sources for response`);
+      console.log('🔍 Source details being sent to frontend:', sourceTimestamps);
       response.headers.set('X-Sources', JSON.stringify(sourceTimestamps));
     } else {
       console.log('📭 No sources found for this query');
+      console.log('🔍 RAG Context Details:', {
+        ragContext: ragContext?.substring(0, 200) + '...',
+        queryComplexity,
+        useAdvancedRAG,
+        maxSources,
+        ragTimeout,
+        ragMetrics
+      });
     }
     
     // Add RAG metrics for debugging and analytics
