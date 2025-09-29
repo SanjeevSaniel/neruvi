@@ -1,8 +1,30 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Trash2, X } from 'lucide-react';
+import { MessageSquare, Clock, Archive, Loader2, Trash2, ChevronDown, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useConversationStore } from '@/store/conversationStore';
+import { formatDistanceToNow } from 'date-fns';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 interface ConversationSidebarProps {
   isOpen: boolean;
@@ -17,234 +39,361 @@ export default function ConversationSidebar({
   const {
     conversations,
     currentConversationId,
-    // createConversation,
-    deleteConversation,
     setCurrentConversation,
-    clearConversations,
     loadConversations,
+    deleteConversation,
   } = useConversationStore();
-  
-  // Debug logging for sidebar
-  console.log('📋 ConversationSidebar render:', {
-    isOpen,
-    conversationsCount: conversations.length,
-    currentConversationId,
-    conversations: conversations.map(c => ({
-      id: c.id,
-      title: c.title,
-      messageCount: c.messages?.length || 0,
-      updatedAt: c.updatedAt
-    }))
-  });
 
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingConversationId, setLoadingConversationId] = useState<string | null>(null);
+  const [deletingConversationId, setDeletingConversationId] = useState<string | null>(null);
+  const [expandedAccordions, setExpandedAccordions] = useState<string[]>([]);
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
+    isOpen: boolean;
+    conversationId: string | null;
+    conversationTitle: string;
+  }>({
+    isOpen: false,
+    conversationId: null,
+    conversationTitle: '',
+  });
 
   // Load conversations on component mount
   useEffect(() => {
     const initializeConversations = async () => {
       try {
-        console.log('📋 ConversationSidebar: Loading conversations on mount');
+        setIsLoading(true);
         await loadConversations();
-        console.log('✅ ConversationSidebar: Conversations loaded successfully');
       } catch (error) {
-        console.error('❌ ConversationSidebar: Failed to load conversations:', error);
+        console.error('Failed to load conversations:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    initializeConversations();
-  }, []); // Only run on mount
+    if (isOpen) {
+      initializeConversations();
+    }
+  }, [isOpen, loadConversations]);
 
-  // const handleNewConversation = () => {
-  //   const newId = createConversation();
-  //   setCurrentConversation(newId);
-  // };
+  const handleConversationClick = async (conversation: any) => {
+    // Prevent multiple conversations from being opened simultaneously
+    if (loadingConversationId || deletingConversationId) return;
 
-  const handleDeleteConversation = (id: string, e: React.MouseEvent) => {
+    try {
+      setLoadingConversationId(conversation.id);
+      const courseId = conversation.selectedCourse || 'nodejs';
+
+      // Add a small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      router.push(`/chat/courses/${courseId}/${conversation.id}`);
+
+      // Keep loading state until navigation completes
+      setTimeout(() => {
+        setLoadingConversationId(null);
+        onClose();
+      }, 200);
+    } catch (error) {
+      console.error('Failed to open conversation:', error);
+      setLoadingConversationId(null);
+    }
+  };
+
+  const handleDeleteClick = (conversationId: string, conversationTitle: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteConversation(id);
+    if (deletingConversationId || loadingConversationId) return;
+
+    setDeleteConfirmDialog({
+      isOpen: true,
+      conversationId,
+      conversationTitle,
+    });
   };
 
-  const formatDate = (date: Date | string) => {
-    const now = new Date();
-    const dateObj = date instanceof Date ? date : new Date(date);
-    const diff = now.getTime() - dateObj.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmDialog.conversationId) return;
 
-    if (days === 0) return 'Today';
-    if (days === 1) return 'Yesterday';
-    if (days < 7) return `${days} days ago`;
-    return dateObj.toLocaleDateString();
+    try {
+      setDeletingConversationId(deleteConfirmDialog.conversationId);
+      await deleteConversation(deleteConfirmDialog.conversationId);
+
+      // Close dialog
+      setDeleteConfirmDialog({
+        isOpen: false,
+        conversationId: null,
+        conversationTitle: '',
+      });
+    } catch (error) {
+      console.error('Failed to delete conversation:', error);
+    } finally {
+      setDeletingConversationId(null);
+    }
   };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirmDialog({
+      isOpen: false,
+      conversationId: null,
+      conversationTitle: '',
+    });
+  };
+
+  const getCourseVariant = (course: string) => {
+    switch (course) {
+      case 'nodejs':
+        return 'bg-green-100 text-green-700';
+      case 'python':
+        return 'bg-emerald-100 text-emerald-700';
+      default:
+        return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getCourseName = (course: string) => {
+    switch (course) {
+      case 'nodejs':
+        return 'Node.js';
+      case 'python':
+        return 'Python';
+      default:
+        return 'General';
+    }
+  };
+
+  // Group conversations by course
+  const groupedConversations = conversations.reduce((acc, conversation) => {
+    const course = conversation.selectedCourse || 'nodejs';
+    if (!acc[course]) {
+      acc[course] = [];
+    }
+    acc[course].push(conversation);
+    return acc;
+  }, {} as Record<string, typeof conversations>);
+
+  // Sort conversations within each group by updatedAt
+  Object.keys(groupedConversations).forEach(course => {
+    groupedConversations[course].sort((a, b) =>
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  });
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className='fixed inset-0 bg-black/50 z-40'
-            onClick={onClose}
-          />
-
-          {/* Sidebar */}
-          <motion.div
-            initial={{ x: -320, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -320, opacity: 0 }}
-            transition={{
-              duration: 0.35,
-              ease: [0.25, 0.46, 0.45, 0.94],
-              opacity: { duration: 0.2 },
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="left" className="w-80 sm:max-w-80 p-0">
+        <div className="flex flex-col h-full">
+          {/* Compact Header */}
+          <SheetHeader
+            className="p-3 pb-2 border-b text-white"
+            style={{
+              background: 'linear-gradient(to right, rgba(78, 166, 116, 0.95), rgba(69, 144, 113, 0.98), rgba(69, 144, 113, 0.95))'
             }}
-            className='fixed left-0 top-0 h-full w-80 bg-white shadow-2xl z-50 flex flex-col'>
-            {/* Header */}
-            <div className='p-4 border-b border-slate-200 bg-gradient-to-r from-purple-600 to-violet-600'>
-              <div className='flex items-center justify-between'>
-                <h2 className='font-semibold' style={{color: 'white'}}>Conversations</h2>
-                <button
-                  onClick={onClose}
-                  className='transition-colors duration-200'
-                  style={{color: 'white'}}>
-                  <X className='w-5 h-5' />
-                </button>
+          >
+            <SheetTitle className="text-left text-white font-medium text-sm">
+              Conversations
+            </SheetTitle>
+            <SheetDescription className="text-left text-white/80 text-xs leading-tight">
+              Continue where you left off
+            </SheetDescription>
+          </SheetHeader>
+
+          {/* Content */}
+          <div className="flex-1 overflow-hidden">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-20">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-500"></div>
               </div>
-            </div>
-
-            {/* Conversations List */}
-            <div className='flex-1 overflow-y-auto'>
-              {conversations.length === 0 ? (
-                <div className='p-4 text-center text-slate-500'>
-                  <MessageSquare className='w-12 h-12 mx-auto mb-2 text-slate-300' />
-                  <p className='text-sm'>No conversations yet</p>
-                  <p className='text-xs text-slate-400 mt-1'>
-                    Start a new chat to begin
-                  </p>
+            ) : conversations.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-3">
+                  <MessageSquare className="w-6 h-6 text-green-400" />
                 </div>
-              ) : (
-                <div className='p-2 space-y-1'>
-                  {conversations
-                    .sort(
-                      (a, b) =>
-                        new Date(b.updatedAt).getTime() -
-                        new Date(a.updatedAt).getTime(),
-                    )
-                    .map((conversation) => (
-                      <motion.div
-                        key={conversation.id}
-                        whileHover={{
-                          x: 3,
-                          transition: {
-                            duration: 0.15,
-                            ease: [0.25, 0.46, 0.45, 0.94],
-                          },
-                        }}
-                        className={`relative p-3 rounded-lg cursor-pointer transition-colors duration-200 ${
-                          conversation.id === currentConversationId
-                            ? 'bg-purple-50 border border-purple-200'
-                            : 'hover:bg-slate-50'
-                        }`}
-                        onClick={() => {
-                          console.log('🔄 Switching to conversation:', {
-                            id: conversation.id,
-                            title: conversation.title,
-                            selectedCourse: conversation.selectedCourse,
-                            messageCount: conversation.messages.length,
-                            firstMessage: conversation.messages[0]?.content.substring(0, 50)
-                          });
-                          
-                          // Navigate to the conversation URL instead of just setting current conversation
-                          const courseId = conversation.selectedCourse || 'nodejs';
-                          router.push(`/chat/courses/${courseId}/${conversation.id}`);
-                          onClose();
-                        }}
-                        onMouseEnter={() => setHoveredId(conversation.id)}
-                        onMouseLeave={() => setHoveredId(null)}>
-                        <div className='flex items-start justify-between'>
-                          <div className='flex-1 min-w-0'>
-                            <div className='flex items-center gap-2 mb-1'>
-                              <h3 className='font-medium truncate flex-1' style={{color: '#1f2937'}}>
-                                {conversation.title}
-                              </h3>
-                              {conversation.selectedCourse && (
-                                <span
-                                  className={`
-                                  text-xs px-2 py-0.5 rounded-full font-medium
-                                  ${
-                                    conversation.selectedCourse === 'nodejs'
-                                      ? 'bg-green-100 text-green-700'
-                                      : conversation.selectedCourse === 'python'
-                                      ? 'bg-blue-100 text-blue-700'
-                                      : 'bg-primary-100'
-                                  }
-                                  style={{
-                                    color: conversation.selectedCourse === 'nodejs' ? '#4ea674' : '#459071'
-                                  }}
-                                `}>
-                                  {conversation.selectedCourse === 'nodejs'
-                                    ? 'Node.js'
-                                    : conversation.selectedCourse === 'python'
-                                    ? 'Python'
-                                    : 'Both'}
-                                </span>
-                              )}
-                            </div>
-                            <p className='text-xs text-slate-500 mt-1'>
-                              {formatDate(new Date(conversation.updatedAt))} •{' '}
-                              {conversation.messages.length} messages
-                            </p>
-                            {conversation.messages.length > 1 && (
-                              <p className='text-xs text-slate-400 mt-1 truncate'>
-                                {conversation.messages[
-                                  conversation.messages.length - 1
-                                ].content.substring(0, 50)}
-                                ...
-                              </p>
-                            )}
+                <h3 className="text-sm font-medium text-gray-900 mb-1">No conversations</h3>
+                <p className="text-xs text-gray-500">
+                  Start chatting to see history here
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-y-auto h-full">
+                <Accordion
+                  type="multiple"
+                  value={expandedAccordions}
+                  onValueChange={setExpandedAccordions}
+                  className="px-2 py-1 space-y-2"
+                >
+                  {Object.entries(groupedConversations).map(([course, courseConversations]) => (
+                    <AccordionItem
+                      key={course}
+                      value={course}
+                      className="border-none bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                    >
+                      <AccordionTrigger className="py-2 px-3 hover:no-underline rounded-lg">
+                        <div className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                          <div className={cn(
+                            "w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium border",
+                            course === 'nodejs'
+                              ? 'bg-green-50 text-green-700 border-green-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          )}>
+                            {courseConversations.length}
                           </div>
-
-                          {/* Delete button */}
-                          <AnimatePresence>
-                            {hoveredId === conversation.id && (
-                              <motion.button
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.8 }}
-                                transition={{
-                                  duration: 0.12,
-                                  ease: [0.25, 0.46, 0.45, 0.94],
-                                }}
-                                onClick={(e) =>
-                                  handleDeleteConversation(conversation.id, e)
-                                }
-                                className='p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors duration-200'>
-                                <Trash2 className='w-4 h-4' />
-                              </motion.button>
-                            )}
-                          </AnimatePresence>
+                          <span className="text-gray-800">{getCourseName(course)}</span>
                         </div>
-                      </motion.div>
-                    ))}
-                </div>
-              )}
-            </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-2 pt-1 px-3">
+                        <div className="space-y-1.5">
+                          {courseConversations.map((conversation, index) => (
+                            <div
+                              key={conversation.id}
+                              onClick={() => handleConversationClick(conversation)}
+                              className={cn(
+                                "group p-2 rounded-md transition-all duration-300 cursor-pointer relative",
+                                conversation.id === currentConversationId
+                                  ? "bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm ring-1 ring-green-200"
+                                  : "bg-gray-50/50 hover:bg-gradient-to-r hover:from-green-50/50 hover:to-emerald-50/50 hover:shadow-sm",
+                                (loadingConversationId === conversation.id || deletingConversationId === conversation.id) && "opacity-75 pointer-events-none",
+                                deletingConversationId === conversation.id && "animate-pulse scale-95"
+                              )}
+                            >
+                              {/* Loading overlay */}
+                              {loadingConversationId === conversation.id && (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] rounded-md flex items-center justify-center z-10">
+                                  <div className="flex items-center gap-1.5 text-xs text-green-600 font-medium">
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                    Opening...
+                                  </div>
+                                </div>
+                              )}
 
-            {/* Footer */}
-            {conversations.length > 0 && (
-              <div className='p-4 border-t border-slate-200'>
-                <button
-                  onClick={clearConversations}
-                  className='w-full text-sm text-slate-500 hover:text-red-500 transition-colors'>
-                  Clear All Conversations
-                </button>
+                              {/* Deleting overlay */}
+                              {deletingConversationId === conversation.id && (
+                                <div className="absolute inset-0 bg-red-50/90 backdrop-blur-[2px] rounded-md flex items-center justify-center z-10 border border-red-200">
+                                  <div className="flex items-center gap-2 text-xs text-red-600 font-medium bg-white/80 px-2 py-1 rounded-full shadow-sm">
+                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                    Deleting...
+                                  </div>
+                                </div>
+                              )}
+
+                              <div className="flex items-start gap-2.5">
+                                {/* Beautiful Number - Smaller Size */}
+                                <div className={cn(
+                                  "w-4 h-4 rounded-full flex items-center justify-center text-xs font-medium text-white flex-shrink-0 mt-1",
+                                  course === 'nodejs' ? 'bg-green-500' : 'bg-emerald-500'
+                                )}>
+                                  {index + 1}
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                  {/* Title */}
+                                  <div className="flex items-center gap-1.5 mb-1">
+                                    <h4 className="font-medium text-gray-900 truncate text-xs group-hover:text-green-700 transition-colors flex-1">
+                                      {conversation.title}
+                                    </h4>
+                                  </div>
+
+                                  {/* Compact metadata */}
+                                  <div className="flex items-center gap-3 text-xs mb-1">
+                                    <span className="flex items-center gap-0.5 text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">
+                                      <MessageSquare className="w-2.5 h-2.5" />
+                                      <span className="font-medium">{conversation.messages?.length || 0}</span>
+                                    </span>
+                                    <span className="flex items-center gap-0.5 text-gray-400">
+                                      <Clock className="w-2.5 h-2.5" />
+                                      <span className="text-gray-500">
+                                        {formatDistanceToNow(new Date(conversation.updatedAt), { addSuffix: true })}
+                                      </span>
+                                    </span>
+                                  </div>
+
+                                  {/* Compact message preview */}
+                                  {conversation.messages && conversation.messages.length > 0 && (
+                                    <p className="text-xs text-gray-400 truncate leading-tight">
+                                      {conversation.messages[conversation.messages.length - 1]?.content?.substring(0, 55) || 'No content'}
+                                      {conversation.messages[conversation.messages.length - 1]?.content?.length > 55 && '...'}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex-shrink-0 mt-0.5 flex items-center gap-1">
+                                  {deletingConversationId === conversation.id ? (
+                                    <Loader2 className="w-3 h-3 animate-spin text-red-600" />
+                                  ) : (
+                                    <button
+                                      onClick={(e) => handleDeleteClick(conversation.id, conversation.title, e)}
+                                      className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all duration-200"
+                                      title="Delete conversation"
+                                    >
+                                      <Trash2 className="w-3 h-3" />
+                                    </button>
+                                  )}
+
+                                  {conversation.archived && (
+                                    <Archive className="w-3 h-3 text-gray-400" />
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
               </div>
             )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
+      </SheetContent>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={deleteConfirmDialog.isOpen} onOpenChange={handleCancelDelete}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="w-5 h-5" />
+              Delete Conversation
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Are you sure you want to delete this conversation? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="my-4 p-3 bg-gray-50 rounded-lg border-l-4 border-red-200">
+            <p className="text-sm font-medium text-gray-800 truncate">
+              "{deleteConfirmDialog.conversationTitle}"
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              All messages and data will be permanently deleted.
+            </p>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <button
+              onClick={handleCancelDelete}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              disabled={!!deletingConversationId}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmDelete}
+              disabled={!!deletingConversationId}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {deletingConversationId === deleteConfirmDialog.conversationId ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete'
+              )}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Sheet>
   );
 }
