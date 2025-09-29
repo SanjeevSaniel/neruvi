@@ -212,7 +212,7 @@ export default function SimpleCourseSelector() {
                   boxShadow: '0 10px 25px rgba(139, 92, 246, 0.2)',
                 }}
                 whileTap={{ scale: 0.95 }}
-                className='px-12 py-4 bg-gradient-to-r from-purple-600 to-violet-600 text-white text-xl font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-3 mx-auto'>
+                className='px-12 py-4 bg-gradient-to-r from-purple-600 to-violet-600 text-white text-xl font-bold rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-3 mx-auto cursor-pointer'>
                 <span>
                   Start Learning{' '}
                   {selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}

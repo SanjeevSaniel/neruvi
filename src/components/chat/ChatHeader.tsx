@@ -139,7 +139,7 @@ export default function ChatHeader({
                 FlowMind
               </h1>
               <p className='text-[10px] text-primary-100/90 font-medium -mt-0.5 drop-shadow-sm'>
-                AI Programming Assistant
+                AI Learning Assistant
               </p>
             </div>
           </button>
@@ -165,21 +165,23 @@ export default function ChatHeader({
           <AIStatusIndicator />
 
           {/* Threading Toggle - Only show when there's an active conversation */}
-          {canToggleThreadView && onToggleThreadSidebar && hasActiveConversation && (
-            <div className='flex items-center space-x-2'>
-              <ThreadToggle
-                isVisible={showThreadSidebar || false}
-                onToggle={onToggleThreadSidebar}
-                variant='compact'
-              />
-              {/* Thread counter for admin/moderators */}
-              {userRole !== 'user' && threadsCount !== undefined && (
-                <span className='text-xs font-medium text-white/70'>
-                  {threadsCount === 0 ? '(New)' : `(${threadsCount})`}
-                </span>
-              )}
-            </div>
-          )}
+          {canToggleThreadView &&
+            onToggleThreadSidebar &&
+            hasActiveConversation && (
+              <div className='flex items-center space-x-2'>
+                <ThreadToggle
+                  isVisible={showThreadSidebar || false}
+                  onToggle={onToggleThreadSidebar}
+                  variant='compact'
+                />
+                {/* Thread counter for admin/moderators */}
+                {userRole !== 'user' && threadsCount !== undefined && (
+                  <span className='text-xs font-medium text-white/70'>
+                    {threadsCount === 0 ? '(New)' : `(${threadsCount})`}
+                  </span>
+                )}
+              </div>
+            )}
 
           {/* Mobile version */}
           <div className='md:hidden'>
