@@ -9,17 +9,23 @@ interface KnowledgeWaveAnimationProps {
 }
 
 export default function KnowledgeWaveAnimation({ className = '' }: KnowledgeWaveAnimationProps) {
-  // Generate floating knowledge particles
+  // Generate floating knowledge particles with deterministic positioning
   const knowledgeIcons = [Brain, Code2, Database, Lightbulb, BookOpen, Zap]
   const particles = Array.from({ length: 12 }, (_, i) => {
     const Icon = knowledgeIcons[i % knowledgeIcons.length]
+    // Use deterministic values based on index to avoid hydration mismatch
+    const seedX = (i * 7 + 17) % 100 // Pseudo-random but deterministic
+    const seedY = (i * 11 + 23) % 100
+    const seedDelay = (i * 0.5) % 4
+    const seedDuration = 8 + (i * 0.3) % 4
+
     return {
       id: i,
       Icon,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 4,
-      duration: 8 + Math.random() * 4,
+      x: seedX,
+      y: seedY,
+      delay: seedDelay,
+      duration: seedDuration,
     }
   })
 
