@@ -75,7 +75,7 @@ const NeruviBrandLogo = ({
   return (
     <div className={`inline-flex flex-col ${className}`}>
       <div className={`flex items-center ${config.gap}`}>
-        {/* Modern Neural Network Icon */}
+        {/* Minimalist Arattai-style Icon */}
         {showIcon && (
           <div className="relative flex-shrink-0">
             <svg
@@ -85,126 +85,33 @@ const NeruviBrandLogo = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Modern rounded square background with strong contrast */}
+              {/* Clean white rounded square - Arattai style */}
               <rect
-                x="2"
-                y="2"
-                width="44"
-                height="44"
-                rx="12"
-                fill={variant === 'light' ? 'white' : variant === 'dark' ? '#f8fafc' : 'white'}
-                stroke={variant === 'light' ? 'rgba(255,255,255,0.4)' : variant === 'dark' ? 'rgba(148,163,184,0.3)' : 'rgba(69,144,113,0.15)'}
-                strokeWidth="1.5"
+                x="4"
+                y="4"
+                width="40"
+                height="40"
+                rx="10"
+                fill={variant === 'light' ? 'white' : variant === 'dark' ? 'white' : 'white'}
+                stroke="none"
               />
 
-              {/* Neural network paths - learning representation */}
-              {/* Layer 1 to Layer 2 connections */}
+              {/* Simple "N" lettermark - clean and minimal */}
               <path
-                d="M 14 18 Q 20 22, 24 16"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#4ea674' : '#4ea674'}
-                strokeWidth="1.5"
+                d="M 16 30 L 16 18 L 25 27 L 25 18"
+                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
+                strokeWidth="2.5"
                 strokeLinecap="round"
+                strokeLinejoin="round"
                 fill="none"
-                opacity="0.4"
-              />
-              <path
-                d="M 14 18 Q 20 20, 24 24"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#4ea674' : '#4ea674'}
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.4"
-              />
-              <path
-                d="M 14 18 Q 20 26, 24 32"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#4ea674' : '#4ea674'}
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.4"
               />
 
-              {/* Layer 2 to Layer 3 connections */}
-              <path
-                d="M 24 16 Q 28 20, 34 24"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#5fad81' : '#5fad81'}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.6"
-              />
-              <path
-                d="M 24 24 L 34 24"
-                stroke={variant === 'light' ? '#059669' : variant === 'dark' ? '#459071' : '#459071'}
-                strokeWidth="2"
-                strokeLinecap="round"
-                fill="none"
-              />
-              <path
-                d="M 24 32 Q 28 28, 34 24"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#5fad81' : '#5fad81'}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                fill="none"
-                opacity="0.6"
-              />
-
-              {/* Neural nodes - learning points */}
-              {/* Input node */}
+              {/* Subtle accent dot */}
               <circle
-                cx="14"
-                cy="18"
-                r="3.5"
-                fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#4ea674' : '#4ea674'}
-                stroke="white"
-                strokeWidth="2"
-              />
-
-              {/* Hidden layer nodes */}
-              <circle
-                cx="24"
-                cy="16"
-                r="3"
-                fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#5fad81' : '#5fad81'}
-                stroke="white"
-                strokeWidth="1.5"
-              />
-              <circle
-                cx="24"
-                cy="24"
-                r="3.5"
-                fill={variant === 'light' ? '#059669' : variant === 'dark' ? '#459071' : '#459071'}
-                stroke="white"
-                strokeWidth="2"
-              />
-              <circle
-                cx="24"
-                cy="32"
-                r="3"
-                fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#5fad81' : '#5fad81'}
-                stroke="white"
-                strokeWidth="1.5"
-              />
-
-              {/* Output node - glowing effect */}
-              <circle
-                cx="34"
-                cy="24"
-                r="4"
-                fill={variant === 'light' ? '#059669' : variant === 'dark' ? '#10b981' : '#10b981'}
-                stroke="white"
-                strokeWidth="2"
-              />
-
-              {/* Glow effect for output */}
-              <circle
-                cx="34"
-                cy="24"
-                r="6"
-                fill="none"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#4ea674' : '#4ea674'}
-                strokeWidth="1"
-                opacity="0.3"
+                cx="30"
+                cy="19"
+                r="2"
+                fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
               />
             </svg>
           </div>
