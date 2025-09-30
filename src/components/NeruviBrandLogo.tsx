@@ -22,25 +22,25 @@ const NeruviBrandLogo = ({
       text: 'text-2xl',
       icon: 32,
       tagline: 'text-[10px]',
-      gap: 'space-x-2.5'
+      gap: 'space-x-2'
     },
     md: {
       text: 'text-4xl',
       icon: 40,
       tagline: 'text-xs',
-      gap: 'space-x-3'
+      gap: 'space-x-2.5'
     },
     lg: {
       text: 'text-6xl',
       icon: 56,
       tagline: 'text-base',
-      gap: 'space-x-4'
+      gap: 'space-x-3'
     },
     xl: {
       text: 'text-7xl md:text-8xl',
       icon: 72,
       tagline: 'text-lg',
-      gap: 'space-x-5'
+      gap: 'space-x-4'
     }
   };
 
@@ -74,7 +74,7 @@ const NeruviBrandLogo = ({
 
   return (
     <div className={`inline-flex flex-col ${className}`}>
-      <div className={`flex items-center ${config.gap}`}>
+      <div className={`flex items-center ${config.gap}`} style={{ alignItems: 'center' }}>
         {/* Minimalist Arattai-style Icon */}
         {showIcon && (
           <div className="relative flex-shrink-0">
@@ -107,13 +107,23 @@ const NeruviBrandLogo = ({
                 </filter>
               </defs>
 
-              {/* Premium white circular background */}
+              {/* Premium white circular background with subtle border */}
               <circle
                 cx="24"
                 cy="24"
                 r="22"
                 fill="white"
                 filter="url(#innerGlow)"
+              />
+
+              {/* Subtle border for visibility on white backgrounds */}
+              <circle
+                cx="24"
+                cy="24"
+                r="21.5"
+                fill="none"
+                stroke={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(0,0,0,0.06)' : 'rgba(16,185,129,0.08)'}
+                strokeWidth="0.5"
               />
 
               {/* Geometric precision "N" with perfect alignment */}
