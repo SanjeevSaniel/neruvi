@@ -14,6 +14,7 @@ import {
   Github,
   Heart,
   Linkedin,
+  Loader2,
   MessageCircle,
   Search,
   X,
@@ -81,7 +82,8 @@ if (typeof window !== 'undefined') {
 //   },
 // };
 
-export default function TranscriptLearningLanding() {
+export default function LandingPage() {
+  const [isNavigating, setIsNavigating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const howItWorksRef = useRef<HTMLDivElement>(null);
@@ -303,19 +305,12 @@ export default function TranscriptLearningLanding() {
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
             <NeruviBrandLogo
-              size='md'
+              size='sm'
               showIcon={true}
               showTagline={false}
             />
 
             <div className='flex items-center space-x-6'>
-              <Link
-                href='https://github.com/SanjeevSaniel/flowmind-ai-chat'
-                className='flex items-center space-x-2 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50'
-                style={{ color: '#4ea674' }}>
-                <Github className='w-4 h-4' />
-                <span className='hidden sm:inline font-medium'>GitHub</span>
-              </Link>
               <Link href='/sign-in'>
                 <Button className='relative overflow-hidden bg-[#4ea674] hover:bg-[#5cbb85] px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer group'>
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
@@ -393,24 +388,24 @@ export default function TranscriptLearningLanding() {
               <div className='space-y-4'>
                 <div className='flex flex-col sm:flex-row gap-4'>
                   <Link href='/sign-up'>
-                    <Button
+                    <button
                       onClick={(e) => {
-                        const target = e.currentTarget;
-                        target.classList.add(
-                          'pointer-events-none',
-                          'opacity-75',
-                        );
-                        const textSpan = target.querySelector('.button-text');
-                        const arrow = target.querySelector('.button-arrow');
-                        const loader = target.querySelector('.button-loader');
-                        if (textSpan && arrow && loader) {
-                          textSpan.classList.add('opacity-0');
-                          arrow.classList.add('opacity-0');
-                          loader.classList.remove('hidden');
-                          loader.classList.add('flex');
+                        setIsNavigating(true);
+                      }}
+                      disabled={isNavigating}
+                      onMouseEnter={(e) => {
+                        if (!isNavigating) {
+                          e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 25px 70px -15px rgba(78, 166, 116, 0.6), 0 0 0 1px rgba(255,255,255,0.2)';
                         }
                       }}
-                      className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform'
+                      onMouseLeave={(e) => {
+                        if (!isNavigating) {
+                          e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)';
+                        }
+                      }}
+                      className='group relative overflow-hidden text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-out flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed'
                       style={{
                         background:
                           'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
@@ -423,22 +418,22 @@ export default function TranscriptLearningLanding() {
                       {/* Overlay gradient */}
                       <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
 
-                      <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
-                        Start learning
-                      </span>
-                      <ArrowRight
-                        className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
-                        style={{ color: 'white' }}
-                      />
-
-                      {/* Loading spinner */}
-                      <div className='button-loader absolute inset-0 hidden items-center justify-center z-10'>
-                        <div className='w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin'></div>
-                      </div>
+                      {isNavigating ? (
+                        <>
+                          <Loader2 className='relative z-10 w-4 h-4 animate-spin' style={{ color: 'white' }} />
+                          <span className='relative z-10'>Loading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className='relative z-10'>
+                            Get Started
+                          </span>
+                        </>
+                      )}
 
                       {/* Outer glow */}
                       <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/40 to-green-400/40 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out -z-10 scale-95 group-hover:scale-110'></div>
-                    </Button>
+                    </button>
                   </Link>
                 </div>
               </div>
@@ -812,7 +807,7 @@ export default function TranscriptLearningLanding() {
 
           <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
             <Link href='/sign-up'>
-              <Button
+              <button
                 onClick={(e) => {
                   const target = e.currentTarget;
                   target.classList.add('pointer-events-none', 'opacity-75');
@@ -826,7 +821,15 @@ export default function TranscriptLearningLanding() {
                     loader.classList.add('flex');
                   }
                 }}
-                className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform'
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 25px 70px -15px rgba(78, 166, 116, 0.6), 0 0 0 1px rgba(255,255,255,0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)';
+                }}
+                className='group relative overflow-hidden text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-out flex items-center justify-center space-x-2 cursor-pointer'
                 style={{
                   background:
                     'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
@@ -839,115 +842,89 @@ export default function TranscriptLearningLanding() {
                 {/* Overlay gradient */}
                 <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
 
-                <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
-                  Start learning
+                <span className='button-text relative z-10'>
+                  Get Started
                 </span>
-                <ArrowRight
-                  className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
-                  style={{ color: 'white' }}
-                />
 
                 {/* Loading spinner */}
                 <div className='button-loader absolute inset-0 hidden items-center justify-center z-10'>
-                  <div className='w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin'></div>
+                  <Loader2 className='w-4 h-4 animate-spin' style={{ color: 'white' }} />
                 </div>
 
                 {/* Outer glow */}
                 <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/40 to-green-400/40 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out -z-10 scale-95 group-hover:scale-110'></div>
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Compact Footer */}
-      <footer
-        className='bg-gray-900 py-8'
-        style={{ color: 'white' }}>
-        <div className='max-w-7xl mx-auto px-6 lg:px-8 '>
-          {/* Main content row */}
-          <div className='flex flex-col lg:flex-row items-center justify-between gap-6 mb-6'>
-            <div className='flex flex-col items-start'>
+      {/* Clean Footer */}
+      <footer className='bg-gray-900 py-12'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='flex flex-col md:flex-row items-center justify-between gap-8'>
+            {/* Brand and Summary */}
+            <div className='flex flex-col items-center md:items-start gap-3'>
               <NeruviBrandLogo
-                size='sm'
+                size='md'
                 showIcon={true}
                 showTagline={false}
                 variant='light'
               />
-              <p className='text-xs text-white/60 flex items-center gap-1.5 ml-1'>
-                <FileText className='w-3 h-3' />
-                Revolutionizing learning through AI
+              <p className='text-sm text-white/70 max-w-md text-center md:text-left'>
+                AI-powered learning with transcript intelligence
               </p>
-            </div>
-
-            {/* Social links - compact icons only */}
-            <div className='flex items-center gap-3'>
-              {[
-                {
-                  href: 'https://github.com/SanjeevSaniel',
-                  icon: Github,
-                  label: 'GitHub',
-                },
-                {
-                  href: 'https://www.linkedin.com/in/sanjeevsaniel/',
-                  icon: Linkedin,
-                  label: 'LinkedIn',
-                },
-                {
-                  href: 'https://x.com/SanjeevSaniel',
-                  icon: X,
-                  label: 'X.com',
-                },
-                {
-                  href: 'https://github.com/SanjeevSaniel/flowmind-ai-chat',
-                  icon: Code2,
-                  label: 'Repository',
-                },
-              ].map((link, index) => (
-                <Link
-                  key={index}
-                  href={link.href}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  title={link.label}
-                  className='p-2.5 rounded-lg transition-all duration-300 hover:scale-110'
-                  style={{
-                    backgroundColor: 'rgba(69, 144, 113, 0.2)',
-                    color: '#4ea674',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#459071';
-                    e.currentTarget.style.color = 'white';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      'rgba(69, 144, 113, 0.2)';
-                    e.currentTarget.style.color = '#4ea674';
-                  }}>
-                  <link.icon className='w-4 h-4' />
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <Separator className='mb-2' />
-
-          <div className='flex justify-between items-center'>
-            <div className='flex flex-col items-center lg:items-start gap-1'>
-              <p className='flex text-sm font-medium text-white/50'>
-                Crafted with{' '}
-                <span className='mx-1 mt-0.5'>
-                  <Heart size={14} />
-                </span>{' '}
-                by Sanjeev Saniel
-              </p>
-            </div>
-
-            {/* Copyright - single line */}
-            <div className='text-center'>
               <p className='text-xs text-white/50'>
                 © {new Date().getFullYear()} Neruvi. All rights reserved.
               </p>
+            </div>
+
+            {/* Social Links */}
+            <div className='flex flex-col items-center md:items-end gap-4'>
+              <p className='text-sm text-white/60 font-medium'>Connect with me</p>
+              <div className='flex items-center gap-3'>
+                {[
+                  {
+                    href: 'https://github.com/SanjeevSaniel',
+                    icon: Github,
+                    label: 'GitHub',
+                  },
+                  {
+                    href: 'https://www.linkedin.com/in/sanjeevsaniel/',
+                    icon: Linkedin,
+                    label: 'LinkedIn',
+                  },
+                  {
+                    href: 'https://x.com/SanjeevSaniel',
+                    icon: X,
+                    label: 'X',
+                  },
+                ].map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    title={link.label}
+                    className='p-3 rounded-xl transition-all duration-300 hover:scale-110 hover:-translate-y-1'
+                    style={{
+                      backgroundColor: 'rgba(69, 144, 113, 0.15)',
+                      color: '#4ea674',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#459071';
+                      e.currentTarget.style.color = 'white';
+                      e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(78, 166, 116, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(69, 144, 113, 0.15)';
+                      e.currentTarget.style.color = '#4ea674';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}>
+                    <link.icon className='w-5 h-5' />
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>

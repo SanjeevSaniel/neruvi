@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import ConversationSidebar from './ConversationSidebar';
@@ -52,6 +53,7 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
     null,
   );
   const [keepPanelOpen, setKeepPanelOpen] = useState(false);
+  const [isLoadingConversation, setIsLoadingConversation] = useState(false);
   const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // const pendingContentRef = useRef<string>('');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -159,6 +161,10 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
         console.log(
           '👥 Conversation switched from history - hiding course selector',
         );
+
+        // Show loading state when switching conversations
+        setIsLoadingConversation(true);
+
         setShowCourseSelector(false); // Always hide course selector when switching from history
         setIsInitialLoad(false); // Mark as no longer initial load
 
@@ -166,6 +172,11 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
           setMessageDetailOpen(false);
           setSelectedMessage(null);
         }
+
+        // Hide loading state after messages are ready
+        setTimeout(() => {
+          setIsLoadingConversation(false);
+        }, 500);
       }
 
       // Update the previous conversation ID reference
@@ -225,8 +236,8 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
 
           // Navigate to the new URL format with conversation ID
           if (conversationId) {
-            console.log('🔄 Navigating to new conversation URL:', `/${courseId}/${conversationId}`);
-            router.push(`/${courseId}/${conversationId}`);
+            console.log('🔄 Navigating to new conversation URL:', `/chat/courses/${courseId}/${conversationId}`);
+            router.push(`/chat/courses/${courseId}/${conversationId}`);
           }
 
           // If there's a suggestion in URL, set it as input for user to submit
@@ -449,8 +460,8 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
       }
 
       // Navigate to the new URL format with conversation ID
-      console.log('🔄 Navigating to suggestion conversation URL:', `/${course}/${conversationId}`);
-      router.push(`/${course}/${conversationId}`);
+      console.log('🔄 Navigating to suggestion conversation URL:', `/chat/courses/${course}/${conversationId}`);
+      router.push(`/chat/courses/${course}/${conversationId}`);
 
       // Update states immediately
       setShowCourseSelector(false); // Hide selector after selection
@@ -811,6 +822,163 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
       </div>
 
       <div className='flex-1 flex min-h-0 relative z-10'>
+        {/* Circuit Flow Loading Animation */}
+        <AnimatePresence>
+          {isLoadingConversation && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className='absolute inset-0 bg-gradient-to-br from-white/95 via-green-50/90 to-white/95 backdrop-blur-md z-50 flex items-center justify-center'>
+              <div className='relative flex flex-col items-center gap-6'>
+                {/* Circuit Flow Container */}
+                <div className='relative w-48 h-20'>
+                  {/* Horizontal Flow Lines */}
+                  <motion.div
+                    className='absolute top-1/2 left-0 h-0.5 rounded-full'
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(90deg, transparent 0%, #459071 50%, transparent 100%)',
+                      transform: 'translateY(-50%)'
+                    }}
+                    animate={{
+                      x: ['-100%', '100%'],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
+
+                  {/* Top Flow Line */}
+                  <motion.div
+                    className='absolute top-2 left-0 h-0.5 rounded-full'
+                    style={{
+                      width: '70%',
+                      background: 'linear-gradient(90deg, transparent 0%, #5cbb85 50%, transparent 100%)',
+                    }}
+                    animate={{
+                      x: ['-100%', '140%'],
+                    }}
+                    transition={{
+                      duration: 1.2,
+                      repeat: Infinity,
+                      ease: 'linear',
+                      delay: 0.3
+                    }}
+                  />
+
+                  {/* Bottom Flow Line */}
+                  <motion.div
+                    className='absolute bottom-2 right-0 h-0.5 rounded-full'
+                    style={{
+                      width: '70%',
+                      background: 'linear-gradient(90deg, transparent 0%, #4ea674 50%, transparent 100%)',
+                    }}
+                    animate={{
+                      x: ['100%', '-140%'],
+                    }}
+                    transition={{
+                      duration: 1.2,
+                      repeat: Infinity,
+                      ease: 'linear',
+                      delay: 0.6
+                    }}
+                  />
+
+                  {/* Circuit Nodes */}
+                  <motion.div
+                    className='absolute top-1/2 left-4 w-2 h-2 rounded-full'
+                    style={{ backgroundColor: '#459071', transform: 'translateY(-50%)' }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                  <motion.div
+                    className='absolute top-1/2 left-1/2 w-2 h-2 rounded-full'
+                    style={{ backgroundColor: '#5cbb85', transform: 'translate(-50%, -50%)' }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: 0.5,
+                    }}
+                  />
+                  <motion.div
+                    className='absolute top-1/2 right-4 w-2 h-2 rounded-full'
+                    style={{ backgroundColor: '#4ea674', transform: 'translateY(-50%)' }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: 1,
+                    }}
+                  />
+
+                  {/* Data Packets */}
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className='absolute top-1/2 left-0 w-1.5 h-1.5 rounded-sm'
+                      style={{
+                        backgroundColor: '#459071',
+                        transform: 'translateY(-50%) rotate(45deg)',
+                        boxShadow: '0 0 8px rgba(69, 144, 113, 0.6)'
+                      }}
+                      animate={{
+                        x: [0, 192],
+                        opacity: [0, 1, 1, 0],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: 'linear',
+                        delay: i * 0.5,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Loading Text */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className='flex items-center gap-2'>
+                  <span
+                    className='text-sm font-semibold tracking-wide'
+                    style={{ color: '#459071' }}>
+                    Loading conversation
+                  </span>
+                  <motion.span
+                    animate={{ opacity: [0, 1, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                    className='text-sm font-semibold'
+                    style={{ color: '#459071' }}>
+                    ...
+                  </motion.span>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className='flex-1 flex justify-center min-w-0'>
           {showCourseSelector || needsCourseSelection ? (
             // Full screen course selection

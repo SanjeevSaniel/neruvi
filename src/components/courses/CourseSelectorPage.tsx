@@ -2,7 +2,7 @@
 
 import { getCourseColors } from '@/lib/courseColors';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, ChevronRight, Code2 } from 'lucide-react';
+import { CheckCircle, ChevronRight, Code2, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { SiNodedotjs, SiPython } from 'react-icons/si';
@@ -105,6 +105,7 @@ export default function CourseSelectorPage() {
   const router = useRouter();
   const [hoveredCourse, setHoveredCourse] = useState<CourseType | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<CourseType | null>(null);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleCourseSelect = (courseId: CourseType) => {
     setSelectedCourse(courseId);
@@ -140,8 +141,11 @@ export default function CourseSelectorPage() {
       conversationId,
     );
 
+    // Set loading state
+    setIsNavigating(true);
+
     // Navigate directly to the new URL structure with conversation ID
-    router.push(`/${courseId}/${conversationId}`);
+    router.push(`/chat/courses/${courseId}/${conversationId}`);
   };
 
   const containerVariants = {
@@ -355,11 +359,22 @@ export default function CourseSelectorPage() {
                     own conversation
                   </p> */}
                   <Button
+                    size="lg"
                     variant='default'
                     onClick={() => handleCourseNavigation(selectedCourse)}
+                    disabled={isNavigating}
                     className='px-6 py-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105 cursor-pointer'>
-                    Start Learning{' '}
-                    {selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}
+                    {isNavigating ? (
+                      <>
+                        <Loader2 className='w-5 h-5 animate-spin mr-2' />
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      <>
+                        Start Learning{' '}
+                        {selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}
+                      </>
+                    )}
                   </Button>
                 </div>
 

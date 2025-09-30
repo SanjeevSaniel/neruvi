@@ -1,13 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect, notFound } from 'next/navigation';
 import ChatInterface from '@/components/chat/ChatInterface';
-
-const VALID_COURSE_IDS = ['nodejs', 'python'] as const;
-type ValidCourseId = typeof VALID_COURSE_IDS[number];
-
-function isValidCourseId(courseId: string): courseId is ValidCourseId {
-  return VALID_COURSE_IDS.includes(courseId as ValidCourseId);
-}
+import { isCourseValid } from '@/lib/courses';
 
 interface ConversationPageProps {
   params: Promise<{ courseId: string; conversationId: string }>;
@@ -21,7 +15,7 @@ export default async function ConversationPage({ params }: ConversationPageProps
     redirect('/sign-in');
   }
 
-  if (!isValidCourseId(courseId)) {
+  if (!isCourseValid(courseId)) {
     notFound();
   }
 
@@ -38,18 +32,18 @@ export default async function ConversationPage({ params }: ConversationPageProps
 }
 
 export async function generateMetadata({ params }: ConversationPageProps) {
-  const { courseId, conversationId } = await params;
-  
-  if (!isValidCourseId(courseId)) {
+  const { courseId } = await params;
+  const { getCourseById } = await import('@/lib/courses');
+  const course = getCourseById(courseId);
+
+  if (!course) {
     return {
       title: 'Course Not Found',
     };
   }
 
-  const courseName = courseId === 'nodejs' ? 'Node.js' : 'Python';
-  
   return {
-    title: `${courseName} Conversation - Neruvi`,
-    description: `Continue your ${courseName} learning conversation`,
+    title: `${course.displayName} Conversation - Neruvi`,
+    description: `Continue your ${course.displayName} learning conversation`,
   };
 }
