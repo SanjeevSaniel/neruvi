@@ -1,6 +1,6 @@
-# FlowMind Documentation Hub
+# Neruvi Documentation Hub
 
-Welcome to the comprehensive documentation for FlowMind - an advanced AI-powered learning assistant with RAG capabilities and dynamic routing architecture.
+Welcome to the comprehensive documentation for Neruvi - an advanced AI-powered learning assistant with RAG capabilities and dynamic routing architecture.
 
 ## 📚 Documentation Overview
 
@@ -154,4 +154,4 @@ docs/
 
 **Built with ❤️ for enhanced learning experiences through AI**
 
-*All documentation is organized for easy navigation and comprehensive understanding of the FlowMind system.*
+*All documentation is organized for easy navigation and comprehensive understanding of the Neruvi system.*
