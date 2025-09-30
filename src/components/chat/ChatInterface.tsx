@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import ChatHeader from './ChatHeader';
 import ChatInput from './ChatInput';
 import ConversationSidebar from './ConversationSidebar';
@@ -52,6 +53,7 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
     null,
   );
   const [keepPanelOpen, setKeepPanelOpen] = useState(false);
+  const [isLoadingConversation, setIsLoadingConversation] = useState(false);
   const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // const pendingContentRef = useRef<string>('');
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -159,6 +161,10 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
         console.log(
           '👥 Conversation switched from history - hiding course selector',
         );
+
+        // Show loading state when switching conversations
+        setIsLoadingConversation(true);
+
         setShowCourseSelector(false); // Always hide course selector when switching from history
         setIsInitialLoad(false); // Mark as no longer initial load
 
@@ -166,6 +172,11 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
           setMessageDetailOpen(false);
           setSelectedMessage(null);
         }
+
+        // Hide loading state after messages are ready
+        setTimeout(() => {
+          setIsLoadingConversation(false);
+        }, 500);
       }
 
       // Update the previous conversation ID reference
@@ -811,6 +822,40 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
       </div>
 
       <div className='flex-1 flex min-h-0 relative z-10'>
+        {/* Loading Overlay for Conversation Switch */}
+        <AnimatePresence>
+          {isLoadingConversation && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className='absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center'>
+              <div className='flex flex-col items-center gap-4'>
+                <Loader2
+                  className='w-12 h-12 animate-spin'
+                  style={{ color: '#459071' }}
+                />
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className='text-lg font-medium'
+                  style={{ color: '#459071' }}>
+                  Loading conversation...
+                </motion.p>
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
+                  className='h-1 w-32 rounded-full'
+                  style={{ backgroundColor: '#459071' }}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className='flex-1 flex justify-center min-w-0'>
           {showCourseSelector || needsCourseSelection ? (
             // Full screen course selection
