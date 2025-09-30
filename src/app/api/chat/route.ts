@@ -1,5 +1,8 @@
 import { createOpenAI } from '@ai-sdk/openai';
 import { streamText } from 'ai';
+import { auth } from '@clerk/nextjs/server';
+import { mem0Service } from '@/lib/mem0-service';
+import { queryCache } from '@/lib/query-cache';
 
 // Lazy initialization of OpenAI client to handle missing API key during build
 let openaiClient: ReturnType<typeof createOpenAI> | null = null;
@@ -26,7 +29,9 @@ interface SourceTimestamp {
 interface ChatRequestBody {
   messages: any[];
   course?: 'nodejs' | 'python';
+  conversationId?: string;
   useAdvancedRAG?: boolean;
+  useMemory?: boolean;
   advancedRAGConfig?: {
     enableCorrectiveRAG?: boolean;
     enableQueryRewriting?: boolean;
@@ -85,12 +90,15 @@ export const POST = async (req: Request) => {
     if (!process.env.OPENAI_API_KEY) {
       console.error('❌ Missing OPENAI_API_KEY');
       return new Response(
-        JSON.stringify({ error: 'Server configuration error' }), 
+        JSON.stringify({ error: 'Server configuration error' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     const startTime = Date.now();
+
+    // Initialize Mem0 service
+    await mem0Service.initialize();
     
     // Validate request body
     let parsedBody;
@@ -104,7 +112,11 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const { messages, course }: ChatRequestBody = parsedBody;
+    const { messages, course, conversationId, useMemory = true }: ChatRequestBody = parsedBody;
+
+    // Get authenticated user
+    const { userId } = await auth();
+    const userIdForMemory = userId || 'anonymous';
     
     // Validate messages array
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -212,14 +224,25 @@ export const POST = async (req: Request) => {
           
         } else {
           console.log(`📝 Using Fast Basic RAG (${queryComplexity} query)`);
-          const { qdrantRAG } = await import('@/lib/qdrant-rag');
-          await qdrantRAG.initialize();
 
-          const searchResults = await qdrantRAG.search(
-            userQuery,
-            maxSources * 2, // Search more, return less
-            selectedCourse as 'nodejs' | 'python',
-          );
+          // Check cache first
+          let searchResults = queryCache.get(userQuery, selectedCourse);
+
+          if (!searchResults) {
+            const { qdrantRAG } = await import('@/lib/qdrant-rag');
+            await qdrantRAG.initialize();
+
+            searchResults = await qdrantRAG.search(
+              userQuery,
+              maxSources * 2, // Search more, return less
+              selectedCourse as 'nodejs' | 'python',
+            );
+
+            // Cache the results
+            if (searchResults && searchResults.length > 0) {
+              queryCache.set(userQuery, selectedCourse, searchResults);
+            }
+          }
 
           console.log(`🔍 RAG Search Results: Found ${searchResults?.length || 0} results`);
           if (searchResults?.length > 0) {
@@ -285,8 +308,22 @@ export const POST = async (req: Request) => {
       });
     }
 
+    // Get personalized learning context from Mem0
+    let personalizedContext = '';
+    if (useMemory && mem0Service.isEnabled()) {
+      try {
+        personalizedContext = await mem0Service.getPersonalizedContext(
+          userIdForMemory,
+          userQuery,
+          selectedCourse
+        );
+      } catch (error) {
+        console.error('⚠️ Error getting personalized context:', error);
+      }
+    }
+
     // Create optimized system prompt based on query complexity and context
-    let systemPrompt = `You are FlowMind, an expert ${selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} programming tutor.`;
+    let systemPrompt = `You are Neruvi, an expert ${selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} programming tutor.`;
     
     if (ragContext) {
       if (queryComplexity === 'simple') {
@@ -294,17 +331,23 @@ export const POST = async (req: Request) => {
 
 Course content: ${ragContext}
 
+${personalizedContext}
+
 Provide a clear, concise answer based on this material. Be direct and helpful.`;
       } else if (queryComplexity === 'medium') {
         systemPrompt += `
 
 Relevant course material: ${ragContext}
 
+${personalizedContext}
+
 Provide a thorough explanation with examples where helpful. Reference timestamps naturally.`;
       } else {
         systemPrompt += `
 
 Course material: ${ragContext}
+
+${personalizedContext}
 
 Provide comprehensive explanation with examples, best practices, and detailed guidance. Reference course sections naturally.`;
       }
@@ -328,6 +371,17 @@ Answer based on your ${selectedCourse === 'nodejs' ? 'Node.js' : 'Python'} exper
       temperature: modelConfig.temperature,
       maxTokens: modelConfig.maxTokens,
     });
+
+    // Store conversation in memory (non-blocking)
+    if (useMemory && mem0Service.isEnabled() && conversationId) {
+      mem0Service.storeConversation({
+        userId: userIdForMemory,
+        conversationId,
+        course: selectedCourse,
+        query: userQuery,
+        timestamp: new Date()
+      }).catch(err => console.error('⚠️ Error storing conversation:', err));
+    }
 
     const response = result.toTextStreamResponse();
 
