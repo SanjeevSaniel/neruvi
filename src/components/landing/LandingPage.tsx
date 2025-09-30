@@ -388,11 +388,24 @@ export default function LandingPage() {
               <div className='space-y-4'>
                 <div className='flex flex-col sm:flex-row gap-4'>
                   <Link href='/sign-up'>
-                    <Button
-                      onClick={() => setIsNavigating(true)}
+                    <button
+                      onClick={(e) => {
+                        setIsNavigating(true);
+                      }}
                       disabled={isNavigating}
-                      size="lg"
-                      className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform disabled:opacity-75 disabled:cursor-not-allowed'
+                      onMouseEnter={(e) => {
+                        if (!isNavigating) {
+                          e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+                          e.currentTarget.style.boxShadow = '0 25px 70px -15px rgba(78, 166, 116, 0.6), 0 0 0 1px rgba(255,255,255,0.2)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isNavigating) {
+                          e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                          e.currentTarget.style.boxShadow = '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)';
+                        }
+                      }}
+                      className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ease-out flex items-center justify-center space-x-3 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed'
                       style={{
                         background:
                           'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
@@ -424,7 +437,7 @@ export default function LandingPage() {
 
                       {/* Outer glow */}
                       <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/40 to-green-400/40 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out -z-10 scale-95 group-hover:scale-110'></div>
-                    </Button>
+                    </button>
                   </Link>
                 </div>
               </div>
@@ -798,7 +811,7 @@ export default function LandingPage() {
 
           <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
             <Link href='/sign-up'>
-              <Button
+              <button
                 onClick={(e) => {
                   const target = e.currentTarget;
                   target.classList.add('pointer-events-none', 'opacity-75');
@@ -812,7 +825,15 @@ export default function LandingPage() {
                     loader.classList.add('flex');
                   }
                 }}
-                className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform'
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 25px 70px -15px rgba(78, 166, 116, 0.6), 0 0 0 1px rgba(255,255,255,0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)';
+                }}
+                className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ease-out flex items-center justify-center space-x-3 cursor-pointer'
                 style={{
                   background:
                     'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
@@ -840,7 +861,7 @@ export default function LandingPage() {
 
                 {/* Outer glow */}
                 <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/40 to-green-400/40 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out -z-10 scale-95 group-hover:scale-110'></div>
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
