@@ -87,7 +87,13 @@ const NeruviBrandLogo = ({
             >
               {/* Definitions */}
               <defs>
-                {/* Elegant gradient for depth */}
+                {/* Background gradient for default variant */}
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f0fdf4" />
+                  <stop offset="100%" stopColor="#dcfce7" />
+                </linearGradient>
+
+                {/* Elegant gradient for N lettermark */}
                 <linearGradient id="nGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
                   <stop offset="100%" stopColor="#059669" stopOpacity="1" />
@@ -107,18 +113,18 @@ const NeruviBrandLogo = ({
                 </filter>
               </defs>
 
-              {/* Premium white rounded square background */}
+              {/* Premium rounded square background */}
               <rect
                 x="2"
                 y="2"
                 width="44"
                 height="44"
                 rx="11"
-                fill="white"
+                fill={variant === 'light' ? 'white' : variant === 'dark' ? 'white' : 'url(#bgGradient)'}
                 filter="url(#innerGlow)"
               />
 
-              {/* Subtle border for visibility on white backgrounds */}
+              {/* Subtle border for definition */}
               <rect
                 x="2.25"
                 y="2.25"
@@ -126,7 +132,7 @@ const NeruviBrandLogo = ({
                 height="43.5"
                 rx="10.75"
                 fill="none"
-                stroke={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(0,0,0,0.06)' : 'rgba(16,185,129,0.08)'}
+                stroke={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(0,0,0,0.08)' : 'rgba(16,185,129,0.15)'}
                 strokeWidth="0.5"
               />
 
