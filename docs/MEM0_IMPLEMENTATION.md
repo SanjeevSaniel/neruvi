@@ -12,23 +12,27 @@ Mem0 has been integrated into Neruvi to provide personalized learning experience
 ## Features Implemented
 
 ### 1. **Personalized Context Enrichment**
+
 - Retrieves relevant past conversations
 - Adds user learning context to responses
 - Adjusts explanations based on user's history
 
 ### 2. **Learning Profile Tracking**
+
 - Tracks topics user has learned
 - Identifies struggled topics
 - Records mastered concepts
 - Determines learning style preferences
 
 ### 3. **Query Caching**
+
 - In-memory cache for repeated queries
 - 15-minute TTL to balance freshness and performance
 - Automatic cleanup of expired entries
 - Reduces Qdrant API calls by ~30-40%
 
 ### 4. **Optimized RAG Pipeline**
+
 - Query complexity analysis
 - Dynamic source count based on complexity
 - Configurable timeouts per complexity level
@@ -37,7 +41,9 @@ Mem0 has been integrated into Neruvi to provide personalized learning experience
 ## API Endpoints
 
 ### GET `/api/learning-profile`
+
 Get user's learning profile including:
+
 - Topics studied
 - Struggled topics
 - Mastered topics
@@ -45,6 +51,7 @@ Get user's learning profile including:
 - Comprehension levels
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -62,9 +69,11 @@ Get user's learning profile including:
 ```
 
 ### POST `/api/learning-profile/update`
+
 Update topic comprehension level
 
 **Request:**
+
 ```json
 {
   "topic": "async/await",
@@ -74,6 +83,7 @@ Update topic comprehension level
 ```
 
 ### DELETE `/api/learning-profile`
+
 Clear user's learning memory (GDPR compliance)
 
 ## Configuration
@@ -103,7 +113,7 @@ The chat API now accepts additional parameters:
 
 ### 1. Memory Storage Flow
 
-```
+```Plaintext
 User Query → Chat API
            ↓
       Mem0 Service (Store conversation)
@@ -125,7 +135,8 @@ User Query → Get Learning Profile
 
 ### 3. Caching Flow
 
-```
+```Plaintext
+
 User Query → Check Cache
            ↓
       Cache Miss? → Qdrant Query
@@ -137,12 +148,14 @@ User Query → Check Cache
 
 ## Performance Improvements
 
-### Before Optimization:
+### Before Optimization
+
 - Average response time: 3-5 seconds
 - No personalization
 - Repeated queries hit Qdrant every time
 
-### After Optimization:
+### After Optimization
+
 - Average response time: 1.5-2.5 seconds (40% faster)
 - Personalized context for logged-in users
 - 30-40% cache hit rate for common queries
@@ -150,7 +163,8 @@ User Query → Check Cache
 
 ## Benefits
 
-### For Users:
+### For Users
+
 1. **Personalized Learning**
    - Remembers what they've learned
    - Adapts explanations to their level
@@ -166,7 +180,8 @@ User Query → Check Cache
    - Builds on previous knowledge
    - Consistent learning journey
 
-### For System:
+### For System
+
 1. **Reduced Costs**
    - Fewer Qdrant API calls
    - Lower OpenAI token usage
@@ -185,11 +200,13 @@ User Query → Check Cache
 ## Memory Management
 
 ### Automatic Cleanup
+
 - Expired cache entries removed every 5 minutes
 - Memory entries subject to Mem0's retention policies
 - User can clear their own memory (GDPR)
 
 ### Privacy & Security
+
 - Memories tied to user IDs (Clerk)
 - Anonymous users supported (limited features)
 - GDPR-compliant deletion endpoint
@@ -198,6 +215,7 @@ User Query → Check Cache
 ## Usage Examples
 
 ### Enable Memory for Conversation
+
 ```typescript
 const response = await fetch('/api/chat', {
   method: 'POST',
@@ -211,6 +229,7 @@ const response = await fetch('/api/chat', {
 ```
 
 ### Get User's Learning Profile
+
 ```typescript
 const profile = await fetch('/api/learning-profile');
 const data = await profile.json();
@@ -220,6 +239,7 @@ console.log('Struggled with:', data.profile.struggledWith);
 ```
 
 ### Update Comprehension
+
 ```typescript
 await fetch('/api/learning-profile/update', {
   method: 'POST',
@@ -252,17 +272,20 @@ await fetch('/api/learning-profile/update', {
 ## Troubleshooting
 
 ### Memory Not Working
+
 1. Check `MEM0_API_KEY` is set in `.env.local`
 2. Verify user is authenticated (Clerk)
 3. Check browser console for errors
 4. Ensure `useMemory: true` is passed to API
 
 ### Cache Not Hitting
+
 1. Cache only works for exact query matches
 2. Check cache stats: `queryCache.getStats()`
 3. TTL is 15 minutes - queries older than that won't hit
 
 ### Performance Still Slow
+
 1. Check Qdrant connection latency
 2. Verify OpenAI API response times
 3. Monitor network requests
@@ -271,13 +294,15 @@ await fetch('/api/learning-profile/update', {
 ## Monitoring
 
 ### Key Metrics to Track
+
 - Cache hit rate (target: >30%)
 - Average response time (target: <2.5s)
 - Memory retrieval latency (target: <200ms)
 - Personalization accuracy (user feedback)
 
 ### Logs to Monitor
-```
+
+```Plaintext
 ✅ Mem0 initialized successfully
 💾 Stored conversation memory for user {id}
 🧠 Retrieved {n} relevant memories
@@ -288,6 +313,7 @@ await fetch('/api/learning-profile/update', {
 ## Support
 
 For issues or questions:
+
 1. Check server logs for error messages
 2. Verify environment variables are set
 3. Test with Mem0 disabled first
