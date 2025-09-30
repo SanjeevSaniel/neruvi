@@ -672,31 +672,23 @@ export const useConversationStore = create<ConversationStore>()(
 
     loadConversation: async (conversationId: string) => {
       const state = get();
-      state.setLoading(true);
-      state.setError(null);
 
       try {
         if (isDatabaseEnabled()) {
-          console.log('🔍 Loading specific conversation from database:', conversationId);
-          
           // Check if conversation already exists in store with messages
           const existingConversation = state.conversations.find(c => c.id === conversationId);
           if (existingConversation && existingConversation.messages.length > 0) {
-            console.log('✅ Conversation already loaded:', conversationId);
+            console.log('✅ Using cached conversation:', conversationId);
             state.setCurrentConversation(conversationId);
             return;
           }
-          
+
+          console.log('📡 Loading conversation from database:', conversationId);
+          state.setLoading(true);
+
           // Load messages for this specific conversation
           const response = await apiCall(`/api/messages?conversationId=${conversationId}`);
-          
-          console.log('📡 Messages API response:', {
-            success: response.success,
-            conversationId,
-            messagesCount: response.data?.length || 0,
-            conversation: response.conversation
-          });
-          
+
           if (response.success && response.data) {
             const messages: Message[] = response.data.map((msg: MessageData) => ({
               id: msg.id,
@@ -705,7 +697,7 @@ export const useConversationStore = create<ConversationStore>()(
               sources: msg.sources || [],
               timestamp: new Date(msg.timestamp),
             }));
-            
+
             // Update or add conversation with loaded messages
             set((state) => {
               const updatedConversations = state.conversations.map((conv) => {
@@ -719,7 +711,7 @@ export const useConversationStore = create<ConversationStore>()(
                 }
                 return conv;
               });
-              
+
               // If conversation doesn't exist in store, add it
               if (!updatedConversations.find(c => c.id === conversationId) && response.conversation) {
                 updatedConversations.push({
@@ -731,19 +723,14 @@ export const useConversationStore = create<ConversationStore>()(
                   selectedCourse: response.conversation.selectedCourse,
                 });
               }
-              
+
               return {
                 conversations: updatedConversations,
                 currentConversationId: conversationId,
               };
             });
-            
-            console.log('✅ Conversation loaded with messages:', {
-              conversationId,
-              messagesCount: messages.length
-            });
-          } else {
-            throw new Error('Failed to load conversation messages');
+
+            console.log('✅ Conversation loaded:', conversationId, `(${messages.length} messages)`);
           }
         } else {
           // Fallback to session storage
