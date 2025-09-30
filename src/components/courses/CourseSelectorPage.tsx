@@ -145,7 +145,7 @@ export default function CourseSelectorPage() {
     setIsNavigating(true);
 
     // Navigate directly to the new URL structure with conversation ID
-    router.push(`/${courseId}/${conversationId}`);
+    router.push(`/chat/courses/${courseId}/${conversationId}`);
   };
 
   const containerVariants = {

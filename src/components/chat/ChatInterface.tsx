@@ -236,8 +236,8 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
 
           // Navigate to the new URL format with conversation ID
           if (conversationId) {
-            console.log('🔄 Navigating to new conversation URL:', `/${courseId}/${conversationId}`);
-            router.push(`/${courseId}/${conversationId}`);
+            console.log('🔄 Navigating to new conversation URL:', `/chat/courses/${courseId}/${conversationId}`);
+            router.push(`/chat/courses/${courseId}/${conversationId}`);
           }
 
           // If there's a suggestion in URL, set it as input for user to submit
@@ -460,8 +460,8 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
       }
 
       // Navigate to the new URL format with conversation ID
-      console.log('🔄 Navigating to suggestion conversation URL:', `/${course}/${conversationId}`);
-      router.push(`/${course}/${conversationId}`);
+      console.log('🔄 Navigating to suggestion conversation URL:', `/chat/courses/${course}/${conversationId}`);
+      router.push(`/chat/courses/${course}/${conversationId}`);
 
       // Update states immediately
       setShowCourseSelector(false); // Hide selector after selection

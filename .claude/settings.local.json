@@ -45,7 +45,11 @@
       "WebFetch(domain:clerk.com)",
       "Bash(timeout:*)",
       "Bash(git reset:*)",
-      "Bash(npx next lint:*)"
+      "Bash(npx next lint:*)",
+      "Bash(npx @squoosh/cli:*)",
+      "Bash(npx -y png-to-ico:*)",
+      "Bash(npx -y svg-to-img:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": []
