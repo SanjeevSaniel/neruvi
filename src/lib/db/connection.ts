@@ -50,7 +50,17 @@ export async function initializeDatabase(): Promise<void> {
 
 // Feature flag to check if database is enabled
 export function isDatabaseEnabled(): boolean {
-  return Boolean(process.env.DATABASE_URL && process.env.NEXT_PUBLIC_USE_DATABASE !== 'false');
+  const hasDbUrl = Boolean(process.env.DATABASE_URL);
+  const useDatabase = process.env.NEXT_PUBLIC_USE_DATABASE === 'true';
+
+  console.log('🔍 Database enabled check:', {
+    hasDbUrl,
+    useDatabase,
+    envValue: process.env.NEXT_PUBLIC_USE_DATABASE,
+    result: hasDbUrl && useDatabase
+  });
+
+  return hasDbUrl && useDatabase;
 }
 
 // Type-safe database instance

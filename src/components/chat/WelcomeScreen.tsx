@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Code2, FileText, Sparkles, Zap, Send } from 'lucide-react';
 import { Suggestion } from './types';
-import FlowMindLogo from '../FlowMindLogo';
+import NeruviBrandLogo from '../NeruviBrandLogo';
 import SpeechRecognitionButton from '../ui/SpeechRecognitionButton';
 import WaveAnimation from '../ui/WaveAnimation';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
@@ -128,12 +128,12 @@ export default function WelcomeScreen({ onSubmit, selectedCourse }: WelcomeScree
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         className='text-center mb-8 max-w-2xl'>
-        <div className='mx-auto mb-4 flex justify-center'>
-          <FlowMindLogo size={32} animated={true} className='w-12 h-12' />
+        <div className='mx-auto mb-6 flex justify-center'>
+          <NeruviBrandLogo size="lg" showIcon={true} showTagline={true} />
         </div>
 
         <h2 className='text-2xl font-bold mb-3 font-comfortaa' style={{color: '#459071'}}>
-          {selectedCourse ? `Ready to learn ${selectedCourse === 'nodejs' ? 'Node.js' : selectedCourse === 'python' ? 'Python' : 'Programming'}?` : 'Welcome to FlowMind'}
+          {selectedCourse ? `Ready to learn ${selectedCourse === 'nodejs' ? 'Node.js' : selectedCourse === 'python' ? 'Python' : 'Programming'}?` : 'Welcome!'}
         </h2>
         <p className='text-base mb-6 leading-relaxed' style={{color: '#4ea674'}}>
           {selectedCourse 
