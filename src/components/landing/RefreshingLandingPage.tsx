@@ -14,6 +14,7 @@ import {
   Github,
   Heart,
   Linkedin,
+  Loader2,
   MessageCircle,
   Search,
   X,
@@ -82,6 +83,7 @@ if (typeof window !== 'undefined') {
 // };
 
 export default function TranscriptLearningLanding() {
+  const [isNavigating, setIsNavigating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const howItWorksRef = useRef<HTMLDivElement>(null);
@@ -394,23 +396,10 @@ export default function TranscriptLearningLanding() {
                 <div className='flex flex-col sm:flex-row gap-4'>
                   <Link href='/sign-up'>
                     <Button
-                      onClick={(e) => {
-                        const target = e.currentTarget;
-                        target.classList.add(
-                          'pointer-events-none',
-                          'opacity-75',
-                        );
-                        const textSpan = target.querySelector('.button-text');
-                        const arrow = target.querySelector('.button-arrow');
-                        const loader = target.querySelector('.button-loader');
-                        if (textSpan && arrow && loader) {
-                          textSpan.classList.add('opacity-0');
-                          arrow.classList.add('opacity-0');
-                          loader.classList.remove('hidden');
-                          loader.classList.add('flex');
-                        }
-                      }}
-                      className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform'
+                      onClick={() => setIsNavigating(true)}
+                      disabled={isNavigating}
+                      size="lg"
+                      className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform disabled:opacity-75 disabled:cursor-not-allowed'
                       style={{
                         background:
                           'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
@@ -423,18 +412,22 @@ export default function TranscriptLearningLanding() {
                       {/* Overlay gradient */}
                       <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
 
-                      <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
-                        Start learning
-                      </span>
-                      <ArrowRight
-                        className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
-                        style={{ color: 'white' }}
-                      />
-
-                      {/* Loading spinner */}
-                      <div className='button-loader absolute inset-0 hidden items-center justify-center z-10'>
-                        <div className='w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin'></div>
-                      </div>
+                      {isNavigating ? (
+                        <>
+                          <Loader2 className='relative z-10 w-5 h-5 animate-spin' style={{ color: 'white' }} />
+                          <span className='relative z-10'>Loading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className='relative z-10 transition-all duration-300 group-hover:tracking-wide'>
+                            Start learning
+                          </span>
+                          <ArrowRight
+                            className='relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
+                            style={{ color: 'white' }}
+                          />
+                        </>
+                      )}
 
                       {/* Outer glow */}
                       <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/40 to-green-400/40 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out -z-10 scale-95 group-hover:scale-110'></div>

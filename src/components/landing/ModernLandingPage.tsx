@@ -9,6 +9,7 @@ import {
   Code2,
   Github,
   Layers,
+  Loader2,
   MessageSquare,
   PlayCircle,
   Users,
@@ -16,7 +17,9 @@ import {
   Zap,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import NeruviBrandLogo from '../NeruviBrandLogo';
+import { Button } from '../ui/button';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -24,11 +27,13 @@ if (typeof window !== 'undefined') {
 }
 
 export default function ModernLandingPage() {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const features = [
     {
@@ -294,19 +299,34 @@ export default function ModernLandingPage() {
 
           {/* Buttons */}
           <div className='hero-buttons flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
-            <Link
-              href='/sign-up'
-              className='group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 inline-block'>
-              <span className='flex items-center space-x-2'>
-                <span>Start Learning</span>
-                <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
-              </span>
-            </Link>
+            <Button
+              size="lg"
+              onClick={() => {
+                setIsNavigating(true);
+                router.push('/sign-up');
+              }}
+              disabled={isNavigating}
+              className='group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105'>
+              {isNavigating ? (
+                <>
+                  <Loader2 className='w-5 h-5 animate-spin mr-2' />
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <>
+                  <span>Start Learning</span>
+                  <ArrowRight className='w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform' />
+                </>
+              )}
+            </Button>
 
-            <button className='group flex items-center space-x-2 px-8 py-4 border border-slate-300 text-slate-700 rounded-xl font-semibold text-lg hover:bg-slate-50 transition-all duration-300 transform hover:scale-105'>
-              <PlayCircle className='w-5 h-5' />
+            <Button
+              size="lg"
+              variant="outline"
+              className='group px-8 py-4 border-slate-300 text-slate-700 rounded-xl font-semibold text-lg hover:bg-slate-50 transition-all duration-300 transform hover:scale-105'>
+              <PlayCircle className='w-5 h-5 mr-2' />
               <span>Watch Demo</span>
-            </button>
+            </Button>
           </div>
         </div>
       </section>
