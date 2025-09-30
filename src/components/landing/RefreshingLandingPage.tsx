@@ -12,6 +12,7 @@ import {
   Database,
   FileText,
   Github,
+  Heart,
   Linkedin,
   MessageCircle,
   Search,
@@ -24,6 +25,7 @@ import NeruviBrandLogo from '../NeruviBrandLogo';
 import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
 import { PointerHighlight } from '@/components/ui/pointer-highlight';
 import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -300,7 +302,11 @@ export default function TranscriptLearningLanding() {
       <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
-            <NeruviBrandLogo size="md" showIcon={true} showTagline={false} />
+            <NeruviBrandLogo
+              size='md'
+              showIcon={true}
+              showTagline={false}
+            />
 
             <div className='flex items-center space-x-6'>
               <Link
@@ -390,7 +396,10 @@ export default function TranscriptLearningLanding() {
                     <Button
                       onClick={(e) => {
                         const target = e.currentTarget;
-                        target.classList.add('pointer-events-none', 'opacity-75');
+                        target.classList.add(
+                          'pointer-events-none',
+                          'opacity-75',
+                        );
                         const textSpan = target.querySelector('.button-text');
                         const arrow = target.querySelector('.button-arrow');
                         const loader = target.querySelector('.button-loader');
@@ -405,7 +414,8 @@ export default function TranscriptLearningLanding() {
                       style={{
                         background:
                           'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
-                        boxShadow: '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)',
+                        boxShadow:
+                          '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)',
                       }}>
                       {/* Shimmer effect */}
                       <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out'></div>
@@ -413,7 +423,9 @@ export default function TranscriptLearningLanding() {
                       {/* Overlay gradient */}
                       <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
 
-                      <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>Start learning</span>
+                      <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
+                        Start learning
+                      </span>
                       <ArrowRight
                         className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
                         style={{ color: 'white' }}
@@ -799,7 +811,7 @@ export default function TranscriptLearningLanding() {
           </p>
 
           <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
-            <Link href="/sign-up">
+            <Link href='/sign-up'>
               <Button
                 onClick={(e) => {
                   const target = e.currentTarget;
@@ -818,7 +830,8 @@ export default function TranscriptLearningLanding() {
                 style={{
                   background:
                     'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
-                  boxShadow: '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)',
+                  boxShadow:
+                    '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)',
                 }}>
                 {/* Shimmer effect */}
                 <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out'></div>
@@ -826,7 +839,9 @@ export default function TranscriptLearningLanding() {
                 {/* Overlay gradient */}
                 <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
 
-                <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>Start learning</span>
+                <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
+                  Start learning
+                </span>
                 <ArrowRight
                   className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
                   style={{ color: 'white' }}
@@ -845,32 +860,28 @@ export default function TranscriptLearningLanding() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Compact Footer */}
       <footer
-        className='bg-gray-900 py-16'
+        className='bg-gray-900 py-8'
         style={{ color: 'white' }}>
-        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-          <div className='grid lg:grid-cols-2 gap-12 items-center'>
-            <div className='space-y-6'>
-              <div className='flex flex-col space-y-2'>
-                <NeruviBrandLogo size="md" showIcon={true} showTagline={false} variant="light" />
-                <div className='text-sm text-white/70'>© 2025 AI Learning Navigator</div>
-              </div>
-
-              <div className='space-y-2'>
-                <p className='font-semibold text-[#c1c2c5]'>
-                  Crafted with ❤️ by Sanjeev Saniel
-                </p>
-                <p className='flex items-center space-x-2 text-[#c1c2c5]'>
-                  <FileText className='w-4 h-4 text-[#c1c2c5]' />
-                  <span>
-                    Revolutionizing transcript-based learning through AI
-                  </span>
-                </p>
-              </div>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8 '>
+          {/* Main content row */}
+          <div className='flex flex-col lg:flex-row items-center justify-between gap-6 mb-6'>
+            <div className='flex flex-col items-start'>
+              <NeruviBrandLogo
+                size='sm'
+                showIcon={true}
+                showTagline={false}
+                variant='light'
+              />
+              <p className='text-xs text-white/60 flex items-center gap-1.5 ml-1'>
+                <FileText className='w-3 h-3' />
+                Revolutionizing learning through AI
+              </p>
             </div>
 
-            <div className='flex flex-wrap gap-4 justify-start lg:justify-end'>
+            {/* Social links - compact icons only */}
+            <div className='flex items-center gap-3'>
               {[
                 {
                   href: 'https://github.com/SanjeevSaniel',
@@ -898,19 +909,45 @@ export default function TranscriptLearningLanding() {
                   href={link.href}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-300'
+                  title={link.label}
+                  className='p-2.5 rounded-lg transition-all duration-300 hover:scale-110'
                   style={{
-                    backgroundColor: '#459071',
-                    borderColor: '#4ea674',
-                    color: 'white',
+                    backgroundColor: 'rgba(69, 144, 113, 0.2)',
+                    color: '#4ea674',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#459071';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(69, 144, 113, 0.2)';
+                    e.currentTarget.style.color = '#4ea674';
                   }}>
-                  <link.icon
-                    className='w-4 h-4'
-                    style={{ color: 'white' }}
-                  />
-                  <span className='text-sm font-medium'>{link.label}</span>
+                  <link.icon className='w-4 h-4' />
                 </Link>
               ))}
+            </div>
+          </div>
+
+          <Separator className='mb-2' />
+
+          <div className='flex justify-between items-center'>
+            <div className='flex flex-col items-center lg:items-start gap-1'>
+              <p className='flex text-sm font-medium text-white/50'>
+                Crafted with{' '}
+                <span className='mx-1 mt-0.5'>
+                  <Heart size={14} />
+                </span>{' '}
+                by Sanjeev Saniel
+              </p>
+            </div>
+
+            {/* Copyright - single line */}
+            <div className='text-center'>
+              <p className='text-xs text-white/50'>
+                © {new Date().getFullYear()} Neruvi. All rights reserved.
+              </p>
             </div>
           </div>
         </div>
