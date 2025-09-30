@@ -85,24 +85,88 @@ const NeruviBrandLogo = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Pure white circular background - Arattai style */}
+              {/* Definitions */}
+              <defs>
+                {/* Elegant gradient for depth */}
+                <linearGradient id="nGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="1" />
+                  <stop offset="100%" stopColor="#059669" stopOpacity="1" />
+                </linearGradient>
+
+                {/* Subtle inner shadow for depth */}
+                <filter id="innerGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+                  <feOffset dx="0" dy="0.5" result="offsetblur"/>
+                  <feComponentTransfer>
+                    <feFuncA type="linear" slope="0.1"/>
+                  </feComponentTransfer>
+                  <feMerge>
+                    <feMergeNode/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              {/* Premium white circular background */}
               <circle
                 cx="24"
                 cy="24"
                 r="22"
                 fill="white"
-                stroke="none"
+                filter="url(#innerGlow)"
               />
 
-              {/* Clean single-stroke "N" - proper diagonal */}
-              <path
-                d="M 16 30 L 16 18 L 32 30 L 32 18"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
+              {/* Geometric precision "N" with perfect alignment */}
+              <g>
+                {/* Left vertical pillar - perfectly aligned */}
+                <rect
+                  x="15"
+                  y="16"
+                  width="2.5"
+                  height="16"
+                  rx="1.25"
+                  fill="url(#nGradient)"
+                />
+
+                {/* Futuristic diagonal connector - mathematically precise */}
+                <path
+                  d="M 16.25 16 L 30.75 32 L 28.5 32 L 15.5 17.5 Z"
+                  fill="url(#nGradient)"
+                  opacity="0.95"
+                />
+
+                {/* Right vertical pillar - mirror aligned */}
+                <rect
+                  x="30.5"
+                  y="16"
+                  width="2.5"
+                  height="16"
+                  rx="1.25"
+                  fill="url(#nGradient)"
+                />
+
+                {/* Subtle accent lines for tech/futuristic feel */}
+                <line
+                  x1="16.25"
+                  y1="16"
+                  x2="16.25"
+                  y2="14"
+                  stroke="url(#nGradient)"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
+                  opacity="0.4"
+                />
+                <line
+                  x1="31.75"
+                  y1="16"
+                  x2="31.75"
+                  y2="14"
+                  stroke="url(#nGradient)"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
+                  opacity="0.4"
+                />
+              </g>
             </svg>
           </div>
         )}
