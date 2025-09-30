@@ -85,82 +85,23 @@ const NeruviBrandLogo = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Soft shadow definition */}
-              <defs>
-                <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
-                  <feOffset dx="0" dy="1" result="offsetblur"/>
-                  <feComponentTransfer>
-                    <feFuncA type="linear" slope="0.15"/>
-                  </feComponentTransfer>
-                  <feMerge>
-                    <feMergeNode/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-
-                {/* Gradient for modern depth */}
-                <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor={variant === 'light' ? '#10b981' : '#10b981'} />
-                  <stop offset="100%" stopColor={variant === 'light' ? '#059669' : '#059669'} />
-                </linearGradient>
-              </defs>
-
-              {/* Premium white container with subtle shadow */}
-              <rect
-                x="2"
-                y="2"
-                width="44"
-                height="44"
-                rx="12"
-                fill={variant === 'light' ? 'white' : variant === 'dark' ? 'white' : 'white'}
-                filter="url(#softShadow)"
+              {/* Pure white circular background - Arattai style */}
+              <circle
+                cx="24"
+                cy="24"
+                r="22"
+                fill="white"
+                stroke="none"
               />
 
-              {/* Geometric "N" with modern proportions */}
-              <g transform="translate(14, 15)">
-                {/* Left vertical stroke */}
-                <rect
-                  x="0"
-                  y="0"
-                  width="3"
-                  height="18"
-                  rx="1.5"
-                  fill="url(#iconGradient)"
-                />
-
-                {/* Diagonal stroke - perfectly aligned */}
-                <path
-                  d="M 1.5 0 L 18 18 L 15 18 L 1.5 3.5 Z"
-                  fill="url(#iconGradient)"
-                />
-
-                {/* Right vertical stroke */}
-                <rect
-                  x="15"
-                  y="0"
-                  width="3"
-                  height="18"
-                  rx="1.5"
-                  fill="url(#iconGradient)"
-                />
-              </g>
-
-              {/* Refined accent dot - positioned with golden ratio */}
-              <circle
-                cx="36"
-                cy="16"
-                r="2"
-                fill="url(#iconGradient)"
-              />
-
-              {/* Subtle glow for depth */}
-              <circle
-                cx="36"
-                cy="16"
-                r="3.5"
-                fill="url(#iconGradient)"
-                opacity="0.15"
+              {/* Ultra-minimal single-stroke "N" - Arattai approach */}
+              <path
+                d="M 15 30 L 15 18 L 24 27 L 33 18 L 33 30"
+                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
               />
             </svg>
           </div>
