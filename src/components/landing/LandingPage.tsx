@@ -405,7 +405,7 @@ export default function LandingPage() {
                           e.currentTarget.style.boxShadow = '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)';
                         }
                       }}
-                      className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ease-out flex items-center justify-center space-x-3 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed'
+                      className='group relative overflow-hidden text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-out flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed'
                       style={{
                         background:
                           'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
@@ -420,18 +420,14 @@ export default function LandingPage() {
 
                       {isNavigating ? (
                         <>
-                          <Loader2 className='relative z-10 w-5 h-5 animate-spin' style={{ color: 'white' }} />
+                          <Loader2 className='relative z-10 w-4 h-4 animate-spin' style={{ color: 'white' }} />
                           <span className='relative z-10'>Loading...</span>
                         </>
                       ) : (
                         <>
-                          <span className='relative z-10 transition-all duration-300 group-hover:tracking-wide'>
-                            Start learning
+                          <span className='relative z-10'>
+                            Get Started
                           </span>
-                          <ArrowRight
-                            className='relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
-                            style={{ color: 'white' }}
-                          />
                         </>
                       )}
 
@@ -833,7 +829,7 @@ export default function LandingPage() {
                   e.currentTarget.style.transform = 'scale(1) translateY(0)';
                   e.currentTarget.style.boxShadow = '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)';
                 }}
-                className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 ease-out flex items-center justify-center space-x-3 cursor-pointer'
+                className='group relative overflow-hidden text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ease-out flex items-center justify-center space-x-2 cursor-pointer'
                 style={{
                   background:
                     'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
@@ -846,17 +842,13 @@ export default function LandingPage() {
                 {/* Overlay gradient */}
                 <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
 
-                <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
-                  Start learning
+                <span className='button-text relative z-10'>
+                  Get Started
                 </span>
-                <ArrowRight
-                  className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
-                  style={{ color: 'white' }}
-                />
 
                 {/* Loading spinner */}
                 <div className='button-loader absolute inset-0 hidden items-center justify-center z-10'>
-                  <div className='w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin'></div>
+                  <Loader2 className='w-4 h-4 animate-spin' style={{ color: 'white' }} />
                 </div>
 
                 {/* Outer glow */}
