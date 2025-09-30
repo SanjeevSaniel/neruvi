@@ -85,80 +85,135 @@ const NeruviBrandLogo = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Modern white rounded square with shadow */}
+              {/* Soft shadow definition */}
               <defs>
-                <filter id="logoShadow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-                  <feOffset dx="0" dy="2" result="offsetblur"/>
+                <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+                  <feOffset dx="0" dy="1" result="offsetblur"/>
                   <feComponentTransfer>
-                    <feFuncA type="linear" slope="0.2"/>
+                    <feFuncA type="linear" slope="0.15"/>
                   </feComponentTransfer>
                   <feMerge>
                     <feMergeNode/>
                     <feMergeNode in="SourceGraphic"/>
                   </feMerge>
                 </filter>
+
+                {/* Gradient for modern depth */}
+                <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor={variant === 'light' ? '#10b981' : '#10b981'} />
+                  <stop offset="100%" stopColor={variant === 'light' ? '#059669' : '#059669'} />
+                </linearGradient>
               </defs>
 
+              {/* Premium white container with subtle shadow */}
               <rect
-                x="4"
-                y="4"
-                width="40"
-                height="40"
-                rx="11"
+                x="2"
+                y="2"
+                width="44"
+                height="44"
+                rx="12"
                 fill={variant === 'light' ? 'white' : variant === 'dark' ? 'white' : 'white'}
-                filter="url(#logoShadow)"
+                filter="url(#softShadow)"
               />
 
-              {/* Bold "N" lettermark - modern and clean */}
-              <path
-                d="M 16 30 L 16 18 L 25 27 L 25 18"
-                stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
+              {/* Geometric "N" with modern proportions */}
+              <g transform="translate(14, 15)">
+                {/* Left vertical stroke */}
+                <rect
+                  x="0"
+                  y="0"
+                  width="3"
+                  height="18"
+                  rx="1.5"
+                  fill="url(#iconGradient)"
+                />
+
+                {/* Diagonal stroke - perfectly aligned */}
+                <path
+                  d="M 1.5 0 L 18 18 L 15 18 L 1.5 3.5 Z"
+                  fill="url(#iconGradient)"
+                />
+
+                {/* Right vertical stroke */}
+                <rect
+                  x="15"
+                  y="0"
+                  width="3"
+                  height="18"
+                  rx="1.5"
+                  fill="url(#iconGradient)"
+                />
+              </g>
+
+              {/* Refined accent dot - positioned with golden ratio */}
+              <circle
+                cx="36"
+                cy="16"
+                r="2"
+                fill="url(#iconGradient)"
               />
 
-              {/* Enhanced accent dot with glow */}
+              {/* Subtle glow for depth */}
               <circle
-                cx="30"
-                cy="19"
-                r="2.5"
-                fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
-              />
-              <circle
-                cx="30"
-                cy="19"
-                r="4"
-                fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
-                opacity="0.2"
+                cx="36"
+                cy="16"
+                r="3.5"
+                fill="url(#iconGradient)"
+                opacity="0.15"
               />
             </svg>
           </div>
         )}
 
-        {/* Premium Typography */}
+        {/* Premium Typography with Design Principles */}
         <div className="flex flex-col">
           <h1
-            className={`${config.text} font-light font-comfortaa leading-none ${getTextStyle()}`}
+            className={`${config.text} font-comfortaa leading-none ${getTextStyle()}`}
             style={{
-              letterSpacing: '-0.03em',
-              fontVariantNumeric: 'proportional-nums'
+              letterSpacing: '-0.04em',
+              fontWeight: 300,
+              fontVariantNumeric: 'proportional-nums',
+              textRendering: 'optimizeLegibility',
+              WebkitFontSmoothing: 'antialiased',
+              MozOsxFontSmoothing: 'grayscale'
             }}
           >
-            <span className="font-light">ne</span>
-            <span className="font-semibold" style={{ color: variant === 'gradient' ? undefined : variant === 'light' ? 'rgba(255,255,255,0.9)' : '#4ea674' }}>ru</span>
-            <span className="font-light">vi</span>
+            <span style={{ fontWeight: 300 }}>ne</span>
+            <span
+              style={{
+                fontWeight: 700,
+                color: variant === 'gradient' ? undefined : variant === 'light' ? 'rgba(255,255,255,0.95)' : '#059669',
+                position: 'relative',
+                display: 'inline-block'
+              }}
+            >
+              ru
+              {/* Subtle underline accent */}
+              <span
+                style={{
+                  position: 'absolute',
+                  bottom: '-2px',
+                  left: '0',
+                  right: '0',
+                  height: '2px',
+                  background: variant === 'light' ? 'rgba(255,255,255,0.3)' : 'rgba(16,185,129,0.3)',
+                  borderRadius: '1px'
+                }}
+              />
+            </span>
+            <span style={{ fontWeight: 300 }}>vi</span>
           </h1>
 
-          {/* Tagline - positioned directly under logo */}
+          {/* Refined Tagline */}
           {showTagline && (
             <p
-              className={`${config.tagline} ${getTaglineStyle()} font-medium tracking-wider uppercase mt-1`}
+              className={`${config.tagline} ${getTaglineStyle()} font-medium uppercase mt-2`}
               style={{
-                letterSpacing: '0.15em',
-                fontWeight: 600
+                letterSpacing: '0.2em',
+                fontWeight: 500,
+                opacity: 0.85,
+                textRendering: 'optimizeLegibility'
               }}
             >
               AI Learning Navigator
