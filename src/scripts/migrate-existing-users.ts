@@ -131,7 +131,7 @@ async function migrateExistingUsers() {
 
     if (createdCount > 0) {
       console.log(`\n🎉 Successfully migrated ${createdCount} existing users to NeonDB!`);
-      console.log('   These users can now fully access the FlowMind application.');
+      console.log('   These users can now fully access the Neruvi application.');
     }
 
     console.log('\n📋 Next steps:');

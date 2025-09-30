@@ -44,7 +44,8 @@
       "Bash(printf \"y\\n\")",
       "WebFetch(domain:clerk.com)",
       "Bash(timeout:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(npx next lint:*)"
     ],
     "deny": [],
     "ask": []

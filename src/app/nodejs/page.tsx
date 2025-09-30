@@ -18,7 +18,7 @@ export default async function NodejsPage() {
 
 export async function generateMetadata() {
   return {
-    title: 'Node.js Chat - FlowMind',
-    description: 'Start learning Node.js with FlowMind AI assistant',
+    title: 'Node.js Chat - Neruvi',
+    description: 'Start learning Node.js with Neruvi AI assistant',
   };
 }

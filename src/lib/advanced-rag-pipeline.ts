@@ -445,7 +445,7 @@ export class AdvancedRAGPipeline {
     const contextLevel = userContext?.technicalLevel || 'intermediate';
     const learningStyle = userContext?.learningStyle || 'balanced';
 
-    const systemPrompt = `You are FlowMind, an expert ${course} programming tutor. Provide comprehensive, detailed explanations based on course materials.
+    const systemPrompt = `You are Neruvi, an expert ${course} programming tutor. Provide comprehensive, detailed explanations based on course materials.
 
 USER CONTEXT:
 - Technical Level: ${contextLevel}

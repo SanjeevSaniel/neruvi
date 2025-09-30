@@ -188,7 +188,7 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               <span className={`text-sm font-semibold ${
                 message.role === 'user' ? 'order-1 text-purple-700' : 'text-purple-700 font-comfortaa'
               }`}>
-                {message.role === 'assistant' ? 'FlowMind' : 'You'}
+                {message.role === 'assistant' ? 'Neruvi' : 'You'}
               </span>
               <span className={`text-sm font-medium ${
                 message.role === 'user' ? 'text-purple-500' : 'text-slate-500'
@@ -324,7 +324,7 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             <span className={`text-sm font-semibold ${
               message.role === 'user' ? 'order-1 text-purple-700' : 'text-purple-700 font-comfortaa'
             }`}>
-              {message.role === 'assistant' ? 'FlowMind' : 'You'}
+              {message.role === 'assistant' ? 'Neruvi' : 'You'}
             </span>
             <span className={`text-sm font-medium ${
               message.role === 'user' ? 'text-purple-500' : 'text-slate-500'

@@ -6,7 +6,7 @@ import { qdrant } from '../lib/qdrant'
 dotenv.config({ path: '.env.local' })
 
 async function processTranscripts() {
-  console.log('🚀 Processing VTT Transcripts for FlowMind RAG')
+  console.log('🚀 Processing VTT Transcripts for Neruvi RAG')
   console.log('===============================================')
 
   try {

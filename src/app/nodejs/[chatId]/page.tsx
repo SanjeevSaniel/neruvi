@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: NodejsChatPageProps) {
   const { chatId } = await params;
 
   return {
-    title: `Node.js Chat ${chatId.split('-')[1] || ''} - FlowMind`,
+    title: `Node.js Chat ${chatId.split('-')[1] || ''} - Neruvi`,
     description: `Continue your Node.js learning conversation`,
   };
 }

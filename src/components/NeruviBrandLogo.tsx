@@ -85,110 +85,71 @@ const NeruviBrandLogo = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Modern rounded square background */}
-              <rect
-                x="2"
-                y="2"
-                width="44"
-                height="44"
-                rx="12"
-                fill={variant === 'light' ? 'rgba(255,255,255,0.15)' : variant === 'dark' ? 'rgba(0,0,0,0.04)' : 'url(#modernBg)'}
-                stroke={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(0,0,0,0.08)' : 'url(#modernStroke)'}
+              {/* Clean circular background - Arattai style */}
+              <circle
+                cx="24"
+                cy="24"
+                r="22"
+                fill={variant === 'light' ? 'rgba(255,255,255,0.12)' : variant === 'dark' ? 'rgba(0,0,0,0.05)' : 'url(#bgGradient)'}
+                stroke={variant === 'light' ? 'rgba(255,255,255,0.25)' : variant === 'dark' ? 'rgba(0,0,0,0.1)' : 'url(#strokeGradient)'}
                 strokeWidth="1.5"
               />
 
-              {/* Main flowing path - represents learning journey */}
+              {/* Simplified path icon - navigation/journey symbol */}
               <path
-                d="M12 18 Q16 14, 20 16 Q24 18, 28 22 Q32 26, 36 24"
-                stroke={variant === 'light' ? 'white' : variant === 'dark' ? '#374151' : 'url(#pathGradient)'}
+                d="M 15 24 L 22 17 L 29 24 L 36 20"
+                stroke={variant === 'light' ? 'white' : variant === 'dark' ? '#374151' : '#459071'}
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 fill="none"
               />
 
-              {/* Secondary subtle path for depth */}
+              {/* Accent line for depth */}
               <path
-                d="M12 22 Q16 20, 20 22 Q24 24, 28 28 Q32 32, 36 30"
-                stroke={variant === 'light' ? 'rgba(255,255,255,0.4)' : variant === 'dark' ? 'rgba(55,65,81,0.4)' : 'url(#pathGradient2)'}
-                strokeWidth="2"
+                d="M 15 28 L 36 24"
+                stroke={variant === 'light' ? 'rgba(255,255,255,0.4)' : variant === 'dark' ? 'rgba(55,65,81,0.3)' : '#5fad81'}
+                strokeWidth="1.5"
                 strokeLinecap="round"
-                strokeLinejoin="round"
                 fill="none"
+                opacity="0.6"
               />
 
-              {/* Start point - larger emphasis */}
+              {/* Clean navigation dots */}
               <circle
-                cx="12"
-                cy="18"
-                r="3"
+                cx="15"
+                cy="24"
+                r="2.5"
                 fill={variant === 'light' ? 'white' : variant === 'dark' ? '#374151' : '#459071'}
               />
               <circle
-                cx="12"
-                cy="18"
-                r="1.5"
-                fill={variant === 'light' ? 'rgba(255,255,255,0.5)' : variant === 'dark' ? 'rgba(55,65,81,0.3)' : '#f0f9f4'}
+                cx="22"
+                cy="17"
+                r="2"
+                fill={variant === 'light' ? 'rgba(255,255,255,0.85)' : variant === 'dark' ? 'rgba(55,65,81,0.8)' : '#4ea674'}
               />
-
-              {/* Mid-point navigation marker */}
               <circle
-                cx="24"
+                cx="29"
+                cy="24"
+                r="2"
+                fill={variant === 'light' ? 'rgba(255,255,255,0.85)' : variant === 'dark' ? 'rgba(55,65,81,0.8)' : '#5fad81'}
+              />
+              <circle
+                cx="36"
                 cy="20"
                 r="2.5"
-                fill={variant === 'light' ? 'white' : variant === 'dark' ? '#374151' : '#4ea674'}
-                opacity="0.9"
-              />
-
-              {/* End point - destination */}
-              <circle
-                cx="36"
-                cy="24"
-                r="3"
-                fill={variant === 'light' ? 'white' : variant === 'dark' ? '#374151' : '#5fad81'}
-              />
-              <circle
-                cx="36"
-                cy="24"
-                r="1.5"
-                fill={variant === 'light' ? 'rgba(255,255,255,0.5)' : variant === 'dark' ? 'rgba(55,65,81,0.3)' : '#dcfce7'}
-              />
-
-              {/* Decorative accent dots - modern touch */}
-              <circle
-                cx="18"
-                cy="32"
-                r="1.5"
-                fill={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(55,65,81,0.2)' : '#4ea674'}
-                opacity="0.6"
-              />
-              <circle
-                cx="30"
-                cy="14"
-                r="1.5"
-                fill={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(55,65,81,0.2)' : '#5fad81'}
-                opacity="0.6"
+                fill={variant === 'light' ? 'white' : variant === 'dark' ? '#374151' : '#68b889'}
               />
 
               {/* Gradients */}
               <defs>
-                <linearGradient id="modernBg" x1="0" y1="0" x2="48" y2="48">
+                <linearGradient id="bgGradient" x1="0" y1="0" x2="48" y2="48">
                   <stop offset="0%" stopColor="#f0f9f4" />
-                  <stop offset="50%" stopColor="#dcfce7" />
-                  <stop offset="100%" stopColor="#bbf7d0" />
+                  <stop offset="100%" stopColor="#dcfce7" />
                 </linearGradient>
-                <linearGradient id="modernStroke" x1="0" y1="0" x2="48" y2="48">
-                  <stop offset="0%" stopColor="#459071" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#5fad81" stopOpacity="0.2" />
-                </linearGradient>
-                <linearGradient id="pathGradient" x1="12" y1="18" x2="36" y2="24">
-                  <stop offset="0%" stopColor="#459071" />
-                  <stop offset="50%" stopColor="#4ea674" />
-                  <stop offset="100%" stopColor="#5fad81" />
-                </linearGradient>
-                <linearGradient id="pathGradient2" x1="12" y1="22" x2="36" y2="30">
-                  <stop offset="0%" stopColor="#459071" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#5fad81" stopOpacity="0.4" />
+                <linearGradient id="strokeGradient" x1="0" y1="0" x2="48" y2="48">
+                  <stop offset="0%" stopColor="#459071" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="#5fad81" stopOpacity="0.15" />
                 </linearGradient>
               </defs>
             </svg>

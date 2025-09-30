@@ -5,8 +5,6 @@ import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 import NeruviBrandLogo from '../NeruviBrandLogo';
 import ConversationHistoryIcon from '../ui/ConversationHistoryIcon';
-import ThreadToggle from '@/components/threading/ThreadToggle';
-import { UserRole } from '@/lib/threading/permissions';
 import { useUserRole as useUserRoleHook } from '@/hooks/useUserRole';
 
 const AIStatusIndicator = () => {
@@ -59,24 +57,11 @@ const AIStatusIndicator = () => {
 interface ChatHeaderProps {
   onOpenSidebar?: () => void;
   onHeaderClick?: () => void;
-  // Threading props
-  canToggleThreadView?: boolean;
-  userRole?: UserRole;
-  showThreadSidebar?: boolean;
-  onToggleThreadSidebar?: (show: boolean) => void;
-  threadsCount?: number;
-  hasActiveConversation?: boolean;
 }
 
 export default function ChatHeader({
   onOpenSidebar,
   onHeaderClick,
-  canToggleThreadView,
-  userRole,
-  showThreadSidebar,
-  onToggleThreadSidebar,
-  threadsCount,
-  hasActiveConversation,
 }: ChatHeaderProps) {
   const { userRole: currentUserRole, canAccessAdmin, isLoading } = useUserRoleHook();
 
@@ -154,25 +139,6 @@ export default function ChatHeader({
             </motion.div>
           </div> */}
           <AIStatusIndicator />
-
-          {/* Threading Toggle - Only show when there's an active conversation */}
-          {canToggleThreadView &&
-            onToggleThreadSidebar &&
-            hasActiveConversation && (
-              <div className='flex items-center space-x-2'>
-                <ThreadToggle
-                  isVisible={showThreadSidebar || false}
-                  onToggle={onToggleThreadSidebar}
-                  variant='compact'
-                />
-                {/* Thread counter for admin/moderators */}
-                {userRole !== 'user' && threadsCount !== undefined && (
-                  <span className='text-xs font-medium text-white/70'>
-                    {threadsCount === 0 ? '(New)' : `(${threadsCount})`}
-                  </span>
-                )}
-              </div>
-            )}
 
           {/* Mobile version */}
           <div className='md:hidden'>
