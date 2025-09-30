@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./public/neruvi-logo.png" alt="Neruvi Logo" width="80" height="80" />
+  <img src="./public/icon-192x192.svg" alt="Neruvi Logo" width="80" height="80" />
   <h1>Neruvi ✨</h1>
   <p><em>Your AI Learning Navigator</em></p>
 </div>
