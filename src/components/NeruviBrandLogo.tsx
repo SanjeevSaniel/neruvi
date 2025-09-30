@@ -107,20 +107,24 @@ const NeruviBrandLogo = ({
                 </filter>
               </defs>
 
-              {/* Premium white circular background with subtle border */}
-              <circle
-                cx="24"
-                cy="24"
-                r="22"
+              {/* Premium white rounded square background */}
+              <rect
+                x="2"
+                y="2"
+                width="44"
+                height="44"
+                rx="11"
                 fill="white"
                 filter="url(#innerGlow)"
               />
 
               {/* Subtle border for visibility on white backgrounds */}
-              <circle
-                cx="24"
-                cy="24"
-                r="21.5"
+              <rect
+                x="2.25"
+                y="2.25"
+                width="43.5"
+                height="43.5"
+                rx="10.75"
                 fill="none"
                 stroke={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(0,0,0,0.06)' : 'rgba(16,185,129,0.08)'}
                 strokeWidth="0.5"
