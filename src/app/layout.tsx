@@ -63,9 +63,9 @@ export const metadata: Metadata = {
     siteName: 'Neruvi',
     images: [
       {
-        url: '/favicon.svg',
-        width: 512,
-        height: 512,
+        url: '/opengraph-image.svg',
+        width: 1200,
+        height: 630,
         alt: 'Neruvi - AI Learning Navigator',
       },
     ],
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     title: 'Neruvi - AI Learning Navigator',
     description:
       'Master Node.js and Python with Neruvi, your intelligent learning navigator.',
-    images: ['/favicon.svg'],
+    images: ['/opengraph-image.svg'],
     creator: '@neruvi',
   },
   robots: {

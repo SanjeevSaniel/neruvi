@@ -22,25 +22,25 @@ const NeruviBrandLogo = ({
       text: 'text-2xl',
       icon: 32,
       tagline: 'text-[10px]',
-      gap: 'space-x-2'
+      gap: 'space-x-1.5'
     },
     md: {
       text: 'text-4xl',
       icon: 40,
       tagline: 'text-xs',
-      gap: 'space-x-2.5'
+      gap: 'space-x-2'
     },
     lg: {
       text: 'text-6xl',
       icon: 56,
       tagline: 'text-base',
-      gap: 'space-x-3'
+      gap: 'space-x-2.5'
     },
     xl: {
       text: 'text-7xl md:text-8xl',
       icon: 72,
       tagline: 'text-lg',
-      gap: 'space-x-4'
+      gap: 'space-x-3'
     }
   };
 
@@ -74,7 +74,7 @@ const NeruviBrandLogo = ({
 
   return (
     <div className={`inline-flex flex-col ${className}`}>
-      <div className={`flex items-center ${config.gap}`} style={{ alignItems: 'center' }}>
+      <div className={`flex items-center ${config.gap}`} style={{ alignItems: 'center', display: 'flex', justifyContent: 'center' }}>
         {/* Minimalist Arattai-style Icon */}
         {showIcon && (
           <div className="relative flex-shrink-0">
@@ -113,78 +113,78 @@ const NeruviBrandLogo = ({
                 </filter>
               </defs>
 
-              {/* Premium rounded square background */}
+              {/* Premium rounded square background - tighter padding */}
               <rect
-                x="2"
-                y="2"
-                width="44"
-                height="44"
-                rx="11"
+                x="8"
+                y="8"
+                width="32"
+                height="32"
+                rx="8"
                 fill={variant === 'light' ? 'white' : variant === 'dark' ? 'white' : 'url(#bgGradient)'}
                 filter="url(#innerGlow)"
               />
 
               {/* Subtle border for definition */}
               <rect
-                x="2.25"
-                y="2.25"
-                width="43.5"
-                height="43.5"
-                rx="10.75"
+                x="8.25"
+                y="8.25"
+                width="31.5"
+                height="31.5"
+                rx="7.75"
                 fill="none"
                 stroke={variant === 'light' ? 'rgba(255,255,255,0.3)' : variant === 'dark' ? 'rgba(0,0,0,0.08)' : 'rgba(16,185,129,0.15)'}
                 strokeWidth="0.5"
               />
 
-              {/* Geometric precision "N" with perfect alignment */}
+              {/* Geometric precision "N" with perfect alignment - BOLD */}
               <g>
-                {/* Left vertical pillar - perfectly aligned */}
+                {/* Left vertical pillar - perfectly aligned and bolder */}
                 <rect
-                  x="15"
-                  y="16"
-                  width="2.5"
-                  height="16"
-                  rx="1.25"
+                  x="14.5"
+                  y="15"
+                  width="3.5"
+                  height="18"
+                  rx="1.75"
                   fill="url(#nGradient)"
                 />
 
-                {/* Futuristic diagonal connector - mathematically precise */}
+                {/* Futuristic diagonal connector - mathematically precise and bolder */}
                 <path
-                  d="M 16.25 16 L 30.75 32 L 28.5 32 L 15.5 17.5 Z"
+                  d="M 16.25 15 L 31.75 33 L 28.75 33 L 14.75 17 Z"
                   fill="url(#nGradient)"
-                  opacity="0.95"
+                  opacity="1"
                 />
 
-                {/* Right vertical pillar - mirror aligned */}
+                {/* Right vertical pillar - mirror aligned and bolder */}
                 <rect
-                  x="30.5"
-                  y="16"
-                  width="2.5"
-                  height="16"
-                  rx="1.25"
+                  x="30"
+                  y="15"
+                  width="3.5"
+                  height="18"
+                  rx="1.75"
                   fill="url(#nGradient)"
                 />
 
-                {/* Subtle accent lines for tech/futuristic feel */}
+                {/* Enhanced accent lines for tech/futuristic feel */}
                 <line
                   x1="16.25"
-                  y1="16"
+                  y1="15"
                   x2="16.25"
-                  y2="14"
+                  y2="13"
                   stroke="url(#nGradient)"
-                  strokeWidth="0.5"
+                  strokeWidth="0.8"
                   strokeLinecap="round"
-                  opacity="0.4"
+                  opacity="0.5"
                 />
                 <line
                   x1="31.75"
-                  y1="16"
+                  y1="15"
                   x2="31.75"
-                  y2="14"
+                  y2="13"
                   stroke="url(#nGradient)"
-                  strokeWidth="0.5"
+                  strokeWidth="0.8"
                   strokeLinecap="round"
-                  opacity="0.4"
+                  opacity="0.5"
                 />
               </g>
             </svg>
