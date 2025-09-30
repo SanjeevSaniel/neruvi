@@ -43,7 +43,7 @@ export default function TypingIndicator() {
             </motion.div>
           </motion.div>
           <span className='text-sm font-semibold text-purple-700 font-comfortaa'>
-            FlowMind
+            Neruvi
           </span>
         </div>
         <div className='px-4 py-2 rounded-2xl bg-white/50 backdrop-blur-sm'>

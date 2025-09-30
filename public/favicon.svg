@@ -1,35 +1,50 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="6" fill="url(#gradient)"/>
-  
-  <!-- Simplified F with flow elements -->
-  <g transform="translate(6, 8)">
-    <!-- Stylized F -->
-    <path d="M0 2 Q0 0 2 0 L10 0 Q12 0 12 2 Q12 4 10 4 L4 4 L4 7 L8 7 Q10 7 10 9 Q10 11 8 11 L4 11 L4 14 Q4 16 2 16 Q0 16 0 14 L0 2 Z" 
-          fill="white"/>
-  </g>
-  
-  <!-- Flow streams -->
-  <path d="M6 12 Q12 10 18 14" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.8"/>
-  <path d="M8 20 Q14 18 20 22" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.7"/>
-  
-  <!-- Knowledge nodes -->
-  <circle cx="12" cy="11" r="1.5" fill="white" opacity="0.9"/>
-  <circle cx="16" cy="13" r="1" fill="white" opacity="0.8"/>
-  <circle cx="14" cy="19" r="1.2" fill="white" opacity="0.85"/>
-  
-  <!-- Mind symbol -->
-  <g transform="translate(22, 10)">
-    <circle cx="0" cy="0" r="4" fill="white" opacity="0.9"/>
-    <circle cx="0" cy="0" r="2" fill="#4ea674" opacity="0.8"/>
-    <!-- Mini neural pattern -->
-    <path d="M-1.5 -1.5 L1.5 1.5 M1.5 -1.5 L-1.5 1.5" stroke="white" stroke-width="0.5" opacity="0.7"/>
-  </g>
-  
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
-      <stop offset="0%" stop-color="#4ea674"/>
-      <stop offset="50%" stop-color="#5fad81"/>
-      <stop offset="100%" stop-color="#459071"/>
+    <!-- Background gradient -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4" />
+      <stop offset="100%" stop-color="#dcfce7" />
     </linearGradient>
+
+    <!-- Elegant gradient for N lettermark -->
+    <linearGradient id="nGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="1" />
+      <stop offset="100%" stop-color="#059669" stop-opacity="1" />
+    </linearGradient>
+
+    <!-- Subtle inner shadow for depth -->
+    <filter id="innerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1"/>
+      <feOffset dx="0" dy="0.5" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.1"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
+
+  <!-- Premium rounded square background - tighter padding -->
+  <rect x="8" y="8" width="32" height="32" rx="8" fill="url(#bgGradient)" filter="url(#innerGlow)" />
+
+  <!-- Subtle border for definition -->
+  <rect x="8.25" y="8.25" width="31.5" height="31.5" rx="7.75" fill="none" stroke="rgba(16,185,129,0.15)" stroke-width="0.5" />
+
+  <!-- Geometric precision "N" with perfect alignment - BOLD -->
+  <g>
+    <!-- Left vertical pillar - perfectly aligned and bolder -->
+    <rect x="14.5" y="15" width="3.5" height="18" rx="1.75" fill="url(#nGradient)" />
+
+    <!-- Futuristic diagonal connector - mathematically precise and bolder -->
+    <path d="M 16.25 15 L 31.75 33 L 28.75 33 L 14.75 17 Z" fill="url(#nGradient)" opacity="1" />
+
+    <!-- Right vertical pillar - mirror aligned and bolder -->
+    <rect x="30" y="15" width="3.5" height="18" rx="1.75" fill="url(#nGradient)" />
+
+    <!-- Enhanced accent lines for tech/futuristic feel -->
+    <line x1="16.25" y1="15" x2="16.25" y2="13" stroke="url(#nGradient)" stroke-width="0.8" stroke-linecap="round" opacity="0.5" />
+    <line x1="31.75" y1="15" x2="31.75" y2="13" stroke="url(#nGradient)" stroke-width="0.8" stroke-linecap="round" opacity="0.5" />
+  </g>
 </svg>

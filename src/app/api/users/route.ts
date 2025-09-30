@@ -8,16 +8,26 @@ export async function GET(request: NextRequest) {
   try {
     // Check if database is enabled
     if (!isDatabaseEnabled()) {
+      console.log('❌ Database not enabled');
       return NextResponse.json(
         { error: 'Database not enabled. Using SessionStorage.' },
         { status: 503 }
       );
     }
 
+    console.log('🔍 Checking Clerk authentication...');
     const { userId } = await auth();
     const clerkUser = await currentUser();
-    
+
+    console.log('🔍 Auth check results:', {
+      hasUserId: !!userId,
+      userId: userId,
+      hasClerkUser: !!clerkUser,
+      userEmail: clerkUser?.emailAddresses?.[0]?.emailAddress
+    });
+
     if (!userId || !clerkUser) {
+      console.log('❌ Authentication failed - no userId or clerkUser');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -53,6 +63,7 @@ export async function GET(request: NextRequest) {
         clerkId: user.clerkId,
         email: user.email,
         displayName: user.displayName,
+        role: user.role, // Include the user's role
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         usage: usage ? {
@@ -73,9 +84,16 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error('❌ Error fetching user data:', error);
+    if (error instanceof Error) {
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error stack:', error.stack);
+    }
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

@@ -18,7 +18,7 @@ export default async function PythonPage() {
 
 export async function generateMetadata() {
   return {
-    title: 'Python Chat - FlowMind',
-    description: 'Start learning Python with FlowMind AI assistant',
+    title: 'Python Chat - Neruvi',
+    description: 'Start learning Python with Neruvi AI assistant',
   };
 }

@@ -1,11 +1,11 @@
 // components/chat/ChatHeader.tsx
 import { motion } from 'framer-motion';
-import { Brain } from 'lucide-react';
+import { Brain, Shield } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
-import FlowMindLogo from '../FlowMindLogo';
+import Link from 'next/link';
+import NeruviBrandLogo from '../NeruviBrandLogo';
 import ConversationHistoryIcon from '../ui/ConversationHistoryIcon';
-import ThreadToggle, { StudentThreadBenefits } from '@/components/threading/ThreadToggle';
-import { UserRole } from '@/lib/threading/permissions';
+import { useUserRole as useUserRoleHook } from '@/hooks/useUserRole';
 
 const AIStatusIndicator = () => {
   return (
@@ -57,25 +57,15 @@ const AIStatusIndicator = () => {
 interface ChatHeaderProps {
   onOpenSidebar?: () => void;
   onHeaderClick?: () => void;
-  // Threading props
-  canToggleThreadView?: boolean;
-  userRole?: UserRole;
-  showThreadSidebar?: boolean;
-  onToggleThreadSidebar?: (show: boolean) => void;
-  threadsCount?: number;
-  hasActiveConversation?: boolean;
 }
 
 export default function ChatHeader({
   onOpenSidebar,
   onHeaderClick,
-  canToggleThreadView,
-  userRole,
-  showThreadSidebar,
-  onToggleThreadSidebar,
-  threadsCount,
-  hasActiveConversation,
 }: ChatHeaderProps) {
+  const { userRole: currentUserRole, canAccessAdmin, isLoading } = useUserRoleHook();
+
+
   return (
     <motion.div
       initial={{ y: -20, opacity: 0 }}
@@ -127,21 +117,7 @@ export default function ChatHeader({
             onClick={onHeaderClick}
             className='flex justify-center items-center gap-2 p-1.5 rounded-lg cursor-pointer'
             title='Show course selection'>
-            <div className='scale-90'>
-              <FlowMindLogo animated={true} />
-            </div>
-
-            {/* Brand Text */}
-            <div className='text-left'>
-              <h1
-                className='text-lg font-semibold drop-shadow-lg tracking-tight lowercase font-comfortaa'
-                style={{ color: 'white' }}>
-                FlowMind
-              </h1>
-              <p className='text-[10px] text-primary-100/90 font-medium -mt-0.5 drop-shadow-sm'>
-                AI Learning Assistant
-              </p>
-            </div>
+            <NeruviBrandLogo size="sm" showIcon={true} showTagline={false} variant="light" />
           </button>
         </div>
 
@@ -164,25 +140,6 @@ export default function ChatHeader({
           </div> */}
           <AIStatusIndicator />
 
-          {/* Threading Toggle - Only show when there's an active conversation */}
-          {canToggleThreadView &&
-            onToggleThreadSidebar &&
-            hasActiveConversation && (
-              <div className='flex items-center space-x-2'>
-                <ThreadToggle
-                  isVisible={showThreadSidebar || false}
-                  onToggle={onToggleThreadSidebar}
-                  variant='compact'
-                />
-                {/* Thread counter for admin/moderators */}
-                {userRole !== 'user' && threadsCount !== undefined && (
-                  <span className='text-xs font-medium text-white/70'>
-                    {threadsCount === 0 ? '(New)' : `(${threadsCount})`}
-                  </span>
-                )}
-              </div>
-            )}
-
           {/* Mobile version */}
           <div className='md:hidden'>
             <motion.div className='flex items-center space-x-1 px-2 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20'>
@@ -194,6 +151,23 @@ export default function ChatHeader({
               </span>
             </motion.div>
           </div>
+
+          {/* Admin Button - Only visible to admins and moderators */}
+          {canAccessAdmin && !isLoading && (
+            <Link href='/admin'>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className='flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-200 cursor-pointer'
+                title={`Admin Dashboard (${currentUserRole})`}>
+                <Shield className='w-4 h-4 text-white' />
+                <span className='text-xs font-medium text-white hidden sm:block'>
+                  {currentUserRole === 'admin' ? 'Admin' : 'Mod'}
+                </span>
+              </motion.button>
+            </Link>
+          )}
+
           {/* User Profile - Compact */}
           <UserButton
             appearance={{

@@ -6,7 +6,7 @@ import { VTTProcessor } from '../lib/vtt-processor'
 dotenv.config({ path: '.env.local' })
 
 async function main() {
-  console.log('🚀 FlowMind Qdrant Cloud Setup')
+  console.log('🚀 Neruvi Qdrant Cloud Setup')
   console.log('================================')
 
   const qdrantSetup = new QdrantSetup()

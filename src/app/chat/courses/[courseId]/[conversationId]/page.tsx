@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: ConversationPageProps) {
   const courseName = courseId === 'nodejs' ? 'Node.js' : 'Python';
   
   return {
-    title: `${courseName} Conversation - FlowMind`,
+    title: `${courseName} Conversation - Neruvi`,
     description: `Continue your ${courseName} learning conversation`,
   };
 }

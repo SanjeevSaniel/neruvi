@@ -177,6 +177,18 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
     });
 
     if (!response.ok) {
+      // Handle 503 (Database not enabled) - fall back to sessionStorage
+      if (response.status === 503) {
+        console.warn('⚠️ Database not enabled (503), falling back to sessionStorage');
+        return { success: false, useSessionStorage: true };
+      }
+
+      // Handle 401 (Unauthorized) - user not authenticated
+      if (response.status === 401) {
+        console.warn('⚠️ User not authenticated (401)');
+        return { success: false, unauthorized: true };
+      }
+
       let errorDetails = `HTTP ${response.status}: ${response.statusText}`;
       try {
         const errorBody = await response.text();
@@ -660,31 +672,23 @@ export const useConversationStore = create<ConversationStore>()(
 
     loadConversation: async (conversationId: string) => {
       const state = get();
-      state.setLoading(true);
-      state.setError(null);
 
       try {
         if (isDatabaseEnabled()) {
-          console.log('🔍 Loading specific conversation from database:', conversationId);
-          
           // Check if conversation already exists in store with messages
           const existingConversation = state.conversations.find(c => c.id === conversationId);
           if (existingConversation && existingConversation.messages.length > 0) {
-            console.log('✅ Conversation already loaded:', conversationId);
+            console.log('✅ Using cached conversation:', conversationId);
             state.setCurrentConversation(conversationId);
             return;
           }
-          
+
+          console.log('📡 Loading conversation from database:', conversationId);
+          state.setLoading(true);
+
           // Load messages for this specific conversation
           const response = await apiCall(`/api/messages?conversationId=${conversationId}`);
-          
-          console.log('📡 Messages API response:', {
-            success: response.success,
-            conversationId,
-            messagesCount: response.data?.length || 0,
-            conversation: response.conversation
-          });
-          
+
           if (response.success && response.data) {
             const messages: Message[] = response.data.map((msg: MessageData) => ({
               id: msg.id,
@@ -693,7 +697,7 @@ export const useConversationStore = create<ConversationStore>()(
               sources: msg.sources || [],
               timestamp: new Date(msg.timestamp),
             }));
-            
+
             // Update or add conversation with loaded messages
             set((state) => {
               const updatedConversations = state.conversations.map((conv) => {
@@ -707,7 +711,7 @@ export const useConversationStore = create<ConversationStore>()(
                 }
                 return conv;
               });
-              
+
               // If conversation doesn't exist in store, add it
               if (!updatedConversations.find(c => c.id === conversationId) && response.conversation) {
                 updatedConversations.push({
@@ -719,19 +723,14 @@ export const useConversationStore = create<ConversationStore>()(
                   selectedCourse: response.conversation.selectedCourse,
                 });
               }
-              
+
               return {
                 conversations: updatedConversations,
                 currentConversationId: conversationId,
               };
             });
-            
-            console.log('✅ Conversation loaded with messages:', {
-              conversationId,
-              messagesCount: messages.length
-            });
-          } else {
-            throw new Error('Failed to load conversation messages');
+
+            console.log('✅ Conversation loaded:', conversationId, `(${messages.length} messages)`);
           }
         } else {
           // Fallback to session storage
@@ -778,14 +777,22 @@ export const useConversationStore = create<ConversationStore>()(
           }
 
           const response = await apiCall('/api/conversations');
-          
+
+          // Check if we should fallback to sessionStorage
+          if (response.useSessionStorage || response.unauthorized) {
+            console.warn('⚠️ Falling back to SessionStorage due to:', response.useSessionStorage ? 'Database not enabled' : 'Unauthorized');
+            const { conversations, currentId } = loadFromSessionStorage();
+            set({ conversations, currentConversationId: currentId });
+            return;
+          }
+
           console.log('📡 Database API response:', {
             success: response.success,
             dataKeys: Object.keys(response.data || {}),
             conversationsLength: response.data?.conversations?.length || 0,
             rawData: response.data
           });
-          
+
           const conversations: Conversation[] = (response.data?.conversations || []).map((conv: ConversationData) => {
             console.log('🔍 Store loading conversation:', {
               conversationId: conv.id,

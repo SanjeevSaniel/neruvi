@@ -1,12 +1,13 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { getCourseColors } from '@/lib/courseColors';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, ChevronRight, Code2, Sparkles } from 'lucide-react';
+import { CheckCircle, ChevronRight, Code2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { SiNodedotjs, SiPython } from 'react-icons/si';
-import { getCourseColors } from '@/lib/courseColors';
-import '../../styles/scrollbar.css';
+import '@/styles/scrollbar.css';
+import { Button } from '../ui/button';
 
 export type CourseType = 'nodejs' | 'python';
 
@@ -51,54 +52,54 @@ const courseOptions = baseCourseData.map((course) => ({
   ...getCourseColors(course.id),
 }));
 
-const getSuggestionsForCourse = (courseId: CourseType) => {
-  const suggestions = {
-    nodejs: [
-      {
-        icon: '🚀',
-        text: 'Express.js best practices',
-        category: 'Framework',
-      },
-      { icon: '🔒', text: 'JWT authentication setup', category: 'Security' },
-      { icon: '📡', text: 'Building REST APIs', category: 'API Design' },
-      {
-        icon: '🔄',
-        text: 'Async/await patterns',
-        category: 'Async Programming',
-      },
-      {
-        icon: '📦',
-        text: 'NPM package management',
-        category: 'Dependencies',
-      },
-    ],
-    python: [
-      {
-        icon: '🐍',
-        text: 'Object-oriented programming',
-        category: 'OOP Concepts',
-      },
-      {
-        icon: '📊',
-        text: 'Data structures & algorithms',
-        category: 'Fundamentals',
-      },
-      {
-        icon: '🌐',
-        text: 'Django/Flask web frameworks',
-        category: 'Web Development',
-      },
-      {
-        icon: '📈',
-        text: 'NumPy and pandas basics',
-        category: 'Data Science',
-      },
-      { icon: '🤖', text: 'Machine learning intro', category: 'AI/ML' },
-    ],
-  };
+// const getSuggestionsForCourse = (courseId: CourseType) => {
+//   const suggestions = {
+//     nodejs: [
+//       {
+//         icon: '🚀',
+//         text: 'Express.js best practices',
+//         category: 'Framework',
+//       },
+//       { icon: '🔒', text: 'JWT authentication setup', category: 'Security' },
+//       { icon: '📡', text: 'Building REST APIs', category: 'API Design' },
+//       {
+//         icon: '🔄',
+//         text: 'Async/await patterns',
+//         category: 'Async Programming',
+//       },
+//       {
+//         icon: '📦',
+//         text: 'NPM package management',
+//         category: 'Dependencies',
+//       },
+//     ],
+//     python: [
+//       {
+//         icon: '🐍',
+//         text: 'Object-oriented programming',
+//         category: 'OOP Concepts',
+//       },
+//       {
+//         icon: '📊',
+//         text: 'Data structures & algorithms',
+//         category: 'Fundamentals',
+//       },
+//       {
+//         icon: '🌐',
+//         text: 'Django/Flask web frameworks',
+//         category: 'Web Development',
+//       },
+//       {
+//         icon: '📈',
+//         text: 'NumPy and pandas basics',
+//         category: 'Data Science',
+//       },
+//       { icon: '🤖', text: 'Machine learning intro', category: 'AI/ML' },
+//     ],
+//   };
 
-  return suggestions[courseId];
-};
+//   return suggestions[courseId];
+// };
 
 export default function CourseSelectorPage() {
   const router = useRouter();
@@ -109,17 +110,24 @@ export default function CourseSelectorPage() {
     setSelectedCourse(courseId);
   };
 
-  const handleSuggestionClick = (suggestion: string, courseId: CourseType) => {
-    // Generate optimized conversation ID for suggestion navigation
-    const timestamp = Date.now().toString(36);
-    const randomPart = Math.random().toString(36).substring(2, 8);
-    const conversationId = `${courseId}-${timestamp}-${randomPart}`;
+  // const handleSuggestionClick = (suggestion: string, courseId: CourseType) => {
+  //   // Generate optimized conversation ID for suggestion navigation
+  //   const timestamp = Date.now().toString(36);
+  //   const randomPart = Math.random().toString(36).substring(2, 8);
+  //   const conversationId = `${courseId}-${timestamp}-${randomPart}`;
 
-    console.log('🚀 Suggestion clicked - Generated conversation ID:', conversationId);
+  //   console.log(
+  //     '🚀 Suggestion clicked - Generated conversation ID:',
+  //     conversationId,
+  //   );
 
-    // Navigate to the new URL structure with conversation ID and suggestion
-    router.push(`/${courseId}/${conversationId}?suggestion=${encodeURIComponent(suggestion)}`);
-  };
+  //   // Navigate to the new URL structure with conversation ID and suggestion
+  //   router.push(
+  //     `/${courseId}/${conversationId}?suggestion=${encodeURIComponent(
+  //       suggestion,
+  //     )}`,
+  //   );
+  // };
 
   const handleCourseNavigation = (courseId: CourseType) => {
     // Generate optimized conversation ID for immediate navigation
@@ -127,7 +135,10 @@ export default function CourseSelectorPage() {
     const randomPart = Math.random().toString(36).substring(2, 8);
     const conversationId = `${courseId}-${timestamp}-${randomPart}`;
 
-    console.log('🚀 Start Learning clicked - Generated conversation ID:', conversationId);
+    console.log(
+      '🚀 Start Learning clicked - Generated conversation ID:',
+      conversationId,
+    );
 
     // Navigate directly to the new URL structure with conversation ID
     router.push(`/${courseId}/${conversationId}`);
@@ -330,7 +341,7 @@ export default function CourseSelectorPage() {
                 className='max-w-5xl mx-auto'>
                 {/* Section Header */}
                 <div className='text-center mb-6'>
-                  <div className='flex items-center justify-center space-x-2 text-slate-700 mb-3'>
+                  {/* <div className='flex items-center justify-center space-x-2 text-slate-700 mb-3'>
                     <Sparkles className='w-5 h-5 text-purple-500' />
                     <h3 className='text-xl font-bold'>
                       Popular{' '}
@@ -338,21 +349,22 @@ export default function CourseSelectorPage() {
                       Topics
                     </h3>
                     <Sparkles className='w-5 h-5 text-purple-500' />
-                  </div>
-                  <p className='text-slate-500 text-sm mb-4'>
+                  </div> */}
+                  {/* <p className='text-slate-500 text-sm mb-4'>
                     Click any topic to get started, or navigate to start your
                     own conversation
-                  </p>
-                  <button
+                  </p> */}
+                  <Button
+                    variant='default'
                     onClick={() => handleCourseNavigation(selectedCourse)}
-                    className='px-6 py-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105'>
+                    className='px-6 py-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-200 transform hover:scale-105 cursor-pointer'>
                     Start Learning{' '}
                     {selectedCourse === 'nodejs' ? 'Node.js' : 'Python'}
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Suggestions Grid */}
-                <div className='grid md:grid-cols-5 gap-3 mb-6'>
+                {/* <div className='grid md:grid-cols-5 gap-3 mb-6'>
                   {getSuggestionsForCourse(selectedCourse).map(
                     (suggestion, index) => {
                       const selectedCourseOption = courseOptions.find(
@@ -394,18 +406,18 @@ export default function CourseSelectorPage() {
                             .replace('200', '300')} 
                           hover:shadow-md transition-all duration-200
                           text-left overflow-hidden
-                        `}>
-                          {/* Gradient overlay on hover */}
-                          <div
+                        `}> */}
+                {/* Gradient overlay on hover */}
+                {/* <div
                             className={`
                           absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 
                           bg-gradient-to-br ${selectedCourseOption?.gradient} 
                           transition-opacity duration-200 pointer-events-none
                         `}
-                          />
+                          /> */}
 
-                          {/* Content */}
-                          <div className='relative z-10'>
+                {/* Content */}
+                {/* <div className='relative z-10'>
                             <div className='flex items-center space-x-2 mb-2'>
                               <span className='text-lg'>{suggestion.icon}</span>
                               <span
@@ -419,10 +431,10 @@ export default function CourseSelectorPage() {
                             <p className='text-sm font-medium leading-relaxed text-gray-800'>
                               {suggestion.text}
                             </p>
-                          </div>
+                          </div> */}
 
-                          {/* Hover indicator */}
-                          <div
+                {/* Hover indicator */}
+                {/* <div
                             className={`
                           absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 
                           transition-opacity duration-200
@@ -433,12 +445,12 @@ export default function CourseSelectorPage() {
                                 color: selectedCourseOption?.textColor,
                               }}
                             />
-                          </div>
-                        </motion.button>
+                          </div> */}
+                {/* </motion.button>
                       );
                     },
-                  )}
-                </div>
+                  )} */}
+                {/* </div> */}
               </motion.div>
             )}
           </AnimatePresence>

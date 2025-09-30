@@ -84,16 +84,14 @@ export default function ConversationSidebar({
       setLoadingConversationId(conversation.id);
       const courseId = conversation.selectedCourse || 'nodejs';
 
-      // Add a small delay to show loading state
-      await new Promise(resolve => setTimeout(resolve, 500));
-
+      // Immediate navigation for better UX
       router.push(`/chat/courses/${courseId}/${conversation.id}`);
 
-      // Keep loading state until navigation completes
+      // Clear loading state and close sidebar after navigation
       setTimeout(() => {
         setLoadingConversationId(null);
         onClose();
-      }, 200);
+      }, 100);
     } catch (error) {
       console.error('Failed to open conversation:', error);
       setLoadingConversationId(null);

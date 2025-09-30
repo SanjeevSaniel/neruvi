@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PythonChatPageProps) {
   const { chatId } = await params;
 
   return {
-    title: `Python Chat ${chatId.split('-')[1] || ''} - FlowMind`,
+    title: `Python Chat ${chatId.split('-')[1] || ''} - Neruvi`,
     description: `Continue your Python learning conversation`,
   };
 }

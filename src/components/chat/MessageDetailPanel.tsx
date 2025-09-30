@@ -45,15 +45,15 @@ export default function MessageDetailPanel({ message, isOpen, onClose, isStreami
       hour12: true
     }) : 'Just now';
     
-    const sender = role === 'assistant' ? 'FlowMind' : 'You';
-    
+    const sender = role === 'assistant' ? 'Neruvi' : 'You';
+
     return `# ${sender}
 *${timeStr}*
 
 ${content}
 
 ---
-*Generated with FlowMind Chat*`;
+*Generated with Neruvi Chat*`;
   };
 
   const handleCopy = async () => {
@@ -74,7 +74,7 @@ ${content}
     const element = document.createElement('a');
     const file = new Blob([markdownContent], { type: 'text/markdown' });
     element.href = URL.createObjectURL(file);
-    element.download = `flowmind-message-${Date.now()}.md`;
+    element.download = `neruvi-message-${Date.now()}.md`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -126,7 +126,7 @@ ${content}
                     <div>
                       <div className="flex items-center space-x-2">
                         <h2 className={`text-lg font-semibold text-slate-800 ${message.role === 'assistant' ? 'font-comfortaa' : ''}`}>
-                          {message.role === 'assistant' ? 'FlowMind' : 'You'}
+                          {message.role === 'assistant' ? 'Neruvi' : 'You'}
                         </h2>
                         {isStreaming && message.role === 'assistant' && (
                           <div className="flex items-center space-x-1">

@@ -1,6 +1,5 @@
 'use client';
 
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
@@ -13,6 +12,7 @@ import {
   Database,
   FileText,
   Github,
+  Heart,
   Linkedin,
   MessageCircle,
   Search,
@@ -21,10 +21,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import FlowMindLogo from '../FlowMindLogo';
+import NeruviBrandLogo from '../NeruviBrandLogo';
 import KnowledgeWaveAnimation from './KnowledgeWaveAnimation';
 import { PointerHighlight } from '@/components/ui/pointer-highlight';
 import { Button } from '../ui/button';
+import { Separator } from '../ui/separator';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -32,53 +33,53 @@ if (typeof window !== 'undefined') {
 }
 
 // Modern Clerk appearance configuration
-const clerkAppearance = {
-  elements: {
-    modalContent:
-      'bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-primary-200/50',
-    modalCloseButton:
-      'text-gray-400 hover:text-primary-600 transition-colors cursor-pointer',
-    headerTitle:
-      'text-3xl font-bold bg-gradient-to-r from-primary-500 to-secondary-900 bg-clip-text font-comfortaa lowercase tracking-tight',
-    socialButtonsBlockButton:
-      'relative overflow-hidden bg-white border-2 border-gray-200 hover:border-primary-300 rounded-2xl font-semibold transition-all duration-300 py-4 cursor-pointer group hover:shadow-lg',
-    socialButtonsBlockButtonText: 'relative z-10 font-semibold',
-    dividerLine:
-      'bg-gradient-to-r from-transparent via-primary-200 to-transparent',
-    dividerText: 'text-primary-500 font-medium text-sm bg-white px-4',
-    formFieldLabel: 'font-semibold text-sm tracking-wide',
-    formFieldInput:
-      'border-2 border-gray-200 rounded-2xl focus:border-primary-500 focus:ring-0 focus:shadow-lg focus:shadow-primary-500/10 transition-all duration-300 py-4 bg-gray-50/50 focus:bg-white',
-    formButtonPrimary:
-      'relative overflow-hidden bg-gradient-to-r from-primary-500 via-secondary-900 to-primary-600 hover:from-primary-600 hover:via-secondary-800 hover:to-primary-700 rounded-2xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary-500/25 py-4 cursor-pointer group hover:scale-105',
-    footerActionLink:
-      'text-primary-600 hover:text-primary-700 font-semibold cursor-pointer transition-colors duration-200 hover:underline decoration-2 underline-offset-2',
-    userButtonPopoverActionButton:
-      'hover:bg-gradient-to-r hover:from-primary-50 hover:to-secondary-50 hover:text-primary-700 rounded-2xl transition-all duration-200 cursor-pointer font-medium',
-    identityPreviewText: 'font-medium',
-    identityPreviewEditButtonIcon: 'text-primary-500 hover:text-primary-600',
-    formFieldSuccessText: 'text-primary-600 font-medium',
-    formFieldErrorText: 'text-red-500 font-medium',
-    // Hide the "You're signing back in to Clerk" text
-    headerSubtitle: 'hidden',
-    // Custom branding text
-    cardBox: 'shadow-none bg-transparent',
-    card: 'bg-transparent shadow-none',
-    rootBox: 'bg-transparent',
-  },
-  variables: {
-    colorPrimary: '#4ea674',
-    colorBackground: '#ffffff',
-    colorInputBackground: 'rgba(249, 250, 251, 0.5)',
-    colorInputText: '#374151',
-    colorText: '#374151',
-    colorTextSecondary: '#6b7280',
-    borderRadius: '16px',
-    fontFamily: "'Figtree', ui-sans-serif, system-ui, sans-serif",
-    fontSize: '16px',
-    spacingUnit: '1.25rem',
-  },
-};
+// const clerkAppearance = {
+//   elements: {
+//     modalContent:
+//       'bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-primary-200/50',
+//     modalCloseButton:
+//       'text-gray-400 hover:text-primary-600 transition-colors cursor-pointer',
+//     headerTitle:
+//       'text-3xl font-bold bg-gradient-to-r from-primary-500 to-secondary-900 bg-clip-text font-comfortaa lowercase tracking-tight',
+//     socialButtonsBlockButton:
+//       'relative overflow-hidden bg-white border-2 border-gray-200 hover:border-primary-300 rounded-2xl font-semibold transition-all duration-300 py-4 cursor-pointer group hover:shadow-lg',
+//     socialButtonsBlockButtonText: 'relative z-10 font-semibold',
+//     dividerLine:
+//       'bg-gradient-to-r from-transparent via-primary-200 to-transparent',
+//     dividerText: 'text-primary-500 font-medium text-sm bg-white px-4',
+//     formFieldLabel: 'font-semibold text-sm tracking-wide',
+//     formFieldInput:
+//       'border-2 border-gray-200 rounded-2xl focus:border-primary-500 focus:ring-0 focus:shadow-lg focus:shadow-primary-500/10 transition-all duration-300 py-4 bg-gray-50/50 focus:bg-white',
+//     formButtonPrimary:
+//       'relative overflow-hidden bg-gradient-to-r from-primary-500 via-secondary-900 to-primary-600 hover:from-primary-600 hover:via-secondary-800 hover:to-primary-700 rounded-2xl font-bold transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-primary-500/25 py-4 cursor-pointer group hover:scale-105',
+//     footerActionLink:
+//       'text-primary-600 hover:text-primary-700 font-semibold cursor-pointer transition-colors duration-200 hover:underline decoration-2 underline-offset-2',
+//     userButtonPopoverActionButton:
+//       'hover:bg-gradient-to-r hover:from-primary-50 hover:to-secondary-50 hover:text-primary-700 rounded-2xl transition-all duration-200 cursor-pointer font-medium',
+//     identityPreviewText: 'font-medium',
+//     identityPreviewEditButtonIcon: 'text-primary-500 hover:text-primary-600',
+//     formFieldSuccessText: 'text-primary-600 font-medium',
+//     formFieldErrorText: 'text-red-500 font-medium',
+//     // Hide the "You're signing back in to Clerk" text
+//     headerSubtitle: 'hidden',
+//     // Custom branding text
+//     cardBox: 'shadow-none bg-transparent',
+//     card: 'bg-transparent shadow-none',
+//     rootBox: 'bg-transparent',
+//   },
+//   variables: {
+//     colorPrimary: '#4ea674',
+//     colorBackground: '#ffffff',
+//     colorInputBackground: 'rgba(249, 250, 251, 0.5)',
+//     colorInputText: '#374151',
+//     colorText: '#374151',
+//     colorTextSecondary: '#6b7280',
+//     borderRadius: '16px',
+//     fontFamily: "'Figtree', ui-sans-serif, system-ui, sans-serif",
+//     fontSize: '16px',
+//     spacingUnit: '1.25rem',
+//   },
+// };
 
 export default function TranscriptLearningLanding() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -301,25 +302,11 @@ export default function TranscriptLearningLanding() {
       <nav className='sticky top-0 z-50 bg-white/95 backdrop-blur-sm'>
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
-            <div className='flex items-center space-x-3'>
-              <FlowMindLogo
-                size={28}
-                animated={true}
-                className='w-8 h-8'
-              />
-              <div>
-                <span
-                  className='text-xl font-extrabold lowercase tracking-wide font-comfortaa'
-                  style={{ color: '#121827' }}>
-                  FlowMind
-                </span>
-                <div
-                  className='text-xs font-medium'
-                  style={{ color: '#4ea674' }}>
-                  AI Powered Learning
-                </div>
-              </div>
-            </div>
+            <NeruviBrandLogo
+              size='md'
+              showIcon={true}
+              showTagline={false}
+            />
 
             <div className='flex items-center space-x-6'>
               <Link
@@ -329,14 +316,12 @@ export default function TranscriptLearningLanding() {
                 <Github className='w-4 h-4' />
                 <span className='hidden sm:inline font-medium'>GitHub</span>
               </Link>
-              <SignInButton
-                mode='modal'
-                appearance={clerkAppearance}>
+              <Link href='/sign-in'>
                 <Button className='relative overflow-hidden bg-[#4ea674] hover:bg-[#5cbb85] px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer group'>
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
                   <span className='relative z-10 text-sm'>Sign In</span>
                 </Button>
-              </SignInButton>
+              </Link>
             </div>
           </div>
         </div>
@@ -389,14 +374,14 @@ export default function TranscriptLearningLanding() {
                       AI-powered
                     </span>
                   </PointerHighlight>{' '}
-                  programming education
+                  learning
                 </h1>
 
                 <p
                   className='hero-subtitle text-lg md:text-xl leading-relaxed max-w-2xl font-light mt-6'
                   style={{ color: '#374151' }}>
                   Access precise answers from extensive programming course
-                  transcripts. FlowMind delivers contextual insights with{' '}
+                  transcripts. Neruvi delivers contextual insights with{' '}
                   <span className='text-primary-700 font-medium bg-gradient-to-r from-primary-50 to-secondary-50 px-2 py-1 rounded-md'>
                     exact timestamps
                   </span>{' '}
@@ -407,25 +392,54 @@ export default function TranscriptLearningLanding() {
               {/* Clean CTA Section */}
               <div className='space-y-4'>
                 <div className='flex flex-col sm:flex-row gap-4'>
-                  <SignUpButton
-                    mode='modal'
-                    appearance={clerkAppearance}>
+                  <Link href='/sign-up'>
                     <Button
-                      className='group relative overflow-hidden text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:scale-[1.02] cursor-pointer transform'
+                      onClick={(e) => {
+                        const target = e.currentTarget;
+                        target.classList.add(
+                          'pointer-events-none',
+                          'opacity-75',
+                        );
+                        const textSpan = target.querySelector('.button-text');
+                        const arrow = target.querySelector('.button-arrow');
+                        const loader = target.querySelector('.button-loader');
+                        if (textSpan && arrow && loader) {
+                          textSpan.classList.add('opacity-0');
+                          arrow.classList.add('opacity-0');
+                          loader.classList.remove('hidden');
+                          loader.classList.add('flex');
+                        }
+                      }}
+                      className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform'
                       style={{
                         background:
-                          'linear-gradient(to right, #4ea674, #459071, #4ea674)',
-                        boxShadow: '0 25px 50px rgba(78, 166, 116, 0.3)',
+                          'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
+                        boxShadow:
+                          '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)',
                       }}>
-                      <div className='absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-                      <span className='relative z-10'>Start learning</span>
+                      {/* Shimmer effect */}
+                      <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out'></div>
+
+                      {/* Overlay gradient */}
+                      <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
+
+                      <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
+                        Start learning
+                      </span>
                       <ArrowRight
-                        className='relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300'
+                        className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
                         style={{ color: 'white' }}
                       />
-                      <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-primary-400/60 to-secondary-400/60 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
+
+                      {/* Loading spinner */}
+                      <div className='button-loader absolute inset-0 hidden items-center justify-center z-10'>
+                        <div className='w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin'></div>
+                      </div>
+
+                      {/* Outer glow */}
+                      <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/40 to-green-400/40 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out -z-10 scale-95 group-hover:scale-110'></div>
                     </Button>
-                  </SignUpButton>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -448,7 +462,7 @@ export default function TranscriptLearningLanding() {
                           'Comfortaa, ui-rounded, ui-sans-serif, system-ui, sans-serif !important',
                         color: '#4ea674',
                       }}>
-                      flowmind
+                      neruvi
                     </div>
                   </div>
                 </div>
@@ -555,7 +569,7 @@ export default function TranscriptLearningLanding() {
             <h2
               className='text-4xl md:text-5xl font-medium mb-6'
               style={{ color: '#459071' }}>
-              How FlowMind Works
+              How Neruvi Works
             </h2>
             <p
               className='text-xl max-w-3xl mx-auto'
@@ -680,7 +694,7 @@ export default function TranscriptLearningLanding() {
             <h2
               className='text-4xl md:text-5xl font-medium mb-6'
               style={{ color: '#459071' }}>
-              Why Choose FlowMind?
+              Why Choose Neruvi?
             </h2>
             <p
               className='text-xl max-w-3xl mx-auto'
@@ -733,7 +747,7 @@ export default function TranscriptLearningLanding() {
               Try It Yourself
             </h2>
             <p className='text-xl max-w-3xl mx-auto' style={{color: '#374151'}}>
-              See how FlowMind answers common programming questions with
+              See how Neruvi answers common programming questions with
               transcript timestamps
             </p>
           </div>
@@ -743,7 +757,7 @@ export default function TranscriptLearningLanding() {
               <div className='bg-gray-900 p-4 flex items-center space-x-3' style={{color: 'white'}}>
                 <Terminal className='w-5 h-5' style={{color: '#459071'}} />
                 <span className='font-mono text-sm'>
-                  FlowMind Interactive Demo
+                  Neruvi Interactive Demo
                 </span>
               </div>
 
@@ -797,64 +811,77 @@ export default function TranscriptLearningLanding() {
           </p>
 
           <div className='flex flex-col sm:flex-row gap-4 justify-center items-center mb-12'>
-            <SignUpButton
-              mode='modal'
-              appearance={clerkAppearance}>
+            <Link href='/sign-up'>
               <Button
-                className='group relative overflow-hidden text-white px-6 py-3 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center space-x-3 shadow-2xl hover:scale-[1.02] cursor-pointer transform'
+                onClick={(e) => {
+                  const target = e.currentTarget;
+                  target.classList.add('pointer-events-none', 'opacity-75');
+                  const textSpan = target.querySelector('.button-text');
+                  const arrow = target.querySelector('.button-arrow');
+                  const loader = target.querySelector('.button-loader');
+                  if (textSpan && arrow && loader) {
+                    textSpan.classList.add('opacity-0');
+                    arrow.classList.add('opacity-0');
+                    loader.classList.remove('hidden');
+                    loader.classList.add('flex');
+                  }
+                }}
+                className='group relative overflow-hidden text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 ease-out flex items-center justify-center space-x-3 shadow-2xl hover:shadow-3xl hover:scale-105 active:scale-100 cursor-pointer transform'
                 style={{
                   background:
-                    'linear-gradient(to right, #4ea674, #459071, #4ea674)',
-                  boxShadow: '0 25px 50px rgba(78, 166, 116, 0.3)',
+                    'linear-gradient(135deg, #4ea674 0%, #459071 50%, #5fad81 100%)',
+                  boxShadow:
+                    '0 20px 60px -10px rgba(78, 166, 116, 0.4), 0 0 0 1px rgba(255,255,255,0.1)',
                 }}>
-                <div className='absolute inset-0 bg-gradient-to-r from-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
-                <span className='relative z-10'>Start learning</span>
+                {/* Shimmer effect */}
+                <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out'></div>
+
+                {/* Overlay gradient */}
+                <div className='absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out'></div>
+
+                <span className='button-text relative z-10 transition-all duration-300 group-hover:tracking-wide'>
+                  Start learning
+                </span>
                 <ArrowRight
-                  className='relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform duration-300'
+                  className='button-arrow relative z-10 w-5 h-5 transition-all duration-500 ease-out group-hover:translate-x-2 group-hover:scale-110'
                   style={{ color: 'white' }}
                 />
-                <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-primary-400/60 to-secondary-400/60 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10'></div>
+
+                {/* Loading spinner */}
+                <div className='button-loader absolute inset-0 hidden items-center justify-center z-10'>
+                  <div className='w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin'></div>
+                </div>
+
+                {/* Outer glow */}
+                <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/40 to-green-400/40 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700 ease-out -z-10 scale-95 group-hover:scale-110'></div>
               </Button>
-            </SignUpButton>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Compact Footer */}
       <footer
-        className='bg-gray-900 py-16'
+        className='bg-gray-900 py-8'
         style={{ color: 'white' }}>
-        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
-          <div className='grid lg:grid-cols-2 gap-12 items-center'>
-            <div className='space-y-6'>
-              <div className='flex items-center space-x-3'>
-                <FlowMindLogo
-                  size={28}
-                  animated={false}
-                  className='w-8 h-8'
-                />
-                <div>
-                  <span className='text-2xl font-bold lowercase tracking-wide font-comfortaa'>
-                    FlowMind
-                  </span>
-                  <div className='text-sm'>© 2025 Transcript Learning AI</div>
-                </div>
-              </div>
-
-              <div className='space-y-2'>
-                <p className='font-semibold text-[#c1c2c5]'>
-                  Crafted with ❤️ by Sanjeev Saniel
-                </p>
-                <p className='flex items-center space-x-2 text-[#c1c2c5]'>
-                  <FileText className='w-4 h-4 text-[#c1c2c5]' />
-                  <span>
-                    Revolutionizing transcript-based learning through AI
-                  </span>
-                </p>
-              </div>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8 '>
+          {/* Main content row */}
+          <div className='flex flex-col lg:flex-row items-center justify-between gap-6 mb-6'>
+            <div className='flex flex-col items-start'>
+              <NeruviBrandLogo
+                size='sm'
+                showIcon={true}
+                showTagline={false}
+                variant='light'
+              />
+              <p className='text-xs text-white/60 flex items-center gap-1.5 ml-1'>
+                <FileText className='w-3 h-3' />
+                Revolutionizing learning through AI
+              </p>
             </div>
 
-            <div className='flex flex-wrap gap-4 justify-start lg:justify-end'>
+            {/* Social links - compact icons only */}
+            <div className='flex items-center gap-3'>
               {[
                 {
                   href: 'https://github.com/SanjeevSaniel',
@@ -882,19 +909,45 @@ export default function TranscriptLearningLanding() {
                   href={link.href}
                   target='_blank'
                   rel='noopener noreferrer'
-                  className='flex items-center space-x-2 px-4 py-3 rounded-lg transition-all duration-300'
+                  title={link.label}
+                  className='p-2.5 rounded-lg transition-all duration-300 hover:scale-110'
                   style={{
-                    backgroundColor: '#459071',
-                    borderColor: '#4ea674',
-                    color: 'white',
+                    backgroundColor: 'rgba(69, 144, 113, 0.2)',
+                    color: '#4ea674',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#459071';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      'rgba(69, 144, 113, 0.2)';
+                    e.currentTarget.style.color = '#4ea674';
                   }}>
-                  <link.icon
-                    className='w-4 h-4'
-                    style={{ color: 'white' }}
-                  />
-                  <span className='text-sm font-medium'>{link.label}</span>
+                  <link.icon className='w-4 h-4' />
                 </Link>
               ))}
+            </div>
+          </div>
+
+          <Separator className='mb-2' />
+
+          <div className='flex justify-between items-center'>
+            <div className='flex flex-col items-center lg:items-start gap-1'>
+              <p className='flex text-sm font-medium text-white/50'>
+                Crafted with{' '}
+                <span className='mx-1 mt-0.5'>
+                  <Heart size={14} />
+                </span>{' '}
+                by Sanjeev Saniel
+              </p>
+            </div>
+
+            {/* Copyright - single line */}
+            <div className='text-center'>
+              <p className='text-xs text-white/50'>
+                © {new Date().getFullYear()} Neruvi. All rights reserved.
+              </p>
             </div>
           </div>
         </div>

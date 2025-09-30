@@ -15,6 +15,20 @@
       "when": 1756345202090,
       "tag": "0001_equal_iceman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759120972564,
+      "tag": "0002_admin_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759168888274,
+      "tag": "0003_heavy_gauntlet",
+      "breakpoints": true
     }
   ]
 }

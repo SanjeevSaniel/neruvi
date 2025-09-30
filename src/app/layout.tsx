@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Figtree, Comfortaa } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from '@/providers/auth-provider';
 import './globals.css';
 
 // const inter = Inter({
@@ -29,9 +30,9 @@ const comfortaa = Comfortaa({
 });
 
 export const metadata: Metadata = {
-  title: 'FlowMind - AI-Powered Learning Assistant',
+  title: 'Neruvi - AI Learning Navigator',
   description:
-    'Master Node.js and Python with FlowMind, your intelligent learning companion. Get precise answers from course content with timestamp references and interactive guidance.',
+    'Master Node.js and Python with Neruvi, your intelligent learning navigator. Get precise answers from course content with timestamp references and personalized guidance.',
   keywords: [
     'AI learning',
     'Node.js',
@@ -39,32 +40,33 @@ export const metadata: Metadata = {
     'programming',
     'education',
     'course assistant',
-    'FlowMind',
+    'Neruvi',
+    'learning navigator',
   ],
-  authors: [{ name: 'FlowMind Team' }],
-  creator: 'FlowMind',
-  publisher: 'FlowMind',
+  authors: [{ name: 'Neruvi Team' }],
+  creator: 'Neruvi',
+  publisher: 'Neruvi',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://flowmind.app'),
+  metadataBase: new URL('https://neruvi.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'FlowMind - AI-Powered Learning Assistant',
+    title: 'Neruvi - AI Learning Navigator',
     description:
-      'Master Node.js and Python with FlowMind, your intelligent learning companion.',
-    url: 'https://flowmind.app',
-    siteName: 'FlowMind',
+      'Master Node.js and Python with Neruvi, your intelligent learning navigator.',
+    url: 'https://neruvi.app',
+    siteName: 'Neruvi',
     images: [
       {
-        url: '/favicon.svg',
-        width: 512,
-        height: 512,
-        alt: 'FlowMind - AI-Powered Learning Assistant',
+        url: '/opengraph-image.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Neruvi - AI Learning Navigator',
       },
     ],
     locale: 'en_US',
@@ -72,11 +74,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FlowMind - AI-Powered Learning Assistant',
+    title: 'Neruvi - AI Learning Navigator',
     description:
-      'Master Node.js and Python with FlowMind, your intelligent learning companion.',
-    images: ['/favicon.svg'],
-    creator: '@flowmind',
+      'Master Node.js and Python with Neruvi, your intelligent learning navigator.',
+    images: ['/opengraph-image.svg'],
+    creator: '@neruvi',
   },
   robots: {
     index: true,
@@ -125,7 +127,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      afterSignInUrl="/"
+      afterSignUpUrl="/"
+    >
       <html
         lang='en'
         suppressHydrationWarning>
@@ -139,7 +146,9 @@ export default function RootLayout({
         <body
           className={`${figtree.variable} ${comfortaa.variable} font-sans antialiased`}
           suppressHydrationWarning>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <Toaster 
             position="top-center"
             toastOptions={{

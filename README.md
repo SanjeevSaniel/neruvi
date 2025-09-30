@@ -1,6 +1,7 @@
 <div align="center">
-  <img src="./public/flowmind-logo-2.png" alt="FlowMind Logo" width="80" height="80" />
-  <h1>FlowMind ✨</h1>
+  <img src="./public/neruvi-logo.png" alt="Neruvi Logo" width="80" height="80" />
+  <h1>Neruvi ✨</h1>
+  <p><em>Your AI Learning Navigator</em></p>
 </div>
 
 <div align="center">
@@ -24,7 +25,7 @@
 
 **Advanced AI-powered learning assistant** for Node.js and Python courses with **RAG (Retrieval-Augmented Generation)** capabilities and Microsoft Copilot/Claude-style interface.
 
-> **🎯 Important**: FlowMind's AI assistant responds **only from curated course transcript data**, not web searches, ensuring focused and reliable educational content.
+> **🎯 Important**: Neruvi's AI assistant responds **only from curated course transcript data**, not web searches, ensuring focused and reliable educational content.
 
 ## 🚀 **Production-Ready Features**
 
@@ -51,15 +52,15 @@
 
 ### **📚 Data-Only Approach (No Web Search)**
 
-FlowMind's AI assistant is designed as a **focused learning companion** that exclusively uses pre-processed course materials:
+Neruvi's AI assistant is designed as a **focused learning companion** that exclusively uses pre-processed course materials:
 
-#### **✅ What FlowMind Uses:**
+#### **✅ What Neruvi Uses:**
 - **Course Transcripts**: Pre-processed VTT files from Node.js & Python courses
 - **Local Vector Database**: 61+ chunks of educational content with embeddings
 - **Curated Knowledge**: Only verified, course-aligned educational material
 - **Timestamp References**: Precise video timestamps for source verification
 
-#### **❌ What FlowMind Does NOT Use:**
+#### **❌ What Neruvi Does NOT Use:**
 - **No Web Search**: No external internet searches or real-time data
 - **No External APIs**: No Wikipedia, Stack Overflow, or documentation fetching
 - **No General Knowledge**: Responses are limited to course content only

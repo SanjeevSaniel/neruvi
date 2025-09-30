@@ -1,6 +1,6 @@
 'use client';
 
-import { SignInButton, SignUpButton } from '@clerk/nextjs';
+import Link from 'next/link';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
@@ -15,9 +15,8 @@ import {
   Workflow,
   Zap,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import FlowMindLogo from '../FlowMindLogo';
+import NeruviBrandLogo from '../NeruviBrandLogo';
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
@@ -232,14 +231,7 @@ export default function ModernLandingPage() {
 
       {/* Navigation */}
       <nav className='relative z-20 flex items-center justify-between p-6 lg:px-12'>
-        <div className='flex items-center space-x-3'>
-          <FlowMindLogo
-            size={20}
-            animated={false}
-            className='w-8 h-8'
-          />
-          <span className='text-lg font-bold text-slate-800 font-comfortaa'>FlowMind</span>
-        </div>
+        <NeruviBrandLogo size="md" showIcon={true} showTagline={false} variant="dark" />
 
         <div className='flex items-center space-x-6'>
           <Link
@@ -248,11 +240,11 @@ export default function ModernLandingPage() {
             <Github className='w-4 h-4' />
             <span className='hidden sm:inline'>GitHub</span>
           </Link>
-          <SignInButton mode='modal'>
-            <button className='text-sm text-slate-600 hover:text-slate-900 transition-colors px-4 py-2 rounded-lg hover:bg-slate-100'>
-              Sign In
-            </button>
-          </SignInButton>
+          <Link
+            href='/sign-in'
+            className='text-sm text-slate-600 hover:text-slate-900 transition-colors px-4 py-2 rounded-lg hover:bg-slate-100'>
+            Sign In
+          </Link>
         </div>
       </nav>
 
@@ -262,13 +254,9 @@ export default function ModernLandingPage() {
         className='relative z-10 px-6 lg:px-12 pt-16 pb-24'>
         <div className='max-w-5xl mx-auto text-center'>
           {/* Logo */}
-          <div className='hero-logo mb-8 floating'>
+          <div className='hero-logo mb-12 floating'>
             <div className='flex justify-center'>
-              <FlowMindLogo
-                size={50}
-                animated={true}
-                className='w-20 h-20'
-              />
+              <NeruviBrandLogo size="xl" showIcon={true} showTagline={true} variant="gradient" />
             </div>
           </div>
 
@@ -306,14 +294,14 @@ export default function ModernLandingPage() {
 
           {/* Buttons */}
           <div className='hero-buttons flex flex-col sm:flex-row gap-4 justify-center items-center mb-16'>
-            <SignUpButton mode='modal'>
-              <button className='group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105'>
-                <span className='flex items-center space-x-2'>
-                  <span>Start Learning</span>
-                  <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
-                </span>
-              </button>
-            </SignUpButton>
+            <Link
+              href='/sign-up'
+              className='group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 inline-block'>
+              <span className='flex items-center space-x-2'>
+                <span>Start Learning</span>
+                <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
+              </span>
+            </Link>
 
             <button className='group flex items-center space-x-2 px-8 py-4 border border-slate-300 text-slate-700 rounded-xl font-semibold text-lg hover:bg-slate-50 transition-all duration-300 transform hover:scale-105'>
               <PlayCircle className='w-5 h-5' />
@@ -375,11 +363,7 @@ export default function ModernLandingPage() {
         <div className='max-w-4xl mx-auto text-center'>
           <div className='floating mb-8'>
             <div className='flex justify-center'>
-              <FlowMindLogo
-                size={40}
-                animated={true}
-                className='w-16 h-16'
-              />
+              <NeruviBrandLogo size="lg" showIcon={true} showTagline={false} variant="gradient" />
             </div>
           </div>
 
@@ -392,15 +376,15 @@ export default function ModernLandingPage() {
           </p>
 
           <div className='flex flex-col sm:flex-row gap-6 justify-center items-center mb-12'>
-            <SignUpButton mode='modal'>
-              <button className='group relative px-12 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-bold text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105'>
-                <span className='flex items-center space-x-3'>
-                  <Brain className='w-6 h-6' />
-                  <span>Get Started Free</span>
-                  <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
-                </span>
-              </button>
-            </SignUpButton>
+            <Link
+              href='/sign-up'
+              className='group relative px-12 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-bold text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 inline-block'>
+              <span className='flex items-center space-x-3'>
+                <Brain className='w-6 h-6' />
+                <span>Get Started Free</span>
+                <ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
+              </span>
+            </Link>
 
             <div className='flex items-center space-x-3 text-slate-500'>
               <div className='flex -space-x-2'>
@@ -422,14 +406,10 @@ export default function ModernLandingPage() {
       <footer className='relative z-10 border-t border-slate-200 px-6 lg:px-12 py-12 bg-white'>
         <div className='max-w-6xl mx-auto'>
           <div className='flex flex-col md:flex-row justify-between items-center'>
-            <div className='flex items-center space-x-3 mb-6 md:mb-0'>
-              <FlowMindLogo
-                size={16}
-                animated={false}
-                className='w-6 h-6'
-              />
-              <span className='text-slate-600'>
-                © 2025 FlowMind. All rights reserved.
+            <div className='flex flex-col space-y-2 mb-6 md:mb-0'>
+              <NeruviBrandLogo size="sm" showIcon={true} showTagline={false} variant="dark" />
+              <span className='text-slate-600 text-sm'>
+                © 2025 Neruvi. All rights reserved.
               </span>
             </div>
 

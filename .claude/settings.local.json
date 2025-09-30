@@ -37,7 +37,15 @@
       "Bash(git log:*)",
       "Bash(echo:*)",
       "Bash(curl:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx eslint:*)",
+      "WebFetch(domain:docs.mem0.ai)",
+      "Bash(printf \"y\\n\")",
+      "WebFetch(domain:clerk.com)",
+      "Bash(timeout:*)",
+      "Bash(git reset:*)",
+      "Bash(npx next lint:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,15 +1,21 @@
-
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="6" fill="url(#gradient)"/>
-  <path d="M8 12h16v2H8v-2z
-           M8 16h16v2H8v-2z
-           M8 20h12v2H8v-2z" fill="white"/>
-  <circle cx="24" cy="8" r="4" fill="#10B981"/>
+<svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
-      <stop offset="0%" stop-color="#8B5CF6"/>
-      <stop offset="50%" stop-color="#A855F7"/>
-      <stop offset="100%" stop-color="#3B82F6"/>
+    <linearGradient id="bgGradient32" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4" />
+      <stop offset="100%" stop-color="#dcfce7" />
+    </linearGradient>
+    <linearGradient id="nGradient32" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
     </linearGradient>
   </defs>
+  <rect x="8" y="8" width="32" height="32" rx="8" fill="url(#bgGradient32)" />
+  <rect x="8.25" y="8.25" width="31.5" height="31.5" rx="7.75" fill="none" stroke="rgba(16,185,129,0.15)" stroke-width="0.5" />
+  <g>
+    <rect x="14.5" y="15" width="3.5" height="18" rx="1.75" fill="url(#nGradient32)" />
+    <path d="M 16.25 15 L 31.75 33 L 28.75 33 L 14.75 17 Z" fill="url(#nGradient32)" />
+    <rect x="30" y="15" width="3.5" height="18" rx="1.75" fill="url(#nGradient32)" />
+    <line x1="16.25" y1="15" x2="16.25" y2="13" stroke="url(#nGradient32)" stroke-width="0.8" stroke-linecap="round" opacity="0.5" />
+    <line x1="31.75" y1="15" x2="31.75" y2="13" stroke="url(#nGradient32)" stroke-width="0.8" stroke-linecap="round" opacity="0.5" />
+  </g>
 </svg>

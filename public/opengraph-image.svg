@@ -1,0 +1,63 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGradientOG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4" />
+      <stop offset="50%" stop-color="#dcfce7" />
+      <stop offset="100%" stop-color="#bbf7d0" />
+    </linearGradient>
+
+    <!-- Logo background gradient -->
+    <linearGradient id="logoBgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdf4" />
+      <stop offset="100%" stop-color="#dcfce7" />
+    </linearGradient>
+
+    <!-- N lettermark gradient -->
+    <linearGradient id="nGradientOG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main background -->
+  <rect width="1200" height="630" fill="url(#bgGradientOG)" />
+
+  <!-- Decorative elements -->
+  <circle cx="150" cy="100" r="80" fill="#10b981" opacity="0.05" />
+  <circle cx="1050" cy="530" r="100" fill="#059669" opacity="0.05" />
+  <circle cx="950" cy="150" r="60" fill="#10b981" opacity="0.08" />
+
+  <!-- Logo and text centered -->
+  <g transform="translate(600, 315)">
+    <!-- Logo icon -->
+    <g transform="translate(-180, -60)">
+      <rect x="8" y="8" width="104" height="104" rx="26" fill="url(#logoBgGradient)" />
+      <rect x="8.5" y="8.5" width="103" height="103" rx="25.5" fill="none" stroke="rgba(16,185,129,0.15)" stroke-width="1" />
+
+      <!-- N lettermark - scaled up -->
+      <g transform="scale(2.5) translate(0, 0)">
+        <rect x="14.5" y="15" width="3.5" height="18" rx="1.75" fill="url(#nGradientOG)" />
+        <path d="M 16.25 15 L 31.75 33 L 28.75 33 L 14.75 17 Z" fill="url(#nGradientOG)" />
+        <rect x="30" y="15" width="3.5" height="18" rx="1.75" fill="url(#nGradientOG)" />
+        <line x1="16.25" y1="15" x2="16.25" y2="13" stroke="url(#nGradientOG)" stroke-width="0.8" stroke-linecap="round" opacity="0.5" />
+        <line x1="31.75" y1="15" x2="31.75" y2="13" stroke="url(#nGradientOG)" stroke-width="0.8" stroke-linecap="round" opacity="0.5" />
+      </g>
+    </g>
+
+    <!-- Brand name -->
+    <text x="-40" y="0" font-family="Comfortaa, system-ui, sans-serif" font-size="120" font-weight="300" fill="#459071" text-anchor="start">
+      <tspan font-weight="300">ne</tspan><tspan font-weight="700" fill="#059669">ru</tspan><tspan font-weight="300">vi</tspan>
+    </text>
+
+    <!-- Tagline -->
+    <text x="0" y="60" font-family="system-ui, sans-serif" font-size="28" font-weight="500" fill="#5fad81" text-anchor="middle" letter-spacing="3">
+      AI LEARNING NAVIGATOR
+    </text>
+  </g>
+
+  <!-- Bottom text -->
+  <text x="600" y="570" font-family="system-ui, sans-serif" font-size="18" font-weight="400" fill="#6b7280" text-anchor="middle">
+    Master Node.js and Python with intelligent guidance
+  </text>
+</svg>

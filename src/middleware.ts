@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const isProtectedRoute = createRouteMatcher(['/chat(.*)'])
+const isProtectedRoute = createRouteMatcher(['/chat(.*)', '/admin(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
   // Protect chat routes - redirect unauthenticated users to sign-in

@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: CoursePageProps) {
   const courseName = courseId === 'nodejs' ? 'Node.js' : 'Python';
   
   return {
-    title: `${courseName} Learning Chat - FlowMind`,
+    title: `${courseName} Learning Chat - Neruvi`,
     description: `Interactive ${courseName} learning chat powered by AI`,
   };
 }
