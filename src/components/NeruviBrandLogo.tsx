@@ -19,28 +19,28 @@ const NeruviBrandLogo = ({
 
   const sizeConfig = {
     sm: {
-      text: 'text-xl',
-      icon: 24,
-      tagline: 'text-[9px]',
-      gap: 'space-x-2'
-    },
-    md: {
-      text: 'text-3xl',
+      text: 'text-2xl',
       icon: 32,
-      tagline: 'text-[11px]',
+      tagline: 'text-[10px]',
       gap: 'space-x-2.5'
     },
-    lg: {
-      text: 'text-5xl',
-      icon: 48,
-      tagline: 'text-sm',
+    md: {
+      text: 'text-4xl',
+      icon: 40,
+      tagline: 'text-xs',
       gap: 'space-x-3'
     },
-    xl: {
-      text: 'text-6xl md:text-7xl',
-      icon: 64,
+    lg: {
+      text: 'text-6xl',
+      icon: 56,
       tagline: 'text-base',
       gap: 'space-x-4'
+    },
+    xl: {
+      text: 'text-7xl md:text-8xl',
+      icon: 72,
+      tagline: 'text-lg',
+      gap: 'space-x-5'
     }
   };
 
@@ -85,33 +85,54 @@ const NeruviBrandLogo = ({
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Clean white rounded square - Arattai style */}
+              {/* Modern white rounded square with shadow */}
+              <defs>
+                <filter id="logoShadow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                  <feOffset dx="0" dy="2" result="offsetblur"/>
+                  <feComponentTransfer>
+                    <feFuncA type="linear" slope="0.2"/>
+                  </feComponentTransfer>
+                  <feMerge>
+                    <feMergeNode/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
               <rect
                 x="4"
                 y="4"
                 width="40"
                 height="40"
-                rx="10"
+                rx="11"
                 fill={variant === 'light' ? 'white' : variant === 'dark' ? 'white' : 'white'}
-                stroke="none"
+                filter="url(#logoShadow)"
               />
 
-              {/* Simple "N" lettermark - clean and minimal */}
+              {/* Bold "N" lettermark - modern and clean */}
               <path
                 d="M 16 30 L 16 18 L 25 27 L 25 18"
                 stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
-                strokeWidth="2.5"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 fill="none"
               />
 
-              {/* Subtle accent dot */}
+              {/* Enhanced accent dot with glow */}
               <circle
                 cx="30"
                 cy="19"
-                r="2"
+                r="2.5"
                 fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
+              />
+              <circle
+                cx="30"
+                cy="19"
+                r="4"
+                fill={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
+                opacity="0.2"
               />
             </svg>
           </div>
