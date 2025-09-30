@@ -822,7 +822,7 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
       </div>
 
       <div className='flex-1 flex min-h-0 relative z-10'>
-        {/* Loading Overlay for Conversation Switch */}
+        {/* Circuit Flow Loading Animation */}
         <AnimatePresence>
           {isLoadingConversation && (
             <motion.div
@@ -830,27 +830,150 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className='absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center'>
-              <div className='flex flex-col items-center gap-4'>
-                <Loader2
-                  className='w-12 h-12 animate-spin'
-                  style={{ color: '#459071' }}
-                />
-                <motion.p
+              className='absolute inset-0 bg-gradient-to-br from-white/95 via-green-50/90 to-white/95 backdrop-blur-md z-50 flex items-center justify-center'>
+              <div className='relative flex flex-col items-center gap-6'>
+                {/* Circuit Flow Container */}
+                <div className='relative w-48 h-20'>
+                  {/* Horizontal Flow Lines */}
+                  <motion.div
+                    className='absolute top-1/2 left-0 h-0.5 rounded-full'
+                    style={{
+                      width: '100%',
+                      background: 'linear-gradient(90deg, transparent 0%, #459071 50%, transparent 100%)',
+                      transform: 'translateY(-50%)'
+                    }}
+                    animate={{
+                      x: ['-100%', '100%'],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'linear',
+                    }}
+                  />
+
+                  {/* Top Flow Line */}
+                  <motion.div
+                    className='absolute top-2 left-0 h-0.5 rounded-full'
+                    style={{
+                      width: '70%',
+                      background: 'linear-gradient(90deg, transparent 0%, #5cbb85 50%, transparent 100%)',
+                    }}
+                    animate={{
+                      x: ['-100%', '140%'],
+                    }}
+                    transition={{
+                      duration: 1.2,
+                      repeat: Infinity,
+                      ease: 'linear',
+                      delay: 0.3
+                    }}
+                  />
+
+                  {/* Bottom Flow Line */}
+                  <motion.div
+                    className='absolute bottom-2 right-0 h-0.5 rounded-full'
+                    style={{
+                      width: '70%',
+                      background: 'linear-gradient(90deg, transparent 0%, #4ea674 50%, transparent 100%)',
+                    }}
+                    animate={{
+                      x: ['100%', '-140%'],
+                    }}
+                    transition={{
+                      duration: 1.2,
+                      repeat: Infinity,
+                      ease: 'linear',
+                      delay: 0.6
+                    }}
+                  />
+
+                  {/* Circuit Nodes */}
+                  <motion.div
+                    className='absolute top-1/2 left-4 w-2 h-2 rounded-full'
+                    style={{ backgroundColor: '#459071', transform: 'translateY(-50%)' }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  />
+                  <motion.div
+                    className='absolute top-1/2 left-1/2 w-2 h-2 rounded-full'
+                    style={{ backgroundColor: '#5cbb85', transform: 'translate(-50%, -50%)' }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: 0.5,
+                    }}
+                  />
+                  <motion.div
+                    className='absolute top-1/2 right-4 w-2 h-2 rounded-full'
+                    style={{ backgroundColor: '#4ea674', transform: 'translateY(-50%)' }}
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: 1,
+                    }}
+                  />
+
+                  {/* Data Packets */}
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className='absolute top-1/2 left-0 w-1.5 h-1.5 rounded-sm'
+                      style={{
+                        backgroundColor: '#459071',
+                        transform: 'translateY(-50%) rotate(45deg)',
+                        boxShadow: '0 0 8px rgba(69, 144, 113, 0.6)'
+                      }}
+                      animate={{
+                        x: [0, 192],
+                        opacity: [0, 1, 1, 0],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: 'linear',
+                        delay: i * 0.5,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Loading Text */}
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
-                  className='text-lg font-medium'
-                  style={{ color: '#459071' }}>
-                  Loading conversation...
-                </motion.p>
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.5, ease: 'easeInOut' }}
-                  className='h-1 w-32 rounded-full'
-                  style={{ backgroundColor: '#459071' }}
-                />
+                  className='flex items-center gap-2'>
+                  <span
+                    className='text-sm font-semibold tracking-wide'
+                    style={{ color: '#459071' }}>
+                    Loading conversation
+                  </span>
+                  <motion.span
+                    animate={{ opacity: [0, 1, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                    className='text-sm font-semibold'
+                    style={{ color: '#459071' }}>
+                    ...
+                  </motion.span>
+                </motion.div>
               </div>
             </motion.div>
           )}
