@@ -82,7 +82,7 @@ if (typeof window !== 'undefined') {
 //   },
 // };
 
-export default function TranscriptLearningLanding() {
+export default function LandingPage() {
   const [isNavigating, setIsNavigating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -305,19 +305,12 @@ export default function TranscriptLearningLanding() {
         <div className='max-w-7xl mx-auto px-6 lg:px-8'>
           <div className='flex items-center justify-between h-16'>
             <NeruviBrandLogo
-              size='md'
+              size='sm'
               showIcon={true}
               showTagline={false}
             />
 
             <div className='flex items-center space-x-6'>
-              <Link
-                href='https://github.com/SanjeevSaniel/flowmind-ai-chat'
-                className='flex items-center space-x-2 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50'
-                style={{ color: '#4ea674' }}>
-                <Github className='w-4 h-4' />
-                <span className='hidden sm:inline font-medium'>GitHub</span>
-              </Link>
               <Link href='/sign-in'>
                 <Button className='relative overflow-hidden bg-[#4ea674] hover:bg-[#5cbb85] px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl cursor-pointer group'>
                   <div className='absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300'></div>
@@ -853,94 +846,72 @@ export default function TranscriptLearningLanding() {
         </div>
       </section>
 
-      {/* Compact Footer */}
-      <footer
-        className='bg-gray-900 py-8'
-        style={{ color: 'white' }}>
-        <div className='max-w-7xl mx-auto px-6 lg:px-8 '>
-          {/* Main content row */}
-          <div className='flex flex-col lg:flex-row items-center justify-between gap-6 mb-6'>
-            <div className='flex flex-col items-start'>
+      {/* Clean Footer */}
+      <footer className='bg-gray-900 py-12'>
+        <div className='max-w-7xl mx-auto px-6 lg:px-8'>
+          <div className='flex flex-col md:flex-row items-center justify-between gap-8'>
+            {/* Brand and Summary */}
+            <div className='flex flex-col items-center md:items-start gap-3'>
               <NeruviBrandLogo
-                size='sm'
+                size='md'
                 showIcon={true}
                 showTagline={false}
                 variant='light'
               />
-              <p className='text-xs text-white/60 flex items-center gap-1.5 ml-1'>
-                <FileText className='w-3 h-3' />
-                Revolutionizing learning through AI
+              <p className='text-sm text-white/70 max-w-md text-center md:text-left'>
+                AI-powered learning with transcript intelligence
               </p>
-            </div>
-
-            {/* Social links - compact icons only */}
-            <div className='flex items-center gap-3'>
-              {[
-                {
-                  href: 'https://github.com/SanjeevSaniel',
-                  icon: Github,
-                  label: 'GitHub',
-                },
-                {
-                  href: 'https://www.linkedin.com/in/sanjeevsaniel/',
-                  icon: Linkedin,
-                  label: 'LinkedIn',
-                },
-                {
-                  href: 'https://x.com/SanjeevSaniel',
-                  icon: X,
-                  label: 'X.com',
-                },
-                {
-                  href: 'https://github.com/SanjeevSaniel/flowmind-ai-chat',
-                  icon: Code2,
-                  label: 'Repository',
-                },
-              ].map((link, index) => (
-                <Link
-                  key={index}
-                  href={link.href}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  title={link.label}
-                  className='p-2.5 rounded-lg transition-all duration-300 hover:scale-110'
-                  style={{
-                    backgroundColor: 'rgba(69, 144, 113, 0.2)',
-                    color: '#4ea674',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#459071';
-                    e.currentTarget.style.color = 'white';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      'rgba(69, 144, 113, 0.2)';
-                    e.currentTarget.style.color = '#4ea674';
-                  }}>
-                  <link.icon className='w-4 h-4' />
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <Separator className='mb-2' />
-
-          <div className='flex justify-between items-center'>
-            <div className='flex flex-col items-center lg:items-start gap-1'>
-              <p className='flex text-sm font-medium text-white/50'>
-                Crafted with{' '}
-                <span className='mx-1 mt-0.5'>
-                  <Heart size={14} />
-                </span>{' '}
-                by Sanjeev Saniel
-              </p>
-            </div>
-
-            {/* Copyright - single line */}
-            <div className='text-center'>
               <p className='text-xs text-white/50'>
                 © {new Date().getFullYear()} Neruvi. All rights reserved.
               </p>
+            </div>
+
+            {/* Social Links */}
+            <div className='flex flex-col items-center md:items-end gap-4'>
+              <p className='text-sm text-white/60 font-medium'>Connect with me</p>
+              <div className='flex items-center gap-3'>
+                {[
+                  {
+                    href: 'https://github.com/SanjeevSaniel',
+                    icon: Github,
+                    label: 'GitHub',
+                  },
+                  {
+                    href: 'https://www.linkedin.com/in/sanjeevsaniel/',
+                    icon: Linkedin,
+                    label: 'LinkedIn',
+                  },
+                  {
+                    href: 'https://x.com/SanjeevSaniel',
+                    icon: X,
+                    label: 'X',
+                  },
+                ].map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    title={link.label}
+                    className='p-3 rounded-xl transition-all duration-300 hover:scale-110 hover:-translate-y-1'
+                    style={{
+                      backgroundColor: 'rgba(69, 144, 113, 0.15)',
+                      color: '#4ea674',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#459071';
+                      e.currentTarget.style.color = 'white';
+                      e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(78, 166, 116, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(69, 144, 113, 0.15)';
+                      e.currentTarget.style.color = '#4ea674';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}>
+                    <link.icon className='w-5 h-5' />
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </div>
