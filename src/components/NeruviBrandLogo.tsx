@@ -94,9 +94,9 @@ const NeruviBrandLogo = ({
                 stroke="none"
               />
 
-              {/* Ultra-minimal single-stroke "N" - Arattai approach */}
+              {/* Clean single-stroke "N" - proper diagonal */}
               <path
-                d="M 15 30 L 15 18 L 24 27 L 33 18 L 33 30"
+                d="M 16 30 L 16 18 L 32 30 L 32 18"
                 stroke={variant === 'light' ? '#10b981' : variant === 'dark' ? '#10b981' : '#10b981'}
                 strokeWidth="2.5"
                 strokeLinecap="round"
