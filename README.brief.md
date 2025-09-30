@@ -83,7 +83,7 @@ npm run debug-rag        # Debug RAG processing
 ## Documentation
 
 - **[Full README](./README.md)** - Comprehensive project documentation
-- **[Queue Workers](./docs/QUEUE_WORKERS.md)** - Async communication patterns
+- **[Mem0 Integration](./docs/MEM0_INTEGRATION.md)** - Personalized learning memory
 - **[Architecture](./docs/ARCHITECTURE.md)** - System design details
 - **[Docs Hub](./docs/README.md)** - Complete documentation index
 
