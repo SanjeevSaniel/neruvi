@@ -22,8 +22,9 @@ export default async function ConversationPage({ params }: ConversationPageProps
   // Validate conversationId format (UUID or custom format)
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const customPattern = /^conv_\d+_[a-z0-9]+$/i;
-  
-  if (!uuidPattern.test(conversationId) && !customPattern.test(conversationId)) {
+  const courseBasedPattern = /^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+$/i;
+
+  if (!uuidPattern.test(conversationId) && !customPattern.test(conversationId) && !courseBasedPattern.test(conversationId)) {
     console.warn('Invalid conversationId format:', conversationId);
     notFound();
   }

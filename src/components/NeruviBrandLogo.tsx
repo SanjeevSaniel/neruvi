@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface NeruviBrandLogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -158,62 +159,27 @@ const NeruviBrandLogo: React.FC<NeruviBrandLogoProps> = ({
                 }
                 filter='url(#innerGlow)'
               />
-              <rect
-                x='8.25'
-                y='8.25'
-                width='31.5'
-                height='31.5'
-                rx='7.75'
-                fill='none'
-                stroke={
-                  variant === 'light'
-                    ? 'rgba(255,255,255,0.3)'
-                    : variant === 'dark'
-                    ? 'rgba(0,0,0,0.08)'
-                    : 'rgba(16,185,129,0.15)'
-                }
-                strokeWidth='0.5'
-              />
-              <g>
-                <rect
-                  x='14.5'
-                  y='15'
-                  width='3.5'
-                  height='18'
-                  rx='1.75'
-                  fill='url(#nGradient)'
-                />
+              <g transform="translate(11, 11)">
+                {/* Single unified N shape with soft rounded design */}
                 <path
-                  d='M 16.25 15 L 31.75 33 L 28.75 33 L 14.75 17 Z'
-                  fill='url(#nGradient)'
-                />
-                <rect
-                  x='30'
-                  y='15'
-                  width='3.5'
-                  height='18'
-                  rx='1.75'
-                  fill='url(#nGradient)'
-                />
-                <line
-                  x1='16.25'
-                  y1='15'
-                  x2='16.25'
-                  y2='13'
-                  stroke='url(#nGradient)'
-                  strokeWidth='0.8'
-                  strokeLinecap='round'
-                  opacity='0.5'
-                />
-                <line
-                  x1='31.75'
-                  y1='15'
-                  x2='31.75'
-                  y2='13'
-                  stroke='url(#nGradient)'
-                  strokeWidth='0.8'
-                  strokeLinecap='round'
-                  opacity='0.5'
+                  d="M 3 0
+                     C 1.343 0 0 1.343 0 3
+                     L 0 23
+                     C 0 24.657 1.343 26 3 26
+                     C 4.657 26 6 24.657 6 23
+                     L 6 9.5
+                     L 20 23.5
+                     C 20.5 24 21 24.5 21.5 24.75
+                     C 22 25 22.5 25 23 25
+                     C 24.657 25 26 23.657 26 22
+                     L 26 3
+                     C 26 1.343 24.657 0 23 0
+                     C 21.343 0 20 1.343 20 3
+                     L 20 16.5
+                     L 6 2.5
+                     C 5.5 2 5 1.5 4.5 1.25
+                     C 4 1 3.5 0 3 0 Z"
+                  fill="#10b981"
                 />
               </g>
             </svg>
