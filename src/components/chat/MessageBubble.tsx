@@ -177,12 +177,12 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               message.role === 'user' ? 'justify-end space-x-2' : 'justify-start space-x-2'
             }`}>
               {message.role === 'assistant' && (
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className='w-8 h-8 bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg'
+                  className='w-9 h-9 bg-gradient-to-br from-[#10b981] via-[#059669] to-[#047857] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-green-100'
                 >
-                  <Sparkles className='w-4 h-4' style={{color: 'white'}} />
+                  <Sparkles className='w-4.5 h-4.5' style={{color: 'white'}} />
                 </motion.div>
               )}
               <span className={`text-sm font-semibold ${
@@ -196,12 +196,12 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
                 {message.timestamp ? formatTimestamp(message.timestamp) : 'Just now'}
               </span>
               {message.role === 'user' && (
-                <motion.div 
+                <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className='w-8 h-8 bg-gradient-to-br from-pink-500 via-purple-500 to-violet-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white order-2'
+                  className='w-9 h-9 bg-gradient-to-br from-[#4ea674] via-[#459071] to-[#3d7a5f] rounded-full flex items-center justify-center shadow-lg ring-2 ring-green-50 order-2'
                 >
-                  <User className='w-4 h-4' style={{color: 'white'}} />
+                  <User className='w-4.5 h-4.5' style={{color: 'white', strokeWidth: 2.5}} />
                 </motion.div>
               )}
             </div>
@@ -313,12 +313,12 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
             message.role === 'user' ? 'justify-end space-x-2' : 'justify-start space-x-2'
           }`}>
             {message.role === 'assistant' && (
-              <motion.div 
+              <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className='w-8 h-8 bg-gradient-to-br from-purple-600 via-violet-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg'
+                className='w-9 h-9 bg-gradient-to-br from-[#10b981] via-[#059669] to-[#047857] rounded-2xl flex items-center justify-center shadow-lg ring-2 ring-green-100'
               >
-                <Sparkles className='w-4 h-4 text-white' />
+                <Sparkles className='w-4.5 h-4.5 text-white' />
               </motion.div>
             )}
             <span className={`text-sm font-semibold ${
@@ -332,12 +332,12 @@ export default function MessageBubble({ message, index, onClick, isCompactMode, 
               {message.timestamp ? formatTimestamp(message.timestamp) : 'Just now'}
             </span>
             {message.role === 'user' && (
-              <motion.div 
+              <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className='w-8 h-8 bg-gradient-to-br from-pink-500 via-purple-500 to-violet-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white order-2'
+                className='w-9 h-9 bg-gradient-to-br from-[#4ea674] via-[#459071] to-[#3d7a5f] rounded-full flex items-center justify-center shadow-lg ring-2 ring-green-50 order-2'
               >
-                <User className='w-4 h-4 text-white' />
+                <User className='w-4.5 h-4.5 text-white' style={{strokeWidth: 2.5}} />
               </motion.div>
             )}
           </div>

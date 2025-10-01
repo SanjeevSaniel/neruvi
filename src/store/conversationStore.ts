@@ -201,8 +201,9 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
 
     return await response.json();
   } catch (error) {
-    console.error(`❌ API call failed: ${endpoint}`, error);
-    if (error instanceof Error) {
+    // Only log non-404 errors as errors; 404s are expected for new conversations
+    if (error instanceof Error && !error.message.includes('404')) {
+      console.error(`❌ API call failed: ${endpoint}`, error);
       console.error('📋 Error details:', error.message);
     }
     throw error;
@@ -740,9 +741,15 @@ export const useConversationStore = create<ConversationStore>()(
             state.setCurrentConversation(conversationId);
           }
         }
-      } catch (error) {
-        console.error('❌ Failed to load conversation:', error);
-        state.setError('Failed to load conversation');
+      } catch (error: any) {
+        // If conversation not found (404), don't treat it as an error - let caller handle it
+        if (error?.message?.includes('404') || error?.message?.includes('not found')) {
+          console.log('ℹ️ Conversation not found in database:', conversationId);
+          throw error; // Re-throw so ChatInterface can create a temp conversation
+        } else {
+          console.error('❌ Failed to load conversation:', error);
+          state.setError('Failed to load conversation');
+        }
       } finally {
         state.setLoading(false);
       }
