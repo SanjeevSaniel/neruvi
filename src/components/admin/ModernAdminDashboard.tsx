@@ -494,12 +494,14 @@ const ModernAdminDashboard = () => {
     }
   }, [canAccessAdmin, fetchData]);
 
-  // Set initial tab based on user role
+  // Set initial tab based on user role (only on mount)
+  const [hasSetInitialTab, setHasSetInitialTab] = useState(false);
   useEffect(() => {
-    if (userRole === 'admin' && activeTab === 'users') {
+    if (userRole === 'admin' && !hasSetInitialTab) {
       setActiveTab('overview');
+      setHasSetInitialTab(true);
     }
-  }, [userRole, activeTab]);
+  }, [userRole, hasSetInitialTab]);
 
   const handleUserUpdate = async (userId: string, updates: UserUpdateData) => {
     try {
@@ -532,10 +534,24 @@ const ModernAdminDashboard = () => {
   const canEditUserRoles = isAdmin;
 
   const filteredUsers = users.filter((user) => {
+    const searchLower = searchTerm.toLowerCase().trim();
+
+    // Debug logging
+    if (searchLower) {
+      console.log('🔍 Search filter:', {
+        searchTerm: searchLower,
+        email: user.user.email,
+        displayName: user.user.displayName,
+        emailMatch: user.user.email && user.user.email.toLowerCase().includes(searchLower),
+        nameMatch: user.user.displayName && user.user.displayName.toLowerCase().includes(searchLower),
+      });
+    }
+
     const matchesSearch =
-      !searchTerm ||
-      user.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.user.displayName?.toLowerCase().includes(searchTerm.toLowerCase());
+      !searchLower ||
+      (user.user.email && user.user.email.toLowerCase().includes(searchLower)) ||
+      (user.user.displayName && user.user.displayName.toLowerCase().includes(searchLower)) ||
+      (user.user.id && user.user.id.toLowerCase().includes(searchLower));
     const matchesRole = filterRole === 'all' || user.user.role === filterRole;
     const matchesStatus =
       filterStatus === 'all' ||
@@ -840,15 +856,15 @@ const ModernAdminDashboard = () => {
                           placeholder='Search users...'
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
-                          className='pl-10 h-8 w-48 text-sm'
+                          className='pl-10 h-8 w-48 text-sm bg-white border-gray-200 text-gray-900 placeholder:text-gray-400'
                         />
                       </div>
 
                       <Select
                         value={filterRole}
                         onValueChange={setFilterRole}>
-                        <SelectTrigger className='w-24 h-8 text-xs'>
-                          <SelectValue />
+                        <SelectTrigger className='w-28 h-8 text-xs bg-white border-gray-200 text-gray-900'>
+                          <SelectValue placeholder='All Roles' />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value='all'>All Roles</SelectItem>
@@ -861,8 +877,8 @@ const ModernAdminDashboard = () => {
                       <Select
                         value={filterStatus}
                         onValueChange={setFilterStatus}>
-                        <SelectTrigger className='w-24 h-8 text-xs'>
-                          <SelectValue />
+                        <SelectTrigger className='w-28 h-8 text-xs bg-white border-gray-200 text-gray-900'>
+                          <SelectValue placeholder='All Status' />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value='all'>All Status</SelectItem>
