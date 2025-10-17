@@ -426,16 +426,25 @@ export class DatabaseService {
 
           let sources: SourceTimestamp[] = [];
           try {
-            sources =
-              msgData.sources &&
-              typeof msgData.sources === 'string' &&
-              msgData.sources.trim()
-                ? JSON.parse(msgData.sources as string)
-                : [];
+            // Drizzle ORM might automatically parse jsonb fields, or they might be strings
+            if (Array.isArray(msgData.sources)) {
+              // Already parsed by Drizzle
+              sources = msgData.sources as SourceTimestamp[];
+            } else if (typeof msgData.sources === 'string' && msgData.sources.trim()) {
+              // Stored as string, need to parse
+              sources = JSON.parse(msgData.sources);
+            } else if (msgData.sources && typeof msgData.sources === 'object') {
+              // Already an object but not an array
+              sources = [];
+            } else {
+              sources = [];
+            }
 
             console.log('🔍 Database service - Sources parsing:', {
               messageId: msgData.id,
               rawSources: msgData.sources,
+              rawSourcesType: typeof msgData.sources,
+              isArray: Array.isArray(msgData.sources),
               parsedSources: sources,
               sourcesLength: sources.length,
               hasTimestamps: sources.map((s) => ({

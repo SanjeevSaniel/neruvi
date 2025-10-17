@@ -131,10 +131,8 @@ export default function CourseSelectorPage() {
   // };
 
   const handleCourseNavigation = (courseId: CourseType) => {
-    // Generate optimized conversation ID for immediate navigation
-    const timestamp = Date.now().toString(36);
-    const randomPart = Math.random().toString(36).substring(2, 8);
-    const conversationId = `${courseId}-${timestamp}-${randomPart}`;
+    // Generate UUID v4 for conversation ID to match database schema
+    const conversationId = crypto.randomUUID();
 
     console.log(
       '🚀 Start Learning clicked - Generated conversation ID:',

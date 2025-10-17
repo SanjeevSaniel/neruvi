@@ -1,8 +1,11 @@
 // components/chat/ChatHeader.tsx
+'use client';
+
 import { motion } from 'framer-motion';
 import { Brain, Shield } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import NeruviBrandLogo from '../NeruviBrandLogo';
 import ConversationHistoryIcon from '../ui/ConversationHistoryIcon';
 import { useUserRole as useUserRoleHook } from '@/hooks/useUserRole';
@@ -64,6 +67,12 @@ export default function ChatHeader({
   onHeaderClick,
 }: ChatHeaderProps) {
   const { userRole: currentUserRole, canAccessAdmin, isLoading } = useUserRoleHook();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Prevent hydration mismatch by only rendering dynamic content after mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
 
   return (
@@ -153,7 +162,7 @@ export default function ChatHeader({
           </div>
 
           {/* Admin Button - Only visible to admins and moderators */}
-          {canAccessAdmin && !isLoading && (
+          {isMounted && canAccessAdmin && !isLoading && (
             <Link href='/admin'>
               <motion.button
                 whileHover={{ scale: 1.05 }}
