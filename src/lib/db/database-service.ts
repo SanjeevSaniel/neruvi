@@ -87,21 +87,36 @@ export class DatabaseService {
     userId: string,
     title: string,
     selectedCourse: 'nodejs' | 'python',
+    id?: string,
   ): Promise<Conversation> {
     try {
+      const values: {
+        userId: string;
+        title: string;
+        selectedCourse: 'nodejs' | 'python';
+        messageCount: number;
+        totalTokens: number;
+        id?: string;
+      } = {
+        userId,
+        title,
+        selectedCourse,
+        messageCount: 0,
+        totalTokens: 0,
+      };
+
+      // If a custom ID is provided, use it
+      if (id) {
+        values.id = id;
+      }
+
       const [conversation] = await this.db
         .insert(conversations)
-        .values({
-          userId,
-          title,
-          selectedCourse,
-          messageCount: 0,
-          totalTokens: 0,
-        })
+        .values(values)
         .returning();
 
       console.log(
-        `💬 Conversation created: "${title}" for course: ${selectedCourse}`,
+        `💬 Conversation created: "${title}" for course: ${selectedCourse}${id ? ` with custom ID: ${id}` : ''}`,
       );
       return conversation;
     } catch (error) {

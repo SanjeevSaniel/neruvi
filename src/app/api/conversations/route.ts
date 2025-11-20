@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, selectedCourse } = body;
+    const { title, selectedCourse, id } = body;
 
     // Validate input
     if (!title || !selectedCourse) {
@@ -117,8 +117,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate UUID format if provided
+    if (id) {
+      const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidPattern.test(id)) {
+        return NextResponse.json(
+          { error: 'Invalid ID format. Must be a valid UUID' },
+          { status: 400 }
+        );
+      }
+    }
+
     const dbService = new DatabaseService();
-    
+
     // Get or create user in database
     let user = await dbService.getUserByClerkId(userId);
     if (!user) {
@@ -129,23 +140,24 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
-      
+
       // Create user from Clerk data
       user = await dbService.createOrUpdateUser(
         userId,
         clerkUser.emailAddresses[0]?.emailAddress || '',
-        clerkUser.firstName && clerkUser.lastName 
-          ? `${clerkUser.firstName} ${clerkUser.lastName}` 
+        clerkUser.firstName && clerkUser.lastName
+          ? `${clerkUser.firstName} ${clerkUser.lastName}`
           : clerkUser.username || ''
       );
-      
+
       console.log(`👤 Auto-created user during conversation creation: ${user.email}`);
     }
 
     const conversation = await dbService.createConversation(
       user.id,
       title,
-      selectedCourse
+      selectedCourse,
+      id
     );
 
     return NextResponse.json({
