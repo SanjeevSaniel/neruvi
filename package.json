@@ -18,7 +18,8 @@
     "db:studio": "drizzle-kit studio",
     "test-db": "tsx src/scripts/test-database.ts",
     "check-db": "tsx src/scripts/check-database-tables.ts",
-    "migrate-users": "tsx src/scripts/migrate-existing-users.ts"
+    "migrate-users": "tsx src/scripts/migrate-existing-users.ts",
+    "diagnose": "tsx src/scripts/diagnose-production.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.19",
