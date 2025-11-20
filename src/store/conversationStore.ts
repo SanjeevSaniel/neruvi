@@ -405,8 +405,9 @@ export const useConversationStore = create<ConversationStore>()(
       if (isFirstMessage && isDatabaseEnabled()) {
         console.log('🆕 First message - persisting temporary conversation to database:', conversationId);
         try {
-          // Create the conversation in the database now that we have the first message
+          // Create the conversation in the database with the same ID from the temporary conversation
           const requestPayload = {
+            id: conversationId, // Use the existing conversationId
             title: currentConversation.title,
             selectedCourse: currentConversation.selectedCourse,
           };
@@ -416,7 +417,7 @@ export const useConversationStore = create<ConversationStore>()(
             body: JSON.stringify(requestPayload),
           });
 
-          console.log('✅ Temporary conversation persisted to database:', conversationId);
+          console.log('✅ Temporary conversation persisted to database with ID:', conversationId);
         } catch (error) {
           console.error('❌ Failed to persist conversation to database:', error);
           // Continue with local storage - don't block the user
@@ -741,9 +742,10 @@ export const useConversationStore = create<ConversationStore>()(
             state.setCurrentConversation(conversationId);
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         // If conversation not found (404), don't treat it as an error - let caller handle it
-        if (error?.message?.includes('404') || error?.message?.includes('not found')) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        if (errorMessage.includes('404') || errorMessage.includes('not found')) {
           console.log('ℹ️ Conversation not found in database:', conversationId);
           throw error; // Re-throw so ChatInterface can create a temp conversation
         } else {

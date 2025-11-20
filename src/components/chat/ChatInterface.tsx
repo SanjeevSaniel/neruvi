@@ -219,25 +219,28 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
   useEffect(() => {
     console.log('🔍 ChatInterface - courseId useEffect triggered:', {
       courseId,
+      conversationId,
       currentConversationId,
       suggestion,
       hasCurrentConversation: !!currentConversationId,
-      shouldCreateConversation: courseId && !currentConversationId
+      shouldCreateConversation: courseId && !conversationId && !currentConversationId
     });
 
     const createCourseConversation = async () => {
-      if (courseId && !currentConversationId) {
-        console.log('🆕 Creating conversation for courseId:', courseId);
+      // Only create a conversation if courseId is provided but NO conversationId in URL
+      // If conversationId is in URL, the other useEffect will handle it
+      if (courseId && !conversationId && !currentConversationId) {
+        console.log('🆕 Creating conversation for courseId (no conversationId in URL):', courseId);
         try {
-          const conversationId = await createConversation(undefined, courseId);
-          console.log('✅ Conversation created successfully:', conversationId);
+          const newConversationId = await createConversation(undefined, courseId);
+          console.log('✅ Conversation created successfully:', newConversationId);
           setShowCourseSelector(false);
           setIsInitialLoad(false);
 
           // Navigate to the new URL format with conversation ID
-          if (conversationId) {
-            console.log('🔄 Navigating to new conversation URL:', `/chat/courses/${courseId}/${conversationId}`);
-            router.push(`/chat/courses/${courseId}/${conversationId}`);
+          if (newConversationId) {
+            console.log('🔄 Navigating to new conversation URL:', `/chat/courses/${courseId}/${newConversationId}`);
+            router.push(`/chat/courses/${courseId}/${newConversationId}`);
           }
 
           // If there's a suggestion in URL, set it as input for user to submit
@@ -250,15 +253,16 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
         }
       } else {
         console.log('ℹ️ Skipping conversation creation:', {
-          reason: !courseId ? 'No courseId' : 'Conversation already exists',
+          reason: !courseId ? 'No courseId' : conversationId ? 'ConversationId in URL' : 'Conversation already exists',
           courseId,
+          conversationId,
           currentConversationId
         });
       }
     };
 
     createCourseConversation();
-  }, [courseId, currentConversationId, createConversation, suggestion, setInput]);
+  }, [courseId, conversationId, currentConversationId, createConversation, suggestion, setInput, router]);
 
   // Handle conversationId prop - load specific conversation
   useEffect(() => {
@@ -290,25 +294,32 @@ export default function ChatInterface({ courseId, conversationId }: ChatInterfac
         currentConversationId
       });
 
-      // Check if conversation exists
+      // Check if conversation exists in store
       const existingConversation = getCurrentConversation();
 
       if (conversationId !== currentConversationId) {
         // Try to load existing conversation first
-        loadConversation(conversationId).catch(() => {
-          // If conversation doesn't exist, create a temporary one
-          console.log('🔄 Conversation not found, creating temporary conversation:', conversationId);
+        loadConversation(conversationId).catch((error) => {
+          // If conversation doesn't exist (404), create a temporary one
+          console.log('🔄 Conversation not found in database, creating temporary conversation:', conversationId);
+          console.log('Error details:', error);
 
           // Extract course from conversationId if it follows our format
           const courseFromId = conversationId.startsWith('nodejs-') ? 'nodejs' :
                               conversationId.startsWith('python-') ? 'python' : courseId as 'nodejs' | 'python';
 
+          // Create temporary conversation with the UUID from URL
           createTempConversation(undefined, courseFromId, conversationId);
           setCurrentConversation(conversationId);
+          setShowCourseSelector(false);
+          setIsInitialLoad(false);
         });
-      } else if (!existingConversation?.messages.length) {
-        // Reload conversation if it exists but has no messages
-        loadConversation(conversationId);
+      } else if (existingConversation && !existingConversation.messages.length) {
+        // If conversation exists in store but has no messages, try to load from database
+        loadConversation(conversationId).catch((error) => {
+          console.log('ℹ️ Could not load messages for conversation (might be new):', error);
+          // It's okay if there are no messages yet - this is a new conversation
+        });
       }
     }
   }, [courseId, conversationId, loadConversation, setCurrentConversation, currentConversationId, getCurrentConversation, createTempConversation]);
