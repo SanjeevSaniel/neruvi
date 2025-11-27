@@ -51,8 +51,8 @@ CLERK_SECRET_KEY=sk_live_...  ← Production environment
 
 1. In your deployment platform (Vercel/Netlify/etc), set:
    ```env
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_cHVtcGVkLWFudC00Mi5jbGVyay5hY2NvdW50cy5kZXYk
-   CLERK_SECRET_KEY=sk_test_QtpHGrBvJtLMxEdSTUo3HPpA1DraXDbk8p2fioudiy
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+   CLERK_SECRET_KEY=sk_...
    ```
 
 2. Redeploy your application
@@ -124,9 +124,9 @@ If you just want your dev conversations to work in production immediately:
 In your deployment platform (e.g., Vercel):
 
 ```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_cHVtcGVkLWFudC00Mi5jbGVyay5hY2NvdW50cy5kZXYk
-CLERK_SECRET_KEY=sk_test_QtpHGrBvJtLMxEdSTUo3HPpA1DraXDbk8p2fioudiy
-DATABASE_URL=postgresql://neondb_owner:npg_h1DcXVIvS3eR@ep-holy-frost-a1we750b-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+DATABASE_URL=''
 NEXT_PUBLIC_USE_DATABASE=true
 ```
 
